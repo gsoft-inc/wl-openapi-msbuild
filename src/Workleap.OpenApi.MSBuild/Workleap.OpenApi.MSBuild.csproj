@@ -2,20 +2,36 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>true</IsPackable>
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- Prevents PDBs from being included in the package as we manually copy the files in the tools/ dir -->
+    <DebugType Condition="'$(Configuration)' == 'Release'">None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.PublicApiAnalyzers" Version="3.3.4">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="CliWrap" Version="3.6.4" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.7.2" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="..\..\README.md" Link="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- https://docs.microsoft.com/en-us/nuget/reference/errors-and-warnings/nu5128#solution-1 -->
+    <None Include="_._" Pack="true" PackagePath="lib\$(TargetFramework)" />
+
+    <None Include="msbuild\tools\*.*" Pack="true" PackagePath="tools" />
+    <None Include="msbuild\build\*.*" Pack="true" PackagePath="build" />
+    <None Include="msbuild\buildMultiTargeting\*.*" Pack="true" PackagePath="buildMultiTargeting" />
+
+    <!-- Copy our task build output including its dependencies to our custom task directory -->
+    <!-- Contrary to usual .NET NuGet packages which restores its dependencies at installation, a MSBuild task package must include its dependencies -->
+    <None Include="bin\$(Configuration)\$(TargetFramework)\**\*" Pack="true" PackagePath="tools\task" Visible="false" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <!-- We use this property when developing this MSBuild task in an IDE, -->
+    <!-- so we can reference the task assembly that is built in its bin folder instead of the one in the distributed NuGet package -->
+    <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>
+  </PropertyGroup>
+
+  <!-- This is the location of this task assembly when it is distributed as a NuGet package -->
+  <UsingTask Condition="'$(OpenApiDebuggingEnabled)' != 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)task\$(MSBuildThisFileName).dll" />
+
+  <!-- This is the location of this task assembly when debugging the task in an IDE -->
+  <UsingTask Condition="'$(OpenApiDebuggingEnabled)' == 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netstandard2.0\$(MSBuildThisFileName).dll" />
+
+  <!-- We can only analyze the OpenAPI spec after the project has been built -->
+  <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build">
+    <PropertyGroup>
+      <!-- The path of the ASP.NET Core project being built -->
+      <OpenApiWebApiAssemblyPath Condition="'$(OpenApiWebApiAssemblyPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll</OpenApiWebApiAssemblyPath>
+
+      <!-- The base directory path where the OpenAPI tools will be downloaded -->
+      <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)openapi</OpenApiToolsDirectoryPath>
+
+      <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
+      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/main/.spectral.yaml</OpenApiSpectralRulesetUrl>
+
+      <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
+      <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
+      <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <OpenApiSwaggerDocumentNamesItems Include="$(OpenApiSwaggerDocumentNames)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <!-- The directory where to find the OpenAPI spec files to validate against the spec generated from Swagger -->
+      <!-- When absolute, keep it as is, otherwise, combine it with the csproj directory and remove any trailing slashes -->
+      <OpenApiSpecDirectoryPath Condition="'$(OpenApiSpecDirectoryPath)' == ''">$(MSBuildProjectDirectory)</OpenApiSpecDirectoryPath>
+      <OpenApiSpecDirectoryPath Condition="'$([System.IO.Path]::IsPathRooted($(OpenApiSpecDirectoryPath)))' == 'false'">$(MSBuildProjectDirectory)\$(OpenApiSpecDirectoryPath)</OpenApiSpecDirectoryPath>
+      <OpenApiSpecDirectoryPath>$(OpenApiSpecDirectoryPath.TrimEnd('/\'))</OpenApiSpecDirectoryPath>
+
+      <!-- We assume that the OpenAPI spec filename pattern is openapi-{documentname}.yaml -->
+      <OpenApiSpecificationFiles Condition="'$(OpenApiSpecificationFiles)' == ''">@(OpenApiSwaggerDocumentNamesItems->'$(OpenApiSpecDirectoryPath)\openapi-%(Identity).yaml')</OpenApiSpecificationFiles>
+    </PropertyGroup>
+
+    <ValidateOpenApiTask
+      OpenApiWebApiAssemblyPath="$(OpenApiWebApiAssemblyPath)"
+      OpenApiToolsDirectoryPath="$(OpenApiToolsDirectoryPath)"
+      OpenApiSpectralRulesetUrl="$(OpenApiSpectralRulesetUrl)"
+      OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
+      OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
+    />
+  </Target>
+</Project>
