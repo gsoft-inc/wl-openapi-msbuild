@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{3B3625CC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workleap.OpenApi.MSBuild.Tests", "Workleap.OpenApi.MSBuild.Tests\Workleap.OpenApi.MSBuild.Tests.csproj", "{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "debug", "debug", "{07F66FC2-73B9-44C7-843C-36C13905AE9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiDebugger", "WebApiDebugger\WebApiDebugger.csproj", "{A4C90BE2-889F-46BB-8B4D-2219B1084695}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +34,12 @@ Global
 		{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A4C90BE2-889F-46BB-8B4D-2219B1084695} = {07F66FC2-73B9-44C7-843C-36C13905AE9B}
 	EndGlobalSection
 EndGlobal
