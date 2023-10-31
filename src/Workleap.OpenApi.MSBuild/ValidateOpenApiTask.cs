@@ -53,10 +53,10 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
-        this.Log.LogMessage(MessageImportance.Low, "OpenApiToolsDirectoryPath = '{0}'", this.OpenApiToolsDirectoryPath);
-        this.Log.LogMessage(MessageImportance.Low, "OpenApiSpectralRulesetUrl = '{0}'", this.OpenApiSpectralRulesetUrl);
-        this.Log.LogMessage(MessageImportance.Low, "OpenApiSwaggerDocumentNames = '{0}'", string.Join(", ", this.OpenApiSwaggerDocumentNames));
-        this.Log.LogMessage(MessageImportance.Low, "OpenApiSpecificationFiles = '{0}'", string.Join(", ", this.OpenApiSpecificationFiles));
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
