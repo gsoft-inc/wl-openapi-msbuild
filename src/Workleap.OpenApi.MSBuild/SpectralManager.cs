@@ -28,7 +28,7 @@ internal sealed class SpectralManager : ISpectralManager
 
         var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{executableFileName}";
 
-        await this.DownloadFileAsync(url, $"{this._toolDirectory}/{executableFileName}");
+        await this.DownloadFileAsync(url, $"{this._toolDirectory}/{executableFileName}", cancellationToken);
     }
 
     private void CreateRequiredDirectories()
@@ -56,14 +56,14 @@ internal sealed class SpectralManager : ISpectralManager
 
         if (osType == "win")
         {
-            fileName = $"spectral.exe";
+            fileName = "spectral.exe";
             this._loggerWrapper.Helper.LogMessage(MessageImportance.Low, "Installing on Windows.");
         }
 
         return fileName;
     }
 
-    private async Task DownloadFileAsync(string url, string destination)
+    private async Task DownloadFileAsync(string url, string destination, CancellationToken cancellationToken)
     {
         if (File.Exists(destination))
         {
@@ -73,21 +73,34 @@ internal sealed class SpectralManager : ISpectralManager
         }
 
         using var httpClient = new HttpClient();
-        using var response = await httpClient.GetAsync(url);
+        using var response = await httpClient.GetAsync(url, cancellationToken);
         response.EnsureSuccessStatusCode();
 
-        byte[] fileContents;
         if (!response.IsSuccessStatusCode)
         {
-            using var retryResponse = await httpClient.GetAsync(url);
-            fileContents = await retryResponse.Content.ReadAsByteArrayAsync();
+            using var retryResponse = await httpClient.GetAsync(url, cancellationToken);
+
+            if (retryResponse.IsSuccessStatusCode)
+            {
+                await SaveFileFromResponseAsync(destination, retryResponse, cancellationToken);
+            }
+            else
+            {
+                throw new OpenApiTaskFailedException("Spectral could not be installed.");
+            }
         }
         else
         {
-            fileContents = await response.Content.ReadAsByteArrayAsync();
+            await SaveFileFromResponseAsync(destination, response, cancellationToken);
         }
+    }
 
-        File.WriteAllBytes(destination, fileContents);
+    private static async Task SaveFileFromResponseAsync(string destination, HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var fileStream = await response.Content.ReadAsStreamAsync();
+
+        await fileStream.CopyToAsync(fileTarget, 1024, cancellationToken);
     }
 
     private static string GetOperatingSystem()
