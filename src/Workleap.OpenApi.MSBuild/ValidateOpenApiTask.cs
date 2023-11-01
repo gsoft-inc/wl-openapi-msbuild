@@ -11,12 +11,14 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private ILoggerWrapper _loggerWrapper;
     private IProcessWrapper _processWrapper;
     private ISwaggerManager _swaggerManager;
+    private ISpectralManager _spectralManager;
 
-    public ValidateOpenApiTask(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, ISwaggerManager swaggerManager)
+    public ValidateOpenApiTask(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, ISwaggerManager swaggerManager, ISpectralManager spectralManager)
     {
         this._loggerWrapper = loggerWrapper;
         this._processWrapper = processWrapper;
         this._swaggerManager = swaggerManager;
+        this._spectralManager = spectralManager;
     }
 
     public ValidateOpenApiTask()
@@ -24,6 +26,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         this._loggerWrapper = new LoggerWrapper(this.Log);
         this._processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
         this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
     }
 
     /// <summary>The path of the ASP.NET Core project being built.</summary>
@@ -51,6 +54,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         this._loggerWrapper = new LoggerWrapper(this.Log);
         this._processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
         this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -71,9 +75,11 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
             // Install Swagger CLI
             await this._swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            await this._swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
+
+            // await this._swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
 
             // Install spectral
+            await this._spectralManager.InstallSpectralAsync(cancellationToken);
 
             // Install oasdiff
         }
