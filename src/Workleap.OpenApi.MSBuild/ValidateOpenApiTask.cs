@@ -54,7 +54,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         this._loggerWrapper = new LoggerWrapper(this.Log);
         this._processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
         this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
-        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
