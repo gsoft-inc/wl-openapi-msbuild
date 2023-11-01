@@ -28,7 +28,6 @@ internal sealed class SwaggerManager : ISwaggerManager
         {
             var outputOpenApiSpecName = $"openapi-{documentName.ToLowerInvariant()}.yaml";
 
-            // IDP-686, this is not the right path, should be in another folder named reports
             var outputOpenApiSpecPath = Path.Combine(this._swaggerDirectory, outputOpenApiSpecName);
 
             await this.GenerateOpenApiSpecAsync(swaggerExePath, outputOpenApiSpecPath, documentName, cancellationToken);

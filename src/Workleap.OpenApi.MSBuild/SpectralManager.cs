@@ -13,7 +13,7 @@ internal sealed class SpectralManager : ISpectralManager
     private readonly string _openApiToolsDirectoryPath;
     private readonly string _toolDirectory;
 
-    public SpectralManager(IProcessWrapper processWrapper, ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, string openApiWebApiAssemblyPath)
+    public SpectralManager(IProcessWrapper processWrapper, ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath)
     {
         this._processWrapper = processWrapper;
         this._loggerWrapper = loggerWrapper;

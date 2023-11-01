@@ -25,8 +25,8 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     {
         this._loggerWrapper = new LoggerWrapper(this.Log);
         this._processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
-        this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
-        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        this._swaggerManager = new SwaggerManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        this._spectralManager = new SpectralManager(this._processWrapper, this._loggerWrapper, this.OpenApiToolsDirectoryPath);
     }
 
     /// <summary>The path of the ASP.NET Core project being built.</summary>
