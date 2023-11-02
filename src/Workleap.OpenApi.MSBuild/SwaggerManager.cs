@@ -17,7 +17,7 @@ internal sealed class SwaggerManager : ISwaggerManager
         this._processWrapper = processWrapper;
         this._loggerWrapper = loggerWrapper;
         this._openApiWebApiAssemblyPath = openApiWebApiAssemblyPath;
-        this._swaggerDirectory = Path.Combine(openApiToolsDirectoryPath, $"swagger/{SwaggerVersion}");
+        this._swaggerDirectory = Path.Combine(openApiToolsDirectoryPath, "swagger", SwaggerVersion);
     }
 
     public async Task RunSwaggerAsync(string[] openApiSwaggerDocumentNames, CancellationToken cancellationToken)
@@ -39,11 +39,11 @@ internal sealed class SwaggerManager : ISwaggerManager
         var retryCount = 0;
         while (retryCount < 2)
         {
-            var exitCode = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", "6.5.0" }, cancellationToken);
+            var exitCode = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", SwaggerVersion }, cancellationToken);
 
             if (exitCode != 0 && retryCount != 1)
             {
-                this._loggerWrapper.Helper.LogWarning("Swashbuckle download failed. Retrying once more...");
+                this._loggerWrapper.LogWarning("Swashbuckle download failed. Retrying once more...");
                 retryCount++;
                 continue;
             }

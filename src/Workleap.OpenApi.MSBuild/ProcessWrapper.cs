@@ -18,6 +18,8 @@ internal sealed class ProcessWrapper : IProcessWrapper
             .WithWorkingDirectory(this._workingDirectory)
             .WithValidation(CommandResultValidation.None)
             .WithArguments(arguments)
+            .WithStandardOutputPipe(PipeTarget.ToStream(Console.OpenStandardOutput()))
+            .WithStandardErrorPipe(PipeTarget.ToStream(Console.OpenStandardError()))
             .ExecuteBufferedAsync(cancellationToken);
 
         return result.ExitCode;

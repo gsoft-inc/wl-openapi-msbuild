@@ -4,5 +4,7 @@ namespace Workleap.OpenApi.MSBuild;
 
 public interface ILoggerWrapper
 {
-    TaskLoggingHelper Helper { get; set; }
+    void LogWarning(string message, params object[] messageArgs);
+
+    void LogMessage(string message, params object[] messageArgs);
 }

@@ -33,7 +33,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
         var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
-        var spectralManager = new SpectralManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath);
+        using var httpClientWrapper = new HttpClientWrapper();
+
+        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -43,7 +45,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            this.Log.LogWarning("OpenApiSpecificationFiles and OpenApiSwaggerDocumentNames should have the same lenght", this.OpenApiWebApiAssemblyPath);
+            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names");
 
             return false;
         }
@@ -52,19 +54,14 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             await this.GeneratePublicNugetSource();
 
-            // Install Swagger CLI
             await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-
-            // await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
-
-            // Install spectral
             await spectralManager.InstallSpectralAsync(cancellationToken);
 
-            // Install oasdiff
+            // await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {
-            this.Log.LogWarning("OpenApi validation could not be done. {0}", e.Message);
+            this.Log.LogWarning("OpenAPI validation could not be done. {0}", e.Message);
         }
 
         return true;

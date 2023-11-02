@@ -8,36 +8,28 @@ internal sealed class SpectralManager : ISpectralManager
 {
     private const string SpectralVersion = "6.11.0";
 
-    private readonly IProcessWrapper _processWrapper;
     private readonly ILoggerWrapper _loggerWrapper;
-    private readonly string _openApiToolsDirectoryPath;
+    private readonly IHttpClientWrapper _httpClientWrapper;
     private readonly string _toolDirectory;
 
-    public SpectralManager(IProcessWrapper processWrapper, ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath)
+    public SpectralManager(LoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper)
     {
-        this._processWrapper = processWrapper;
         this._loggerWrapper = loggerWrapper;
-        this._openApiToolsDirectoryPath = openApiToolsDirectoryPath;
-        this._toolDirectory = Path.Combine(openApiToolsDirectoryPath, $"spectral/{SpectralVersion}");
+        this._httpClientWrapper = httpClientWrapper;
+        this._toolDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
     }
 
     public async Task InstallSpectralAsync(CancellationToken cancellationToken)
     {
-        this.CreateRequiredDirectories();
-        var executableFileName = this.GetSpectralFileName();
+        Directory.CreateDirectory(this._toolDirectory);
 
+        var executableFileName = GetSpectralFileName();
         var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{executableFileName}";
 
-        await this.DownloadFileAsync(url, $"{this._toolDirectory}/{executableFileName}", cancellationToken);
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._toolDirectory, executableFileName), cancellationToken);
     }
 
-    private void CreateRequiredDirectories()
-    {
-        Directory.CreateDirectory(Path.Combine(this._openApiToolsDirectoryPath, "spectral"));
-        Directory.CreateDirectory(this._toolDirectory);
-    }
-
-    private string GetSpectralFileName()
+    private static string GetSpectralFileName()
     {
         var osType = GetOperatingSystem();
         var architecture = GetArchitecture();
@@ -48,7 +40,6 @@ internal sealed class SpectralManager : ISpectralManager
             if (distro.Contains("Alpine Linux"))
             {
                 osType = "alpine";
-                this._loggerWrapper.Helper.LogMessage(MessageImportance.Low, "Installing on Alpine Linux.");
             }
         }
 
@@ -57,50 +48,9 @@ internal sealed class SpectralManager : ISpectralManager
         if (osType == "win")
         {
             fileName = "spectral.exe";
-            this._loggerWrapper.Helper.LogMessage(MessageImportance.Low, "Installing on Windows.");
         }
 
         return fileName;
-    }
-
-    private async Task DownloadFileAsync(string url, string destination, CancellationToken cancellationToken)
-    {
-        if (File.Exists(destination))
-        {
-            this._loggerWrapper.Helper.LogMessage(MessageImportance.Low, "File already exist");
-
-            return;
-        }
-
-        using var httpClient = new HttpClient();
-        using var response = await httpClient.GetAsync(url, cancellationToken);
-        response.EnsureSuccessStatusCode();
-
-        if (!response.IsSuccessStatusCode)
-        {
-            using var retryResponse = await httpClient.GetAsync(url, cancellationToken);
-
-            if (retryResponse.IsSuccessStatusCode)
-            {
-                await SaveFileFromResponseAsync(destination, retryResponse, cancellationToken);
-            }
-            else
-            {
-                throw new OpenApiTaskFailedException("Spectral could not be installed.");
-            }
-        }
-        else
-        {
-            await SaveFileFromResponseAsync(destination, response, cancellationToken);
-        }
-    }
-
-    private static async Task SaveFileFromResponseAsync(string destination, HttpResponseMessage response, CancellationToken cancellationToken)
-    {
-        using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
-        using var fileStream = await response.Content.ReadAsStreamAsync();
-
-        await fileStream.CopyToAsync(fileTarget, 1024, cancellationToken);
     }
 
     private static string GetOperatingSystem()
