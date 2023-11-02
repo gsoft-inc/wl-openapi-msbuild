@@ -24,14 +24,53 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     [Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
-    protected override Task<bool> ExecuteAsync(CancellationToken cancellationToken)
+    protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
-        this.Log.LogMessage(MessageImportance.High, "OpenApiWebApiAssemblyPath = '{0}'", this.OpenApiWebApiAssemblyPath);
-        this.Log.LogMessage(MessageImportance.High, "OpenApiToolsDirectoryPath = '{0}'", this.OpenApiToolsDirectoryPath);
-        this.Log.LogMessage(MessageImportance.High, "OpenApiSpectralRulesetUrl = '{0}'", this.OpenApiSpectralRulesetUrl);
-        this.Log.LogMessage(MessageImportance.High, "OpenApiSwaggerDocumentNames = '{0}'", string.Join(", ", this.OpenApiSwaggerDocumentNames));
-        this.Log.LogMessage(MessageImportance.High, "OpenApiSpecificationFiles = '{0}'", string.Join(", ", this.OpenApiSpecificationFiles));
+        var loggerWrapper = new LoggerWrapper(this.Log);
+        var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
+        var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        using var httpClientWrapper = new HttpClientWrapper();
 
-        return Task.FromResult(true);
+        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
+        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
+
+        if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
+        {
+            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names");
+
+            return false;
+        }
+
+        try
+        {
+            await this.GeneratePublicNugetSource();
+
+            await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
+            await spectralManager.InstallSpectralAsync(cancellationToken);
+
+            // await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
+        }
+        catch (OpenApiTaskFailedException e)
+        {
+            this.Log.LogWarning("An error occured while validating the OpenAPI specification: {0}", e.Message);
+        }
+
+        return true;
+    }
+
+    private async Task GeneratePublicNugetSource()
+    {
+        Directory.CreateDirectory(this.OpenApiToolsDirectoryPath);
+
+        if (!File.Exists(Path.Combine(this.OpenApiToolsDirectoryPath, "nuget.config")))
+        {
+            var path = Path.Combine(this.OpenApiToolsDirectoryPath, "nuget.config");
+            File.WriteAllText(path, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<configuration>\n  <packageSources>\n    <clear />\n    <add key=\"nuget\" value=\"https://api.nuget.org/v3/index.json\" />\n  </packageSources>\n</configuration>");
+        }
     }
 }
