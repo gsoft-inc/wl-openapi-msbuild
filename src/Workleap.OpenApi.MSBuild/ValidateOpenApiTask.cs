@@ -1,8 +1,4 @@
-﻿using System.Runtime.InteropServices;
-using CliWrap;
-using CliWrap.Buffered;
-using Microsoft.Build.Framework;
-using Workleap.OpenApi.MSBuild.Exceptions;
+﻿using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -43,7 +39,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            this.Log.LogWarning("OpenApiSpecificationFiles and OpenApiSwaggerDocumentNames should have the same lenght", this.OpenApiWebApiAssemblyPath);
+            this.Log.LogWarning("{0} and {1} should have the same length", nameof(this.OpenApiSpecificationFiles), nameof(this.OpenApiSwaggerDocumentNames));
 
             return false;
         }
@@ -64,7 +60,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         }
         catch (OpenApiTaskFailedException e)
         {
-            this.Log.LogWarning("OpenApi validation could not be done. {0}", e.Message);
+            this.Log.LogWarning("An error occured while validating the OpenAPI specification: {0}", e.Message);
         }
 
         return true;

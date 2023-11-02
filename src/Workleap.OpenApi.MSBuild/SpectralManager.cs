@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
-using Workleap.OpenApi.MSBuild.Exceptions;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -10,15 +9,13 @@ internal sealed class SpectralManager : ISpectralManager
 
     private readonly IProcessWrapper _processWrapper;
     private readonly ILoggerWrapper _loggerWrapper;
-    private readonly string _openApiToolsDirectoryPath;
     private readonly string _toolDirectory;
 
     public SpectralManager(IProcessWrapper processWrapper, ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath)
     {
         this._processWrapper = processWrapper;
         this._loggerWrapper = loggerWrapper;
-        this._openApiToolsDirectoryPath = openApiToolsDirectoryPath;
-        this._toolDirectory = Path.Combine(openApiToolsDirectoryPath, $"spectral/{SpectralVersion}");
+        this._toolDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
     }
 
     public async Task InstallSpectralAsync(CancellationToken cancellationToken)
@@ -28,12 +25,11 @@ internal sealed class SpectralManager : ISpectralManager
 
         var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{executableFileName}";
 
-        await this.DownloadFileAsync(url, $"{this._toolDirectory}/{executableFileName}", cancellationToken);
+        await this.DownloadFileAsync(url, Path.Combine(this._toolDirectory, executableFileName), cancellationToken);
     }
 
     private void CreateRequiredDirectories()
     {
-        Directory.CreateDirectory(Path.Combine(this._openApiToolsDirectoryPath, "spectral"));
         Directory.CreateDirectory(this._toolDirectory);
     }
 
@@ -120,7 +116,7 @@ internal sealed class SpectralManager : ISpectralManager
             return "win";
         }
 
-        return "unknown";
+        throw new OpenApiTaskFailedException("Unknown operating system encountered");
     }
 
     private static string GetArchitecture()
@@ -135,6 +131,6 @@ internal sealed class SpectralManager : ISpectralManager
             return "arm64";
         }
 
-        return "unknown";
+        throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
     }
 }
