@@ -4,12 +4,7 @@ namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 {
-    private readonly HttpClient _httpClient;
-
-    public HttpClientWrapper()
-    {
-        this._httpClient = new HttpClient();
-    }
+    private readonly HttpClient _httpClient = new();
 
     public async Task DownloadFileToDestinationAsync(string url, string destination, CancellationToken cancellationToken)
     {
