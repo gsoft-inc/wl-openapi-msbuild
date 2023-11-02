@@ -114,5 +114,7 @@ internal sealed class SpectralManager : ISpectralManager
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
         }
+
+        this._loggerWrapper.LogMessage("Spectral report generated. {0}", htmlReportPath);
     }
 }
