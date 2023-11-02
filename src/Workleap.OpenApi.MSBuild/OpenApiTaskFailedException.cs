@@ -1,4 +1,4 @@
-namespace Workleap.OpenApi.MSBuild.Exceptions;
+namespace Workleap.OpenApi.MSBuild;
 
 public class OpenApiTaskFailedException : Exception
 {

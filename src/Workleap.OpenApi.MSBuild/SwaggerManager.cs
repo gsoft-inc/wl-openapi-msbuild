@@ -1,6 +1,4 @@
 using System.Runtime.InteropServices;
-using Microsoft.Build.Framework;
-using Workleap.OpenApi.MSBuild.Exceptions;
 
 namespace Workleap.OpenApi.MSBuild;
 

@@ -1,6 +1,5 @@
 using System.Runtime.InteropServices;
 using Microsoft.Build.Framework;
-using Workleap.OpenApi.MSBuild.Exceptions;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -70,7 +69,7 @@ internal sealed class SpectralManager : ISpectralManager
             return "win";
         }
 
-        return "unknown";
+        throw new OpenApiTaskFailedException("Unknown operating system encountered");
     }
 
     private static string GetArchitecture()
@@ -85,6 +84,6 @@ internal sealed class SpectralManager : ISpectralManager
             return "arm64";
         }
 
-        return "unknown";
+        throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
     }
 }
