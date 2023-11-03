@@ -51,10 +51,10 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await this.GeneratePublicNugetSource();
 
             await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            var spectralExecutableFile = await spectralManager.InstallSpectralAsync(cancellationToken);
+            await spectralManager.InstallSpectralAsync(cancellationToken);
 
             var swaggerDocPaths = await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
-            await spectralManager.RunSpectralAsync(swaggerDocPaths, this.OpenApiSpectralRulesetUrl, spectralExecutableFile, cancellationToken);
+            await spectralManager.RunSpectralAsync(swaggerDocPaths, this.OpenApiSpectralRulesetUrl, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {
