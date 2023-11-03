@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -9,23 +8,49 @@ internal sealed class SpectralManager : ISpectralManager
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
-    private readonly string _toolDirectory;
-
-    public SpectralManager(LoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper)
+    private readonly string _spectralDirectory;
+    private readonly string _openApiToolsDirectory;
+    private readonly IProcessWrapper _processWrapper;
+    
+    public SpectralManager(ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper, IProcessWrapper processWrapper)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
-        this._toolDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
+        this._openApiToolsDirectory = openApiToolsDirectoryPath;
+        this._spectralDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
+        this._processWrapper = processWrapper;
     }
+    
+    private string ExecutablePath { get; set; } = string.Empty;
 
     public async Task InstallSpectralAsync(CancellationToken cancellationToken)
     {
-        Directory.CreateDirectory(this._toolDirectory);
+        Directory.CreateDirectory(this._spectralDirectory);
 
-        var executableFileName = GetSpectralFileName();
-        var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{executableFileName}";
+        this.ExecutablePath = GetSpectralFileName();
+        var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
+        var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
 
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._toolDirectory, executableFileName), cancellationToken);
+        if (!File.Exists(destination))
+        {
+            await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+        }
+    }
+
+    public async Task RunSpectralAsync(IEnumerable<string> swaggerDocumentPaths, string rulesetUrl, CancellationToken cancellationToken)
+    {
+        this._loggerWrapper.LogMessage("Starting Spectral report generation.");
+        
+        var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
+        var reportsPath = Path.Combine(this._openApiToolsDirectory, "reports");
+        Directory.CreateDirectory(reportsPath);
+
+        foreach (var documentPath in swaggerDocumentPaths)
+        {
+            var documentName = Path.GetFileNameWithoutExtension(documentPath);
+            var outputSpectralReportName = $"spectral-{documentName}.html";
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(reportsPath, outputSpectralReportName), cancellationToken);
+        }
     }
 
     private static string GetSpectralFileName()
@@ -85,5 +110,30 @@ internal sealed class SpectralManager : ISpectralManager
         }
 
         throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
+    }
+
+    private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetUrl, string htmlReportPath, CancellationToken cancellationToken)
+    {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
+        }
+
+        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--output.html", htmlReportPath }, cancellationToken);
+        if (exitCode != 0)
+        {
+            throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
+        }
+
+        this._loggerWrapper.LogMessage("Spectral report generated. {0}", htmlReportPath);
+    }
+
+    private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
+    {
+        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
+        if (chmodExitCode != 0)
+        {
+            throw new OpenApiTaskFailedException($"Failed to provide execute permission to {spectralExecutePath}");
+        }
     }
 }

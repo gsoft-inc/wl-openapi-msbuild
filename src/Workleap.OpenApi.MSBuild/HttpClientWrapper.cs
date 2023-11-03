@@ -1,30 +1,36 @@
-using System.Net;
-
 namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 {
-    private readonly HttpClient _httpClient = new();
+    private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
 
     public async Task DownloadFileToDestinationAsync(string url, string destination, CancellationToken cancellationToken)
     {
-        using var responseStream = await this._httpClient.GetStreamAsync(url);
-
-        if (responseStream == null)
+        try
         {
-            using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
-            if (retryResponseStream != null)
+            using var responseStream = await this._httpClient.GetStreamAsync(url);
+
+            if (responseStream == null)
             {
-                await SaveFileFromResponseAsync(destination, retryResponseStream, cancellationToken);
+                using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
+                if (retryResponseStream != null)
+                {
+                    await SaveFileFromResponseAsync(destination, retryResponseStream, cancellationToken);
+                }
+                else
+                {
+                    throw new OpenApiTaskFailedException("Spectral could not be downloaded.");
+                }
             }
             else
             {
-                throw new OpenApiTaskFailedException("Spectral could not be downloaded.");
+                await SaveFileFromResponseAsync(destination, responseStream, cancellationToken);
             }
         }
-        else
+        catch (Exception)
         {
-            await SaveFileFromResponseAsync(destination, responseStream, cancellationToken);
+            File.Delete(destination);
+            throw;
         }
     }
 

@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -28,10 +28,10 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     {
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
-        var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiToolsDirectoryPath);
+        var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
         using var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper, processWrapper);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -53,11 +53,12 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
             await spectralManager.InstallSpectralAsync(cancellationToken);
 
-            // await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
+            var swaggerDocPaths = await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
+            await spectralManager.RunSpectralAsync(swaggerDocPaths, this.OpenApiSpectralRulesetUrl, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {
-            this.Log.LogWarning("An error occured while validating the OpenAPI specification: {0}", e.Message);
+            this.Log.LogWarning("An error occurred while validating the OpenAPI specification: {0}", e.Message);
         }
 
         return true;

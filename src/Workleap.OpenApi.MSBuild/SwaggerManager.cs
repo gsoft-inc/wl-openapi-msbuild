@@ -9,27 +9,32 @@ internal sealed class SwaggerManager : ISwaggerManager
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly string _openApiWebApiAssemblyPath;
     private readonly string _swaggerDirectory;
+    private readonly string _openApiToolsDirectoryPath;
 
     public SwaggerManager(IProcessWrapper processWrapper, ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, string openApiWebApiAssemblyPath)
     {
         this._processWrapper = processWrapper;
         this._loggerWrapper = loggerWrapper;
         this._openApiWebApiAssemblyPath = openApiWebApiAssemblyPath;
+        this._openApiToolsDirectoryPath = openApiToolsDirectoryPath;
         this._swaggerDirectory = Path.Combine(openApiToolsDirectoryPath, "swagger", SwaggerVersion);
     }
 
-    public async Task RunSwaggerAsync(string[] openApiSwaggerDocumentNames, CancellationToken cancellationToken)
+    public async Task<IEnumerable<string>> RunSwaggerAsync(string[] openApiSwaggerDocumentNames, CancellationToken cancellationToken)
     {
         var swaggerExePath = Path.Combine(this._swaggerDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "swagger.exe" : "swagger");
+        var taskList = new List<Task<string>>();
 
         foreach (var documentName in openApiSwaggerDocumentNames)
         {
             var outputOpenApiSpecName = $"openapi-{documentName.ToLowerInvariant()}.yaml";
 
-            var outputOpenApiSpecPath = Path.Combine(this._swaggerDirectory, outputOpenApiSpecName);
+            var outputOpenApiSpecPath = Path.Combine(this._openApiToolsDirectoryPath, outputOpenApiSpecName);
 
-            await this.GenerateOpenApiSpecAsync(swaggerExePath, outputOpenApiSpecPath, documentName, cancellationToken);
+            taskList.Add(this.GenerateOpenApiSpecAsync(swaggerExePath, outputOpenApiSpecPath, documentName, cancellationToken));
         }
+
+        return await Task.WhenAll(taskList);
     }
 
     public async Task InstallSwaggerCliAsync(CancellationToken cancellationToken)
@@ -55,13 +60,15 @@ internal sealed class SwaggerManager : ISwaggerManager
         }
     }
 
-    public async Task GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
+    public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
         var exitCode = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken);
 
         if (exitCode != 0)
         {
-            throw new OpenApiTaskFailedException("OpenApi file could not be created.");
+            throw new OpenApiTaskFailedException($"OpenApi file {outputOpenApiSpecPath} could not be created.");
         }
+
+        return outputOpenApiSpecPath;
     }
 }
