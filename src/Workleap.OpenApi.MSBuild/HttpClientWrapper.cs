@@ -8,6 +8,11 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
     public async Task DownloadFileToDestinationAsync(string url, string destination, CancellationToken cancellationToken)
     {
+        if (File.Exists(destination))
+        {
+            return;
+        }
+
         using var responseStream = await this._httpClient.GetStreamAsync(url);
 
         if (responseStream == null)
