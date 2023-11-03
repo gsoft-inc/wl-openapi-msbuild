@@ -111,13 +111,9 @@ internal sealed class SpectralManager : ISpectralManager
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            var chmodExitCode = await this._processWrapper.RunProcessAsync("/bin/bash", new[] { "-c", "chmod", "+x", spectralExecutePath }, cancellationToken);
-            if (chmodExitCode != 0)
-            {
-                this._loggerWrapper.LogMessage("Failed to provide execute permission to {0}", spectralExecutePath);
-            }
+            await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
-        
+
         var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--output.html", htmlReportPath }, cancellationToken);
         if (exitCode != 0)
         {
@@ -125,5 +121,14 @@ internal sealed class SpectralManager : ISpectralManager
         }
 
         this._loggerWrapper.LogMessage("Spectral report generated. {0}", htmlReportPath);
+    }
+
+    private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
+    {
+        var chmodExitCode = await this._processWrapper.RunProcessAsync("/bin/bash", new[] { "-c",  $"chmod +x {spectralExecutePath}" }, cancellationToken);
+        if (chmodExitCode != 0)
+        {
+            this._loggerWrapper.LogMessage("Failed to provide execute permission to {0}", spectralExecutePath);
+        }
     }
 }
