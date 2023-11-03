@@ -29,8 +29,12 @@ internal sealed class SpectralManager : ISpectralManager
 
         this.ExecutablePath = GetSpectralFileName();
         var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
+        var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
 
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._spectralDirectory, this.ExecutablePath), cancellationToken);
+        if (!File.Exists(destination))
+        {
+            await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+        }
     }
 
     public async Task RunSpectralAsync(IEnumerable<string> swaggerDocumentPaths, string rulesetUrl, CancellationToken cancellationToken)
