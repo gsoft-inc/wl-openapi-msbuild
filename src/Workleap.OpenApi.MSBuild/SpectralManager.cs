@@ -44,7 +44,7 @@ internal sealed class SpectralManager : ISpectralManager
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var outputSpectralReportName = $"spectral-{documentName}.html";
-            await this.GenerateSpectralReport(documentPath, rulesetUrl, spectralExecutePath, Path.Combine(reportsPath, outputSpectralReportName), cancellationToken);
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(reportsPath, outputSpectralReportName), cancellationToken);
         }
     }
 
@@ -107,8 +107,17 @@ internal sealed class SpectralManager : ISpectralManager
         throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
     }
 
-    private async Task GenerateSpectralReport(string swaggerDocumentPath, string rulesetUrl, string spectralExecutePath, string htmlReportPath, CancellationToken cancellationToken)
+    private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetUrl, string htmlReportPath, CancellationToken cancellationToken)
     {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            var chmodExitCode = await this._processWrapper.RunProcessAsync("/bin/bash", new[] { "-c", "chmod", "+x", spectralExecutePath }, cancellationToken);
+            if (chmodExitCode != 0)
+            {
+                this._loggerWrapper.LogMessage("Failed to provide execute permission to {0}", spectralExecutePath);
+            }
+        }
+        
         var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--output.html", htmlReportPath }, cancellationToken);
         if (exitCode != 0)
         {
