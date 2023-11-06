@@ -52,8 +52,8 @@ internal sealed class SpectralManager : ISpectralManager
 
     private static string GetSpectralFileName()
     {
-        var osType = GetOperatingSystem();
-        var architecture = GetArchitecture();
+        var osType = RuntimeInformationHelper.GetOperatingSystem();
+        var architecture = RuntimeInformationHelper.GetArchitecture();
 
         if (osType == "linux")
         {
@@ -66,47 +66,12 @@ internal sealed class SpectralManager : ISpectralManager
 
         var fileName = $"spectral-{osType}-{architecture}";
 
-        if (osType == "win")
+        if (osType == "windows")
         {
             fileName = "spectral.exe";
         }
 
         return fileName;
-    }
-
-    private static string GetOperatingSystem()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            return "linux";
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return "macos";
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return "win";
-        }
-
-        throw new OpenApiTaskFailedException("Unknown operating system encountered");
-    }
-
-    private static string GetArchitecture()
-    {
-        if (RuntimeInformation.OSArchitecture == Architecture.X64)
-        {
-            return "x64";
-        }
-
-        if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
-        {
-            return "arm64";
-        }
-
-        throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
     }
 
     private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetUrl, string htmlReportPath, CancellationToken cancellationToken)

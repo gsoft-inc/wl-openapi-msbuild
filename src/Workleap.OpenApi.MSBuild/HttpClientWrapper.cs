@@ -24,7 +24,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
                 }
                 else
                 {
-                    throw new OpenApiTaskFailedException("Spectral could not be downloaded.");
+                    throw new OpenApiTaskFailedException($"{url} could not be downloaded.");
                 }
             }
             else

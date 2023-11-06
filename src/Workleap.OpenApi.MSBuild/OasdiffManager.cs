@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class OasdiffManager : IOasdiffManager
@@ -36,8 +34,8 @@ internal sealed class OasdiffManager : IOasdiffManager
 
     private static string GetOasdiffFileName()
     {
-        var osType = GetOperatingSystem();
-        var architecture = GetArchitecture();
+        var osType = RuntimeInformationHelper.GetOperatingSystem();
+        var architecture = RuntimeInformationHelper.GetArchitecture("amd");
 
         var fileName = $"oasdiff_{OasdiffVersion}_{osType}_{architecture}.tar.gz";
 
@@ -47,40 +45,5 @@ internal sealed class OasdiffManager : IOasdiffManager
         }
 
         return fileName;
-    }
-
-    private static string GetOperatingSystem()
-    {
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-        {
-            return "linux";
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            return "macos";
-        }
-
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        {
-            return "windows";
-        }
-
-        throw new OpenApiTaskFailedException("Unknown operating system encountered");
-    }
-
-    private static string GetArchitecture()
-    {
-        if (RuntimeInformation.OSArchitecture == Architecture.X64)
-        {
-            return "amd64";
-        }
-
-        if (RuntimeInformation.OSArchitecture == Architecture.Arm64)
-        {
-            return "arm64";
-        }
-
-        throw new OpenApiTaskFailedException("Unknown processor architecture encountered");
     }
 }
