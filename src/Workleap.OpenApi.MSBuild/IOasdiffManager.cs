@@ -4,5 +4,5 @@ internal interface IOasdiffManager
 {
     Task InstallOasdiffAsync(CancellationToken cancellationToken);
     
-    Task RunOasdiffAsync(IEnumerable<string> openApiSpecificationFiles, CancellationToken cancellationToken);
+    Task RunOasdiffAsync(IEnumerable<string> openApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken);
 }

@@ -9,7 +9,7 @@ internal sealed class LoggerWrapper : ILoggerWrapper
         this.Helper = helper;
     }
 
-    public TaskLoggingHelper Helper { get; set; }
+    private TaskLoggingHelper Helper { get; }
 
     public void LogWarning(string message, params object[] messageArgs)
     {

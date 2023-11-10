@@ -13,11 +13,11 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
         try
         {
-            using var responseStream = await this._httpClient.GetStreamAsync(url);
+            await using var responseStream = await this._httpClient.GetStreamAsync(url);
 
             if (responseStream == null)
             {
-                using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
+                await using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
                 if (retryResponseStream != null)
                 {
                     await SaveFileFromResponseAsync(destination, retryResponseStream, cancellationToken);
@@ -41,7 +41,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
     private static async Task SaveFileFromResponseAsync(string destination, Stream responseStream, CancellationToken cancellationToken)
     {
-        using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
+        await using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
 
         await responseStream.CopyToAsync(fileTarget, 81920, cancellationToken);
     }

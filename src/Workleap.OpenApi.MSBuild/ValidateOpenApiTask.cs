@@ -28,12 +28,12 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     {
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
-        var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
 
         using var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper, processWrapper);
-        var oasdiffManager = new OasdiffManager(processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -58,7 +58,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
             var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
             await spectralManager.RunSpectralAsync(generateOpenApiDocsPath, this.OpenApiSpectralRulesetUrl, cancellationToken);
-            await oasdiffManager.RunOasdiffAsync(generateOpenApiDocsPath, cancellationToken);
+            await oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {

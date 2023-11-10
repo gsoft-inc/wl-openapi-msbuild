@@ -12,7 +12,7 @@ internal sealed class SpectralManager : ISpectralManager
     private readonly string _openApiToolsDirectory;
     private readonly IProcessWrapper _processWrapper;
     
-    public SpectralManager(ILoggerWrapper loggerWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper, IProcessWrapper processWrapper)
+    public SpectralManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
@@ -22,20 +22,39 @@ internal sealed class SpectralManager : ISpectralManager
     }
     
     private string ExecutablePath { get; set; } = string.Empty;
+    
+    private bool SkipRun { get; set; }
 
     public async Task InstallSpectralAsync(CancellationToken cancellationToken)
     {
-        Directory.CreateDirectory(this._spectralDirectory);
+        try
+        {
+            this._loggerWrapper.LogMessage("Starting Spectral installation.");
+            
+            Directory.CreateDirectory(this._spectralDirectory);
 
-        this.ExecutablePath = GetSpectralFileName();
-        var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
-        var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
+            this.ExecutablePath = GetSpectralFileName();
+            var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
+            var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+            await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+            
+            this._loggerWrapper.LogMessage("Spectral installation completed.");
+        }
+        catch (Exception)
+        {
+            this.SkipRun = true;
+            throw;
+        }
     }
 
     public async Task RunSpectralAsync(IEnumerable<string> swaggerDocumentPaths, string rulesetUrl, CancellationToken cancellationToken)
     {
+        if (this.SkipRun)
+        {
+            return;
+        }
+
         this._loggerWrapper.LogMessage("Starting Spectral report generation.");
         
         var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
