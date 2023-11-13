@@ -5,6 +5,7 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class SpectralManager : ISpectralManager
 {
     private const string SpectralVersion = "6.11.0";
+    private const string SpectralDownloadUrlFormat = "https://github.com/stoplightio/spectral/releases/download/v{0}/{1}";
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
@@ -30,7 +31,7 @@ internal sealed class SpectralManager : ISpectralManager
         Directory.CreateDirectory(this._spectralDirectory);
 
         this.ExecutablePath = GetSpectralFileName();
-        var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
+        var url = string.Format(SpectralDownloadUrlFormat,  SpectralVersion, this.ExecutablePath);
         var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
         await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);

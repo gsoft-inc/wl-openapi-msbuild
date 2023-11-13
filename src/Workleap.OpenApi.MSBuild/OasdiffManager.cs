@@ -5,6 +5,7 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class OasdiffManager : IOasdiffManager
 {
     private const string OasdiffVersion = "1.9.2";
+    private const string OasdiffDownloadUrlFormat = "https://github.com/Tufin/oasdiff/releases/download/v{0}/{1}";
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
@@ -28,7 +29,7 @@ internal sealed class OasdiffManager : IOasdiffManager
         Directory.CreateDirectory(this._oasdiffDirectory);
 
         var oasdiffFileName = GetOasdiffFileName();
-        var url = $"https://github.com/Tufin/oasdiff/releases/download/v{OasdiffVersion}/{oasdiffFileName}";
+        var url = string.Format(OasdiffDownloadUrlFormat, OasdiffVersion, oasdiffFileName);
 
         await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName), cancellationToken);
         await this.DecompressDownloadedFileAsync(oasdiffFileName, cancellationToken);
