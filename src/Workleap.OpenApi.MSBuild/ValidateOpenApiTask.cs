@@ -28,12 +28,12 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     {
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
-        var swaggerManager = new SwaggerManager(processWrapper, loggerWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
 
         using var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper, processWrapper);
-        var oasdiffManager = new OasdiffManager(processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -43,7 +43,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names");
+            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names.");
 
             return false;
         }
@@ -52,12 +52,20 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             await this.GeneratePublicNugetSource();
 
-            await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            await spectralManager.InstallSpectralAsync(cancellationToken);
-            await oasdiffManager.InstallOasdiffAsync(cancellationToken);
+            var installSwaggerCliTask = swaggerManager.InstallSwaggerCliAsync(cancellationToken);
+            var installSpectralTask = spectralManager.InstallSpectralAsync(cancellationToken);
+            var installOasdiffTask = oasdiffManager.InstallOasdiffAsync(cancellationToken);
+            
+            await installSwaggerCliTask;
+            await installSpectralTask;
+            await installOasdiffTask;
 
-            var swaggerDocPaths = await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken);
-            await spectralManager.RunSpectralAsync(swaggerDocPaths, this.OpenApiSpectralRulesetUrl, cancellationToken);
+            var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
+            var runSpectralTask = spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
+            var runOasdiffTask = oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
+
+            await runSpectralTask;
+            await runOasdiffTask;
         }
         catch (OpenApiTaskFailedException e)
         {
