@@ -4,7 +4,7 @@ namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class LoggerWrapper : ILoggerWrapper
 {
-    private TaskLoggingHelper _taskLoggingHelper;
+    private readonly TaskLoggingHelper _taskLoggingHelper;
 
     public LoggerWrapper(TaskLoggingHelper helper) => this._taskLoggingHelper = helper;
 

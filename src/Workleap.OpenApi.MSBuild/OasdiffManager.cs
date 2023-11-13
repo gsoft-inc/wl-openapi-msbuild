@@ -54,8 +54,9 @@ internal sealed class OasdiffManager : IOasdiffManager
 
     private async Task DecompressDownloadedFileAsync(string oasdiffFileName, CancellationToken cancellationToken)
     {
+        var alreadyDecompressed = Path.Combine(this._oasdiffDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "oasdiff.exe" : "oasdiff");
         var pathToCompressedFile = Path.Combine(this._oasdiffDirectory, oasdiffFileName);
-        if (File.Exists(pathToCompressedFile))
+        if (File.Exists(alreadyDecompressed))
         {
             return;
         }
