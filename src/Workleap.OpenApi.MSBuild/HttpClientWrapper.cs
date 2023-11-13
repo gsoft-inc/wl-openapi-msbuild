@@ -43,7 +43,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
     {
         await using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
 
-        await responseStream.CopyToAsync(fileTarget, 81920, cancellationToken);
+        await responseStream.CopyToAsync(fileTarget, cancellationToken);
     }
 
     public void Dispose()

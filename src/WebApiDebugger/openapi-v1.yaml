@@ -12,17 +12,7 @@ paths:
         '200':
           description: Success --- New Description
           content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WeatherForecast'
             application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/WeatherForecast'
-            text/json:
               schema:
                 type: array
                 items:

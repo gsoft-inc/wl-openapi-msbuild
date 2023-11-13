@@ -20,39 +20,24 @@ internal sealed class OasdiffManager : IOasdiffManager
         this._openApiToolsDirectory = openApiToolsDirectoryPath;
         this._oasdiffDirectory = Path.Combine(openApiToolsDirectoryPath, "oasdiff", OasdiffVersion);
     }
-
-    private bool SkipRun { get; set; }
     
     public async Task InstallOasdiffAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            this._loggerWrapper.LogMessage("Starting Oasdiff installation.");
+        this._loggerWrapper.LogMessage("Starting Oasdiff installation.");
             
-            Directory.CreateDirectory(this._oasdiffDirectory);
+        Directory.CreateDirectory(this._oasdiffDirectory);
 
-            var oasdiffFileName = GetOasdiffFileName();
-            var url = $"https://github.com/Tufin/oasdiff/releases/download/v{OasdiffVersion}/{oasdiffFileName}";
+        var oasdiffFileName = GetOasdiffFileName();
+        var url = $"https://github.com/Tufin/oasdiff/releases/download/v{OasdiffVersion}/{oasdiffFileName}";
 
-            await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName), cancellationToken);
-            await this.DecompressDownloadedFileAsync(oasdiffFileName, cancellationToken);
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName), cancellationToken);
+        await this.DecompressDownloadedFileAsync(oasdiffFileName, cancellationToken);
             
-            this._loggerWrapper.LogMessage("Oasdiff installation completed.");
-        }
-        catch (Exception)
-        {
-            this.SkipRun = true;
-            throw;
-        }
+        this._loggerWrapper.LogMessage("Oasdiff installation completed.");
     }
 
     public async Task RunOasdiffAsync(IEnumerable<string> openApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
-        if (this.SkipRun)
-        {
-            return;
-        }
-        
         var generatedOpenApiSpecFilesList = generatedOpenApiSpecFiles.ToList();
         var oasdiffExecutePath = Path.Combine(this._oasdiffDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "oasdiff.exe" : "oasdiff");
 
@@ -70,6 +55,11 @@ internal sealed class OasdiffManager : IOasdiffManager
     private async Task DecompressDownloadedFileAsync(string oasdiffFileName, CancellationToken cancellationToken)
     {
         var pathToCompressedFile = Path.Combine(this._oasdiffDirectory, oasdiffFileName);
+        if (File.Exists(pathToCompressedFile))
+        {
+            return;
+        }
+        
         var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
 
         if (exitCode != 0)

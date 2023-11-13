@@ -23,38 +23,23 @@ internal sealed class SpectralManager : ISpectralManager
     
     private string ExecutablePath { get; set; } = string.Empty;
     
-    private bool SkipRun { get; set; }
-
     public async Task InstallSpectralAsync(CancellationToken cancellationToken)
     {
-        try
-        {
-            this._loggerWrapper.LogMessage("Starting Spectral installation.");
+        this._loggerWrapper.LogMessage("Starting Spectral installation.");
             
-            Directory.CreateDirectory(this._spectralDirectory);
+        Directory.CreateDirectory(this._spectralDirectory);
 
-            this.ExecutablePath = GetSpectralFileName();
-            var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
-            var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
+        this.ExecutablePath = GetSpectralFileName();
+        var url = $"https://github.com/stoplightio/spectral/releases/download/v{SpectralVersion}/{this.ExecutablePath}";
+        var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
-            await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
             
-            this._loggerWrapper.LogMessage("Spectral installation completed.");
-        }
-        catch (Exception)
-        {
-            this.SkipRun = true;
-            throw;
-        }
+        this._loggerWrapper.LogMessage("Spectral installation completed.");
     }
 
     public async Task RunSpectralAsync(IEnumerable<string> swaggerDocumentPaths, string rulesetUrl, CancellationToken cancellationToken)
     {
-        if (this.SkipRun)
-        {
-            return;
-        }
-
         this._loggerWrapper.LogMessage("Starting Spectral report generation.");
         
         var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);

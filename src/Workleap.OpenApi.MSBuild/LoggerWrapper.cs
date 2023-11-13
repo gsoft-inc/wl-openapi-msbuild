@@ -4,20 +4,13 @@ namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class LoggerWrapper : ILoggerWrapper
 {
-    public LoggerWrapper(TaskLoggingHelper helper)
-    {
-        this.Helper = helper;
-    }
+    private TaskLoggingHelper _taskLoggingHelper;
 
-    private TaskLoggingHelper Helper { get; }
+    public LoggerWrapper(TaskLoggingHelper helper) => this._taskLoggingHelper = helper;
 
     public void LogWarning(string message, params object[] messageArgs)
-    {
-        this.Helper.LogWarning(message, messageArgs);
-    }
+        => this._taskLoggingHelper.LogWarning(message, messageArgs);
 
     public void LogMessage(string message, params object[] messageArgs)
-    {
-        this.Helper.LogMessage(message, messageArgs);
-    }
+        => this._taskLoggingHelper.LogMessage(message, messageArgs);
 }

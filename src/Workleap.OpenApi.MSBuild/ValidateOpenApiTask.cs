@@ -52,13 +52,20 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             await this.GeneratePublicNugetSource();
 
-            await swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            await spectralManager.InstallSpectralAsync(cancellationToken);
-            await oasdiffManager.InstallOasdiffAsync(cancellationToken);
+            var installSwaggerCliTask = swaggerManager.InstallSwaggerCliAsync(cancellationToken);
+            var installSpectralTask = spectralManager.InstallSpectralAsync(cancellationToken);
+            var installOasdiffTask = oasdiffManager.InstallOasdiffAsync(cancellationToken);
+            
+            await installSwaggerCliTask;
+            await installSpectralTask;
+            await installOasdiffTask;
 
             var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
-            await spectralManager.RunSpectralAsync(generateOpenApiDocsPath, this.OpenApiSpectralRulesetUrl, cancellationToken);
-            await oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
+            var runSpectralTask = spectralManager.RunSpectralAsync(generateOpenApiDocsPath, this.OpenApiSpectralRulesetUrl, cancellationToken);
+            var runOasdiffTask = oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
+
+            await runSpectralTask;
+            await runOasdiffTask;
         }
         catch (OpenApiTaskFailedException e)
         {
