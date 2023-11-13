@@ -61,7 +61,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await installOasdiffTask;
 
             var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
-            var runSpectralTask = spectralManager.RunSpectralAsync(generateOpenApiDocsPath, this.OpenApiSpectralRulesetUrl, cancellationToken);
+            var runSpectralTask = spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
             var runOasdiffTask = oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
 
             await runSpectralTask;
