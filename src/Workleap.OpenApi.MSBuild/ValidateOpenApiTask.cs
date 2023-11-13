@@ -43,7 +43,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names");
+            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names.");
 
             return false;
         }
