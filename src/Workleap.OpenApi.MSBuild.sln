@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "debug", "debug", "{07F66FC2
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiDebugger", "WebApiDebugger\WebApiDebugger.csproj", "{A4C90BE2-889F-46BB-8B4D-2219B1084695}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "system-tests", "system-tests", "{4DDE83BF-D190-4CC9-AD36-E9250DABB27D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest", "system-test\WebApi.MsBuild.SystemTest\WebApi.MsBuild.SystemTest.csproj", "{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,8 +42,13 @@ Global
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695} = {07F66FC2-73B9-44C7-843C-36C13905AE9B}
+		{EFB1C9DD-9DFC-4898-A3F6-31B2A239B402} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 	EndGlobalSection
 EndGlobal
