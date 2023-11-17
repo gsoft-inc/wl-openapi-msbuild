@@ -18,14 +18,12 @@ Process {
 
     try {
         Push-Location $workingDir
-        Remove-Item $outputDir -Force -Recurse -ErrorAction SilentlyContinue
-    
+
         Exec { & dotnet pack -c Release -o "$outputDir" }
 
         Push-Location $sysTestDir
-
-        Exec { & echo "<?xml version=`"1.0`" encoding=`"utf-8`"?><configuration><packageSources><add key=`"local-packages`" value=`"$outputDir`" /></packageSources></configuration>" > NuGet.Config }
-        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease }
+        
+        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
         Exec { & dotnet build -c Release }
 
     }
