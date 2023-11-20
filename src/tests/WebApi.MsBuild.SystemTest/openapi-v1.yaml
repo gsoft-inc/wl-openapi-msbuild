@@ -3,7 +3,7 @@ info:
   title: V1 API General
   version: v1
 paths:
-  /WeatherForecast/:
+  /WeatherForecast:
     get:
       tags:
         - WeatherForecast
