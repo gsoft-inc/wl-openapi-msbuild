@@ -4,6 +4,10 @@ namespace Workleap.OpenApi.MSBuild;
 
 public sealed class ValidateOpenApiTask : CancelableAsyncTask
 {
+    /// <summary>The path of the ASP.NET Core project startup assembly directory.</summary>
+    [Required]
+    public string StartupAssemblyPath { get; set; } = string.Empty;
+    
     /// <summary>The path of the ASP.NET Core project being built.</summary>
     [Required]
     public string OpenApiWebApiAssemblyPath { get; set; } = string.Empty;
@@ -26,13 +30,14 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
+        var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var loggerWrapper = new LoggerWrapper(this.Log);
-        var processWrapper = new ProcessWrapper(this.OpenApiToolsDirectoryPath);
+        var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
 
         using var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
@@ -51,6 +56,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         try
         {
             await this.GeneratePublicNugetSource();
+            Directory.CreateDirectory(reportsPath);
 
             var installSwaggerCliTask = swaggerManager.InstallSwaggerCliAsync(cancellationToken);
             var installSpectralTask = spectralManager.InstallSpectralAsync(cancellationToken);
@@ -61,6 +67,12 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await installOasdiffTask;
 
             var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
+            
+            if (!this.CheckIfBaseSpecExists())
+            {
+                return false;
+            }
+
             var runSpectralTask = spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
             var runOasdiffTask = oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
 
@@ -70,6 +82,27 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         catch (OpenApiTaskFailedException e)
         {
             this.Log.LogWarning("An error occurred while validating the OpenAPI specification: {0}", e.Message);
+        }
+
+        return true;
+    }
+
+    private bool CheckIfBaseSpecExists()
+    {
+        foreach (var file in this.OpenApiSpecificationFiles)
+        {
+            if (File.Exists(file))
+            {
+                continue;
+            }
+
+            this.Log.LogWarning(
+                "The file '{0}' does not exist. If you are running this for the first time, we have generated specification here '{1}' which can be used as base specification. " +
+                                "Please copy specification file(s) to your project directory and rebuild.", 
+                file, 
+                this.OpenApiToolsDirectoryPath);
+
+            return false;
         }
 
         return true;

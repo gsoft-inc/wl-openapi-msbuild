@@ -4,13 +4,12 @@ namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class OasdiffManager : IOasdiffManager
 {
-    private const string OasdiffVersion = "1.9.2";
+    private const string OasdiffVersion = "1.9.6";
     private const string OasdiffDownloadUrlFormat = "https://github.com/Tufin/oasdiff/releases/download/v{0}/{1}";
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
     private readonly IProcessWrapper _processWrapper;
-    private readonly string _openApiToolsDirectory;
     private readonly string _oasdiffDirectory;
 
     public OasdiffManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper)
@@ -18,7 +17,6 @@ internal sealed class OasdiffManager : IOasdiffManager
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
         this._processWrapper = processWrapper;
-        this._openApiToolsDirectory = openApiToolsDirectoryPath;
         this._oasdiffDirectory = Path.Combine(openApiToolsDirectoryPath, "oasdiff", OasdiffVersion);
     }
     
@@ -42,14 +40,13 @@ internal sealed class OasdiffManager : IOasdiffManager
         var generatedOpenApiSpecFilesList = generatedOpenApiSpecFiles.ToList();
         var oasdiffExecutePath = Path.Combine(this._oasdiffDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "oasdiff.exe" : "oasdiff");
 
-        foreach (var specFile in openApiSpecFiles)
+        foreach (var baseSpecFile in openApiSpecFiles)
         {
-            this._loggerWrapper.LogMessage($"Starting Oasdiff comparison with {specFile}.");
+            this._loggerWrapper.LogMessage($"Starting Oasdiff comparison with {baseSpecFile}.");
             
-            var fileName = Path.GetFileName(specFile);
-            var baseSpecRelativePath = Path.GetRelativePath(this._openApiToolsDirectory, specFile);
-            var newSpecRelativePath = Path.GetRelativePath(this._openApiToolsDirectory, generatedOpenApiSpecFilesList.First(x => x.Contains(fileName)));
-            await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecRelativePath, newSpecRelativePath, "--exclude-elements", "description,examples,title,summary", "-f", "text" }, cancellationToken);
+            var fileName = Path.GetFileName(baseSpecFile);
+            var newSpecRelativePath = generatedOpenApiSpecFilesList.First(x => x.Contains(fileName));
+            await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, newSpecRelativePath, "--exclude-elements", "description,examples,title,summary", "-f", "text" }, cancellationToken);
         }
     }
 
@@ -62,7 +59,7 @@ internal sealed class OasdiffManager : IOasdiffManager
             return;
         }
         
-        var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
+        var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken: cancellationToken);
 
         if (exitCode != 0)
         {

@@ -10,14 +10,14 @@ internal sealed class SpectralManager : ISpectralManager
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
     private readonly string _spectralDirectory;
-    private readonly string _openApiToolsDirectory;
+    private readonly string _openApiReportsDirectoryPath;
     private readonly IProcessWrapper _processWrapper;
     
-    public SpectralManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, IHttpClientWrapper httpClientWrapper)
+    public SpectralManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, string openApiReportsDirectoryPath, IHttpClientWrapper httpClientWrapper)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
-        this._openApiToolsDirectory = openApiToolsDirectoryPath;
+        this._openApiReportsDirectoryPath = openApiReportsDirectoryPath;
         this._spectralDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
         this._processWrapper = processWrapper;
     }
@@ -44,14 +44,12 @@ internal sealed class SpectralManager : ISpectralManager
         this._loggerWrapper.LogMessage("Starting Spectral report generation.");
         
         var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
-        var reportsPath = Path.Combine(this._openApiToolsDirectory, "reports");
-        Directory.CreateDirectory(reportsPath);
 
         foreach (var documentPath in swaggerDocumentPaths)
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var outputSpectralReportName = $"spectral-{documentName}.html";
-            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(reportsPath, outputSpectralReportName), cancellationToken);
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName), cancellationToken);
         }
     }
 
@@ -86,7 +84,7 @@ internal sealed class SpectralManager : ISpectralManager
             await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
 
-        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--output.html", htmlReportPath }, cancellationToken);
+        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken: cancellationToken);
         if (exitCode != 0)
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
@@ -97,7 +95,7 @@ internal sealed class SpectralManager : ISpectralManager
 
     private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
     {
-        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
+        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken: cancellationToken);
         if (chmodExitCode != 0)
         {
             throw new OpenApiTaskFailedException($"Failed to provide execute permission to {spectralExecutePath}");
