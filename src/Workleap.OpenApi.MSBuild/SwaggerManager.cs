@@ -48,7 +48,7 @@ internal sealed class SwaggerManager : ISwaggerManager
         var retryCount = 0;
         while (retryCount < 2)
         {
-            var exitCode = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", SwaggerVersion }, cancellationToken: cancellationToken);
+            var exitCode = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", SwaggerVersion }, cancellationToken);
 
             if (exitCode != 0 && retryCount != 1)
             {

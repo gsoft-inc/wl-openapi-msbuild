@@ -46,7 +46,7 @@ internal sealed class OasdiffManager : IOasdiffManager
             
             var fileName = Path.GetFileName(baseSpecFile);
             var newSpecRelativePath = generatedOpenApiSpecFilesList.First(x => x.Contains(fileName));
-            await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, newSpecRelativePath, "--exclude-elements", "description,examples,title,summary", "-f", "text" }, cancellationToken);
+            await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, newSpecRelativePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
         }
     }
 
@@ -59,7 +59,7 @@ internal sealed class OasdiffManager : IOasdiffManager
             return;
         }
         
-        var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken: cancellationToken);
+        var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
 
         if (exitCode != 0)
         {

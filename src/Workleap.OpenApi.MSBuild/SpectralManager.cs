@@ -84,7 +84,7 @@ internal sealed class SpectralManager : ISpectralManager
             await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
 
-        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken: cancellationToken);
+        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken);
         if (exitCode != 0)
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
@@ -95,7 +95,7 @@ internal sealed class SpectralManager : ISpectralManager
 
     private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
     {
-        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken: cancellationToken);
+        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
         if (chmodExitCode != 0)
         {
             throw new OpenApiTaskFailedException($"Failed to provide execute permission to {spectralExecutePath}");
