@@ -51,7 +51,7 @@ internal sealed class SpectralManager : ISpectralManager
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var outputSpectralReportName = $"spectral-{documentName}.html";
             
-            this._loggerWrapper.LogMessage("Validating {0} against Spectral ruleset", MessageImportance.High, documentPath);
+            this._loggerWrapper.LogMessage("\n Validating {0} against Spectral ruleset", MessageImportance.High, documentPath);
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName), cancellationToken);
         }
     }

@@ -43,7 +43,7 @@ internal sealed class OasdiffManager : IOasdiffManager
 
         foreach (var baseSpecFile in openApiSpecFiles)
         {
-            this._loggerWrapper.LogMessage($"Starting Oasdiff comparison with {baseSpecFile}.", MessageImportance.High);
+            this._loggerWrapper.LogMessage($"\n Starting Oasdiff comparison with {baseSpecFile}.", MessageImportance.High);
             
             var fileName = Path.GetFileName(baseSpecFile);
             var generatedSpecFilePath = generatedOpenApiSpecFilesList.FirstOrDefault(x => x.Contains(fileName));
