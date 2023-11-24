@@ -72,12 +72,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             {
                 return false;
             }
-
-            var runSpectralTask = spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
-            var runOasdiffTask = oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
-
-            await runSpectralTask;
-            await runOasdiffTask;
+            
+            await spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
+            await oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {
