@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -49,6 +50,8 @@ internal sealed class SpectralManager : ISpectralManager
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var outputSpectralReportName = $"spectral-{documentName}.html";
+            
+            this._loggerWrapper.LogMessage("Validating {0} against Spectral ruleset", MessageImportance.High, documentPath);
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName), cancellationToken);
         }
     }
@@ -90,7 +93,7 @@ internal sealed class SpectralManager : ISpectralManager
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
         }
 
-        this._loggerWrapper.LogMessage("Spectral report generated. {0}", htmlReportPath);
+        this._loggerWrapper.LogMessage("Spectral report generated. {0}", messageArgs: htmlReportPath);
     }
 
     private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)

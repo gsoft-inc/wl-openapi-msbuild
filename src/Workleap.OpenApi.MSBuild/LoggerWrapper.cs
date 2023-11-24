@@ -1,3 +1,4 @@
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
 namespace Workleap.OpenApi.MSBuild;
@@ -11,6 +12,6 @@ internal sealed class LoggerWrapper : ILoggerWrapper
     public void LogWarning(string message, params object[] messageArgs)
         => this._taskLoggingHelper.LogWarning(message, messageArgs);
 
-    public void LogMessage(string message, params object[] messageArgs)
-        => this._taskLoggingHelper.LogMessage(message, messageArgs);
+    public void LogMessage(string message, MessageImportance importance = MessageImportance.Low, params object[] messageArgs)
+        => this._taskLoggingHelper.LogMessage(importance, message, messageArgs);
 }
