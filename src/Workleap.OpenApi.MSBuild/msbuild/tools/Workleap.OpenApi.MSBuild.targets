@@ -15,7 +15,10 @@
   <!-- We can only analyze the OpenAPI spec after the project has been built -->
   <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build">
     <PropertyGroup>
-      <!-- The path of the ASP.NET Core project being built -->
+      <!-- The path of the ASP.NET Core project build output directory -->
+      <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)</StartupAssemblyPath>
+      
+      <!-- The path of the ASP.NET Core project DLL being executed after built -->
       <OpenApiWebApiAssemblyPath Condition="'$(OpenApiWebApiAssemblyPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)$(AssemblyName).dll</OpenApiWebApiAssemblyPath>
 
       <!-- The base directory path where the OpenAPI tools will be downloaded -->
@@ -45,6 +48,7 @@
     </PropertyGroup>
 
     <ValidateOpenApiTask
+      StartupAssemblyPath="$(StartupAssemblyPath)"
       OpenApiWebApiAssemblyPath="$(OpenApiWebApiAssemblyPath)"
       OpenApiToolsDirectoryPath="$(OpenApiToolsDirectoryPath)"
       OpenApiSpectralRulesetUrl="$(OpenApiSpectralRulesetUrl)"

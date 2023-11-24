@@ -68,7 +68,7 @@ internal sealed class SwaggerManager : ISwaggerManager
 
     public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
-        var exitCode = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken);
+        var exitCode = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken: cancellationToken);
 
         if (exitCode != 0)
         {
