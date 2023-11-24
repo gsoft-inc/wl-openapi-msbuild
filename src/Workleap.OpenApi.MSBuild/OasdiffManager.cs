@@ -55,7 +55,7 @@ internal sealed class OasdiffManager : IOasdiffManager
             }
             
             await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
-            this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison completed ********", MessageImportance.High);
+            this._loggerWrapper.LogMessage($"\n ****************************************************************", MessageImportance.High);
         }
     }
 
