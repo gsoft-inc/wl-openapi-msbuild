@@ -50,9 +50,11 @@ internal sealed class SpectralManager : ISpectralManager
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var outputSpectralReportName = $"spectral-{documentName}.html";
+            var htmlReportPath = Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
             
             this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentPath);
-            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName), cancellationToken);
+            File.Delete(htmlReportPath);
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, htmlReportPath, cancellationToken);
             this._loggerWrapper.LogMessage("\n *********************************************************", MessageImportance.High, documentPath);
         }
     }
@@ -89,9 +91,15 @@ internal sealed class SpectralManager : ISpectralManager
         }
 
         var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken);
-        if (exitCode != 0)
+        
+        if (!File.Exists(htmlReportPath))
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
+        }
+        
+        if (exitCode != 0)
+        {
+            this._loggerWrapper.LogWarning($"Spectral scan detected violation of ruleset. Please check the report [{htmlReportPath}] for more details.");
         }
 
         this._loggerWrapper.LogMessage("Spectral report generated. {0}", messageArgs: htmlReportPath);
