@@ -94,7 +94,7 @@ internal sealed class SpectralManager : ISpectralManager
         
         if (!File.Exists(htmlReportPath))
         {
-            throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created.");
+            throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created. Please check the CONSOLE output above for more details.");
         }
         
         if (exitCode != 0)
