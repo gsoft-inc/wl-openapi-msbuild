@@ -54,7 +54,13 @@ internal sealed class OasdiffManager : IOasdiffManager
                 continue;
             }
             
-            await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
+            var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
+            this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+            if (!string.IsNullOrEmpty(result.StandardError))
+            {
+                this._loggerWrapper.LogWarning(result.StandardError);
+            }
+
             this._loggerWrapper.LogMessage($"\n ****************************************************************", MessageImportance.High);
         }
     }
@@ -68,10 +74,12 @@ internal sealed class OasdiffManager : IOasdiffManager
             return;
         }
         
-        var exitCode = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
+        var result = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
 
-        if (exitCode != 0)
+        if (result.ExitCode != 0)
         {
+            this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+            this._loggerWrapper.LogWarning(result.StandardError);
             throw new OpenApiTaskFailedException("Failed to decompress oasdiff.");
         }
     }

@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -48,16 +49,19 @@ internal sealed class SwaggerManager : ISwaggerManager
         var retryCount = 0;
         while (retryCount < 2)
         {
-            var exitCode = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", SwaggerVersion }, cancellationToken);
+            var result = await this._processWrapper.RunProcessAsync("dotnet", new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--tool-path", this._swaggerDirectory, "--version", SwaggerVersion }, cancellationToken);                
 
-            if (exitCode != 0 && retryCount != 1)
+            if (result.ExitCode != 0 && retryCount != 1)
             {
+                this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+                this._loggerWrapper.LogWarning(result.StandardError);
                 this._loggerWrapper.LogWarning("Swashbuckle download failed. Retrying once more...");
+
                 retryCount++;
                 continue;
             }
 
-            if (retryCount == 1 && exitCode != 0)
+            if (retryCount == 1 && result.ExitCode != 0)
             {
                 throw new OpenApiTaskFailedException("Swashbuckle CLI could not be installed.");
             }
@@ -68,10 +72,12 @@ internal sealed class SwaggerManager : ISwaggerManager
 
     public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
-        var exitCode = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken: cancellationToken);
+        var result = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken: cancellationToken);
+        this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
 
-        if (exitCode != 0)
+        if (result.ExitCode != 0)
         {
+            this._loggerWrapper.LogWarning(result.StandardError);
             throw new OpenApiTaskFailedException($"OpenApi file {outputOpenApiSpecPath} could not be created.");
         }
 

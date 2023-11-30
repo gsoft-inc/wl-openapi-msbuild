@@ -13,11 +13,11 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
         try
         {
-            await using var responseStream = await this._httpClient.GetStreamAsync(url);
+            using var responseStream = await this._httpClient.GetStreamAsync(url);
 
             if (responseStream == null)
             {
-                await using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
+                using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
                 if (retryResponseStream != null)
                 {
                     await SaveFileFromResponseAsync(destination, retryResponseStream, cancellationToken);
@@ -41,9 +41,10 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
     private static async Task SaveFileFromResponseAsync(string destination, Stream responseStream, CancellationToken cancellationToken)
     {
-        await using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
 
-        await responseStream.CopyToAsync(fileTarget, cancellationToken);
+        // In order to use cancellationToken we need to specify a bufferSize, so we just use the default value
+        await responseStream.CopyToAsync(fileTarget, 81920, cancellationToken);
     }
 
     public void Dispose()

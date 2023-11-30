@@ -1,6 +1,8 @@
+using CliWrap.Buffered;
+
 namespace Workleap.OpenApi.MSBuild;
 
 public interface IProcessWrapper
 {
-    public Task<int> RunProcessAsync(string filename, string[] arguments, CancellationToken cancellationToken);
+    public Task<BufferedCommandResult> RunProcessAsync(string filename, string[] arguments, CancellationToken cancellationToken);
 }

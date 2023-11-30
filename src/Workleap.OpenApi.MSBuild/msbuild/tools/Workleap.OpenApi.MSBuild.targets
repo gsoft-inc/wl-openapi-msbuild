@@ -10,7 +10,7 @@
   <UsingTask Condition="'$(OpenApiDebuggingEnabled)' != 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)task\$(MSBuildThisFileName).dll" />
 
   <!-- This is the location of this task assembly when debugging the task in an IDE -->
-  <UsingTask Condition="'$(OpenApiDebuggingEnabled)' == 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netstandard2.1\$(MSBuildThisFileName).dll" />
+  <UsingTask Condition="'$(OpenApiDebuggingEnabled)' == 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netstandard2.0\$(MSBuildThisFileName).dll" />
 
   <!-- We can only analyze the OpenAPI spec after the project has been built -->
   <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build">
