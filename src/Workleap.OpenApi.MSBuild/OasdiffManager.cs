@@ -78,6 +78,8 @@ internal sealed class OasdiffManager : IOasdiffManager
 
         if (result.ExitCode != 0)
         {
+            this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+            this._loggerWrapper.LogWarning(result.StandardError);
             throw new OpenApiTaskFailedException("Failed to decompress oasdiff.");
         }
     }

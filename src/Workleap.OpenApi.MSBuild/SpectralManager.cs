@@ -115,6 +115,8 @@ internal sealed class SpectralManager : ISpectralManager
         var result = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
         if (result.ExitCode != 0)
         {
+            this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+            this._loggerWrapper.LogWarning(result.StandardError);
             throw new OpenApiTaskFailedException($"Failed to provide execute permission to {spectralExecutePath}");
         }
     }
