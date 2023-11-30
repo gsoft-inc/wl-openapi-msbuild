@@ -43,6 +43,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
     {
         using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
 
+        // In order to use cancellationToken we need to specify a bufferSize, so we just use the default value
         await responseStream.CopyToAsync(fileTarget, 81920, cancellationToken);
     }
 
