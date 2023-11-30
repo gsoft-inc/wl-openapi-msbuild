@@ -25,7 +25,7 @@ internal sealed class SpectralManager : ISpectralManager
     
     private string ExecutablePath { get; set; } = string.Empty;
     
-    public async Task InstallSpectralAsync(CancellationToken cancellationToken)
+    public async Task InstallSpectralAsync()
     {
         this._loggerWrapper.LogMessage("Starting Spectral installation.");
             
@@ -35,7 +35,7 @@ internal sealed class SpectralManager : ISpectralManager
         var url = string.Format(SpectralDownloadUrlFormat,  SpectralVersion, this.ExecutablePath);
         var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination);
             
         this._loggerWrapper.LogMessage("Spectral installation completed.");
     }
@@ -90,14 +90,19 @@ internal sealed class SpectralManager : ISpectralManager
             await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
 
-        var exitCode = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken);
+        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken);
+        this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+        if (!string.IsNullOrEmpty(result.StandardError))
+        {
+            this._loggerWrapper.LogWarning(result.StandardError);
+        }
         
         if (!File.Exists(htmlReportPath))
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created. Please check the CONSOLE output above for more details.");
         }
-        
-        if (exitCode != 0)
+
+        if (result.ExitCode != 0)
         {
             this._loggerWrapper.LogWarning($"Spectral scan detected violation of ruleset. Please check the report [{htmlReportPath}] for more details.");
         }
@@ -107,8 +112,8 @@ internal sealed class SpectralManager : ISpectralManager
 
     private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
     {
-        var chmodExitCode = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
-        if (chmodExitCode != 0)
+        var result = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
+        if (result.ExitCode != 0)
         {
             throw new OpenApiTaskFailedException($"Failed to provide execute permission to {spectralExecutePath}");
         }

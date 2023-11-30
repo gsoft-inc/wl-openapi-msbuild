@@ -4,7 +4,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 {
     private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
 
-    public async Task DownloadFileToDestinationAsync(string url, string destination, CancellationToken cancellationToken)
+    public async Task DownloadFileToDestinationAsync(string url, string destination)
     {
         if (File.Exists(destination))
         {
@@ -13,14 +13,14 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
         try
         {
-            await using var responseStream = await this._httpClient.GetStreamAsync(url);
+            using var responseStream = await this._httpClient.GetStreamAsync(url);
 
             if (responseStream == null)
             {
-                await using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
+                using var retryResponseStream = await this._httpClient.GetStreamAsync(url);
                 if (retryResponseStream != null)
                 {
-                    await SaveFileFromResponseAsync(destination, retryResponseStream, cancellationToken);
+                    await SaveFileFromResponseAsync(destination, retryResponseStream);
                 }
                 else
                 {
@@ -29,7 +29,7 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
             }
             else
             {
-                await SaveFileFromResponseAsync(destination, responseStream, cancellationToken);
+                await SaveFileFromResponseAsync(destination, responseStream);
             }
         }
         catch (Exception)
@@ -39,11 +39,11 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
         }
     }
 
-    private static async Task SaveFileFromResponseAsync(string destination, Stream responseStream, CancellationToken cancellationToken)
+    private static async Task SaveFileFromResponseAsync(string destination, Stream responseStream)
     {
-        await using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
+        using var fileTarget = new FileStream(destination, FileMode.Create, FileAccess.Write, FileShare.None);
 
-        await responseStream.CopyToAsync(fileTarget, cancellationToken);
+        await responseStream.CopyToAsync(fileTarget);
     }
 
     public void Dispose()
