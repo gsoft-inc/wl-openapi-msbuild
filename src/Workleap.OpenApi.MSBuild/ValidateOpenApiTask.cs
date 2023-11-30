@@ -59,7 +59,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             Directory.CreateDirectory(reportsPath);
 
             var installSwaggerCliTask = swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            var installSpectralTask = spectralManager.InstallSpectralAsync();
+            var installSpectralTask = spectralManager.InstallSpectralAsync(cancellationToken);
             var installOasdiffTask = oasdiffManager.InstallOasdiffAsync(cancellationToken);
             
             await installSwaggerCliTask;

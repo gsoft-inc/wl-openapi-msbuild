@@ -25,7 +25,7 @@ internal sealed class SpectralManager : ISpectralManager
     
     private string ExecutablePath { get; set; } = string.Empty;
     
-    public async Task InstallSpectralAsync()
+    public async Task InstallSpectralAsync(CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("Starting Spectral installation.");
             
@@ -35,7 +35,7 @@ internal sealed class SpectralManager : ISpectralManager
         var url = string.Format(SpectralDownloadUrlFormat,  SpectralVersion, this.ExecutablePath);
         var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination);
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
             
         this._loggerWrapper.LogMessage("Spectral installation completed.");
     }

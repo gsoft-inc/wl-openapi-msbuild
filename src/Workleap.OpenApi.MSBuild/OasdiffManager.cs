@@ -30,7 +30,7 @@ internal sealed class OasdiffManager : IOasdiffManager
         var oasdiffFileName = GetOasdiffFileName();
         var url = string.Format(OasdiffDownloadUrlFormat, OasdiffVersion, oasdiffFileName);
 
-        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName));
+        await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName), cancellationToken);
         await this.DecompressDownloadedFileAsync(oasdiffFileName, cancellationToken);
             
         this._loggerWrapper.LogMessage("Oasdiff installation completed.");
