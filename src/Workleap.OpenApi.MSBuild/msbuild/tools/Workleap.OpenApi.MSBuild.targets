@@ -19,7 +19,7 @@
       <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
 
       <!-- When ContractFirst, validate if the provided specification files match the code -->
-      <ValidateCodeSync Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</ValidateCodeSync>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
       
       <!-- The path of the ASP.NET Core project build output directory -->
       <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)</StartupAssemblyPath>

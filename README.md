@@ -26,3 +26,5 @@ This command `./Run-SystemTest.ps1` will:
 
 1. Pack the MSBuild library
 2. Build the WebApi.MssBuild.SystemTest and inject the previously packed library
+
+Be careful since it will update the project dependencies to the local path of the packed library: do not commit this.
