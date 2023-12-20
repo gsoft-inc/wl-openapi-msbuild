@@ -8,7 +8,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private const string ContractFirst = "ContractFirst";
     
     /// <summary>
-    /// 2 supported mode2:
+    /// 2 supported modes:
     ///     - CodeFirst: Generate the OpenAPI specification files from the code
     ///     - ContractFirst: Will use the OpenAPI specification files provided
     /// </summary>
