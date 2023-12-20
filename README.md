@@ -4,12 +4,16 @@ Validates at build time that the OpenAPI specification files extracted from the 
 
 Depending if the user chose the Contract-First or Code-First development mode this MSBuild task will:
 
-- Install tools: OasDiff, Spectral, SwashbuckleCLI
+- Install tools: [OasDiff](https://github.com/Tufin/oasdiff), [Spectral](https://github.com/stoplightio/spectral), [SwashbuckleCLI](https://github.com/domaindrivendev/Swashbuckle.AspNetCore?tab=readme-ov-file#swashbuckleaspnetcorecli)
 - Generate the OpenAPI specification file from the associated Web API
-- Validate Spectral rules
+- Validate [Workleap Spectral rules](https://github.com/gsoft-inc/wl-api-guidelines/blob/main/.spectral.yaml)
 - Compare the given OpenAPI specification file with the generated one
 
 ## How it works
+
+[Official Documentation](https://learn.microsoft.com/en-us/visualstudio/msbuild/tutorial-custom-task-code-generation?view=vs-2022#include-msbuild-properties-and-targets-in-a-package)
+
+For the TLDR version: 
 
 - The entry point is `ValidateOpenApiTask.ExecuteAsync()` and will be executed after the referencing project is built. This is defined in `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets` as a `UsingTask.TaskName`
 - The default value are defined in the property group on the target `ValidateOpenApi` in this file `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets`

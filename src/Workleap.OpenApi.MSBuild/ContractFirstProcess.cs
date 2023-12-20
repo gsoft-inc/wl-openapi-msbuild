@@ -3,7 +3,7 @@
 /// <summary>
 /// For a Contract First approach it will:
 ///     1. Validate the OpenAPI specification files base on spectral rules
-///     2. If validateCodeSync=true, will generate the OpenAPI specification files from the code and validate if it match the provided specifications.
+///     2. If <see cref="CompareCodeAgainstSpecFile"/> is enabled, will generate the OpenAPI specification files from the code and validate if it match the provided specifications.
 /// </summary>
 internal class ContractFirstProcess
 {
