@@ -395,3 +395,6 @@ $RECYCLE.BIN/
 
 # Git merge
 *.orig
+
+# Ignore output of system test
+/src/tests/**.Nuget.Config

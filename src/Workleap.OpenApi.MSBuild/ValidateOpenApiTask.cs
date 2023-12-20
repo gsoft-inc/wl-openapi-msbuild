@@ -16,7 +16,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
     /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>  
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
     
     /// <summary>The path of the ASP.NET Core project startup assembly directory.</summary>
