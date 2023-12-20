@@ -16,8 +16,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <DevelopmentMode>CodeFirst</DevelopmentMode>
-<!--    <ValidateCodeSync>true</ValidateCodeSync>-->
+    <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
+    <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
   </PropertyGroup>
 
   <ItemGroup>

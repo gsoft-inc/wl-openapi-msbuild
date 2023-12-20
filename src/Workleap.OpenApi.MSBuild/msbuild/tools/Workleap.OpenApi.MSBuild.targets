@@ -16,10 +16,10 @@
   <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build">
     <PropertyGroup>
       <!-- Set development mode: ContractFirst or CodeFirst -->
-      <DevelopmentMode Condition="'$(DevelopmentMode)' == ''">ContractFirst</DevelopmentMode>
+      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
 
       <!-- When ContractFirst, validate if the provided specification files match the code -->
-      <ValidateCodeSync Condition="'$(ValidateCodeSync)' == ''">false</ValidateCodeSync>
+      <ValidateCodeSync Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</ValidateCodeSync>
       
       <!-- The path of the ASP.NET Core project build output directory -->
       <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$(MSBuildProjectDirectory)\$(OutputPath)</StartupAssemblyPath>
@@ -54,8 +54,8 @@
     </PropertyGroup>
 
     <ValidateOpenApiTask
-      DevelopmentMode="$(DevelopmentMode)"
-      ValidateCodeSync="$(ValidateCodeSync)"
+      OpenApiDevelopmentMode="$(OpenApiDevelopmentMode)"
+      OpenApiCompareCodeAgainstSpecFile="$(OpenApiCompareCodeAgainstSpecFile)"
       StartupAssemblyPath="$(StartupAssemblyPath)"
       OpenApiWebApiAssemblyPath="$(OpenApiWebApiAssemblyPath)"
       OpenApiToolsDirectoryPath="$(OpenApiToolsDirectoryPath)"

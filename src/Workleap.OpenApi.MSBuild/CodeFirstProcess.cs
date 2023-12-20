@@ -7,6 +7,8 @@
 /// </summary>
 internal class CodeFirstProcess
 {
+    private const string DisableSpecGenEnvVarName = "WL_DISABLE_SPECGEN";
+    
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
 
@@ -22,15 +24,13 @@ internal class CodeFirstProcess
         string openApiSpectralRulesetUrl,
         CancellationToken cancellationToken)
     {
-        var isGenerationEnable = Environment.GetEnvironmentVariable("WL_DISABLE_SPECGEN") != "true";
+        var isGenerationEnabled = string.Equals(Environment.GetEnvironmentVariable(DisableSpecGenEnvVarName), "true", StringComparison.OrdinalIgnoreCase);
 
-        await this.InstallDependencies(isGenerationEnable, cancellationToken);
+        await this.InstallDependencies(isGenerationEnabled, cancellationToken);
         
-        if (isGenerationEnable)
+        if (isGenerationEnabled)
         {
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
-            
-            // Will overwrite the file in the repo here
         }
 
         await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);

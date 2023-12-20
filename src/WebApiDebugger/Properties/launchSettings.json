@@ -5,7 +5,7 @@
       "commandName": "Executable",
       "executablePath": "dotnet",
       "commandLineArgs": "msbuild /t:ValidateOpenApi",
-      "workingDirectory": "$(ProjectDir)",
+      "workingDirectory": "$(ProjectDir)"
     },
     "WebApiDebugger": {
       "commandName": "Project",

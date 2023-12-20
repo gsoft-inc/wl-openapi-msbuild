@@ -6,13 +6,13 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <IsPackable>false</IsPackable>
         <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
-        <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
         <RootNamespace>WebApi.MsBuild.SystemTest</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup>
-      <DevelopmentMode>ContractFirst</DevelopmentMode>
-      <ValidateCodeSync>true</ValidateCodeSync>
+      <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
+      <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
     </PropertyGroup>
 
     <ItemGroup>

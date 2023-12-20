@@ -8,16 +8,16 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private const string ContractFirst = "ContractFirst";
     
     /// <summary>
-    /// 2 supported mode:
+    /// 2 supported mode2:
     ///     - CodeFirst: Generate the OpenAPI specification files from the code
     ///     - ContractFirst: Will use the OpenAPI specification files provided
     /// </summary>
-    [Microsoft.Build.Framework.Required]
-    public string DevelopmentMode { get; set; } = string.Empty;
+    [Required]
+    public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
     /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>  
     [Microsoft.Build.Framework.Required]
-    public bool ValidateCodeSync { get; set; } = false;
+    public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
     
     /// <summary>The path of the ASP.NET Core project startup assembly directory.</summary>
     [Required]
@@ -76,7 +76,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await this.GeneratePublicNugetSource();
             Directory.CreateDirectory(reportsPath);
 
-            switch (this.DevelopmentMode)
+            switch (this.OpenApiDevelopmentMode)
             {
                 case CodeFirst:
                     await codeFirstProcess.Execute(
@@ -92,7 +92,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                         this.OpenApiToolsDirectoryPath,
                         this.OpenApiSwaggerDocumentNames,
                         this.OpenApiSpectralRulesetUrl,
-                        this.ValidateCodeSync,
+                        this.OpenApiCompareCodeAgainstSpecFile ? ContractFirstProcess.CompareCodeAgainstSpecFile.Enabled : ContractFirstProcess.CompareCodeAgainstSpecFile.Disabled,
                         cancellationToken);
 
                     if (!isSuccess)
@@ -103,7 +103,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
                 
                 default:
-                    this.Log.LogError("Invalid value for {0}. Allowed values are '{1}' or '{2}'", nameof(ValidateOpenApiTask.DevelopmentMode), ContractFirst, CodeFirst);
+                    this.Log.LogError("Invalid value for {0}. Allowed values are '{1}' or '{2}'", nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
                     return false;
             }
         }

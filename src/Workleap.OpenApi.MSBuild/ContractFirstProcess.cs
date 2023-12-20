@@ -11,7 +11,7 @@ internal class ContractFirstProcess
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
     private readonly OasdiffManager _oasdiffManager;
-
+    
     internal ContractFirstProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
@@ -20,12 +20,18 @@ internal class ContractFirstProcess
         this._oasdiffManager = oasdiffManager;
     }
 
+    internal enum CompareCodeAgainstSpecFile
+    {
+        Disabled,
+        Enabled,
+    }
+
     internal async Task<bool> Execute(
         string[] openApiSpecificationFiles,
         string openApiToolsDirectoryPath,
         string[] openApiSwaggerDocumentNames,
         string openApiSpectralRulesetUrl,
-        bool validateCodeSync,
+        CompareCodeAgainstSpecFile compareCodeAgainstSpecFile,
         CancellationToken cancellationToken)
     {
         if (!this.CheckIfBaseSpecExists(openApiSpecificationFiles, openApiToolsDirectoryPath))
@@ -33,9 +39,9 @@ internal class ContractFirstProcess
             return false;
         }
 
-        await this.InstallDependencies(validateCodeSync, cancellationToken);
+        await this.InstallDependencies(compareCodeAgainstSpecFile, cancellationToken);
         
-        if (validateCodeSync)
+        if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
@@ -70,13 +76,13 @@ internal class ContractFirstProcess
     }
     
     private async Task InstallDependencies(
-        bool validateCodeSync,
+        CompareCodeAgainstSpecFile compareCodeAgainstSpecFile,
         CancellationToken cancellationToken)
     {
         var installationTasks = new List<Task>();    
         installationTasks.Add(this._spectralManager.InstallSpectralAsync(cancellationToken));        
         
-        if (validateCodeSync)
+        if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
             installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
             installationTasks.Add(this._oasdiffManager.InstallOasdiffAsync(cancellationToken));
