@@ -27,4 +27,6 @@ This command `./Run-SystemTest.ps1` will:
 1. Pack the MSBuild library
 2. Build the WebApi.MssBuild.SystemTest and inject the previously packed library
 
-Be careful since it will update the project dependencies to the local path of the packed library: do not commit this.
+Be careful since it will update the project dependencies to use a local version: do not commit this.
+
+Also if you run it multiple time on the same branch you need to clear the local cache `%UserProfile%\.nuget\packages\workleap.openapi.msbuild` since the name won't change.
