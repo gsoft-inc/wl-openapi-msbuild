@@ -25,7 +25,7 @@ Since it's a MSBuild task named `ValidateOpenApi` you can run it this command: `
 This command `./Run-SystemTest.ps1` will:
 
 1. Pack the MSBuild library
-2. Build the WebApi.MssBuild.SystemTest and inject the previously packed library
+2. Build the WebApi.MsBuild.SystemTest and inject the previously packed library
 
 Be careful since it will update the project dependencies to use a local version: do not commit this.
 
