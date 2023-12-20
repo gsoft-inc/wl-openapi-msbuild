@@ -14,14 +14,20 @@ Process {
     
     $workingDir = Join-Path $PSScriptRoot "src"
     $outputDir = Join-Path $PSScriptRoot ".output"
-    $sysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest"
+    $contractFirstSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.ContractFirst"
+    $codeFirstSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.CodeFirst"
 
     try {
         Push-Location $workingDir
 
         Exec { & dotnet pack -c Release -o "$outputDir" }
 
-        Push-Location $sysTestDir
+        Push-Location $contractFirstSysTestDir
+        
+        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
+        Exec { & dotnet build -c Release }
+        
+        Push-Location $codeFirstSysTestDir
         
         Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
         Exec { & dotnet build -c Release }

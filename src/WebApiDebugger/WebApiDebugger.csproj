@@ -15,6 +15,11 @@
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
+    <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>

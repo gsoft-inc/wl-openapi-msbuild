@@ -55,7 +55,7 @@ internal sealed class SpectralManager : ISpectralManager
             this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentPath);
             File.Delete(htmlReportPath);
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, htmlReportPath, cancellationToken);
-            this._loggerWrapper.LogMessage("\n *********************************************************", MessageImportance.High, documentPath);
+            this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
         }
     }
 
