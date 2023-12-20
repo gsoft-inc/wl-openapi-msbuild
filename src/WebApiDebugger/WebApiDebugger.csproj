@@ -15,6 +15,11 @@
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <DevelopmentMode>CodeFirst</DevelopmentMode>
+<!--    <ValidateCodeSync>true</ValidateCodeSync>-->
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>

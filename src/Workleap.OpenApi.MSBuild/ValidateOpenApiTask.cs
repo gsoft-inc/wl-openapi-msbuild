@@ -4,28 +4,43 @@ namespace Workleap.OpenApi.MSBuild;
 
 public sealed class ValidateOpenApiTask : CancelableAsyncTask
 {
+    private const string CodeFirst = "CodeFirst";
+    private const string ContractFirst = "ContractFirst";
+    
+    /// <summary>
+    /// 2 supported mode:
+    ///     - CodeFirst: Generate the OpenAPI specification files from the code
+    ///     - ContractFirst: Will use the OpenAPI specification files provided
+    /// </summary>
+    [Microsoft.Build.Framework.Required]
+    public string DevelopmentMode { get; set; } = string.Empty;
+
+    /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>  
+    [Microsoft.Build.Framework.Required]
+    public bool ValidateCodeSync { get; set; } = false;
+    
     /// <summary>The path of the ASP.NET Core project startup assembly directory.</summary>
     [Required]
     public string StartupAssemblyPath { get; set; } = string.Empty;
     
     /// <summary>The path of the ASP.NET Core project being built.</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string OpenApiWebApiAssemblyPath { get; set; } = string.Empty;
 
     /// <summary>The base directory path where the OpenAPI tools will be downloaded.</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string[] OpenApiSwaggerDocumentNames { get; set; } = Array.Empty<string>();
 
     /// <summary>The paths of the OpenAPI specification files to validate against.</summary>
-    [Required]
+    [Microsoft.Build.Framework.Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
@@ -39,6 +54,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+
+        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager);
+        var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
@@ -58,23 +76,36 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             await this.GeneratePublicNugetSource();
             Directory.CreateDirectory(reportsPath);
 
-            var installSwaggerCliTask = swaggerManager.InstallSwaggerCliAsync(cancellationToken);
-            var installSpectralTask = spectralManager.InstallSpectralAsync(cancellationToken);
-            var installOasdiffTask = oasdiffManager.InstallOasdiffAsync(cancellationToken);
-            
-            await installSwaggerCliTask;
-            await installSpectralTask;
-            await installOasdiffTask;
-
-            var generateOpenApiDocsPath = (await swaggerManager.RunSwaggerAsync(this.OpenApiSwaggerDocumentNames, cancellationToken)).ToList();
-            
-            if (!this.CheckIfBaseSpecExists())
+            switch (this.DevelopmentMode)
             {
-                return false;
+                case CodeFirst:
+                    await codeFirstProcess.Execute(
+                        this.OpenApiSpecificationFiles,
+                        this.OpenApiSwaggerDocumentNames,
+                        this.OpenApiSpectralRulesetUrl,
+                        cancellationToken);
+                    break;
+                
+                case ContractFirst:
+                    var isSuccess = await contractFirstProcess.Execute(
+                        this.OpenApiSpecificationFiles,
+                        this.OpenApiToolsDirectoryPath,
+                        this.OpenApiSwaggerDocumentNames,
+                        this.OpenApiSpectralRulesetUrl,
+                        this.ValidateCodeSync,
+                        cancellationToken);
+
+                    if (!isSuccess)
+                    {
+                        return false;
+                    }
+
+                    break;
+                
+                default:
+                    this.Log.LogError("Invalid value for {0}. Allowed values are '{1}' or '{2}'", nameof(ValidateOpenApiTask.DevelopmentMode), ContractFirst, CodeFirst);
+                    return false;
             }
-            
-            await spectralManager.RunSpectralAsync(this.OpenApiSpecificationFiles, this.OpenApiSpectralRulesetUrl, cancellationToken);
-            await oasdiffManager.RunOasdiffAsync(this.OpenApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
         catch (OpenApiTaskFailedException e)
         {
@@ -84,27 +115,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         return true;
     }
 
-    private bool CheckIfBaseSpecExists()
-    {
-        foreach (var file in this.OpenApiSpecificationFiles)
-        {
-            if (File.Exists(file))
-            {
-                continue;
-            }
-
-            this.Log.LogWarning(
-                "The file '{0}' does not exist. If you are running this for the first time, we have generated specification here '{1}' which can be used as base specification. " +
-                                "Please copy specification file(s) to your project directory and rebuild.", 
-                file, 
-                this.OpenApiToolsDirectoryPath);
-
-            return false;
-        }
-
-        return true;
-    }
-
+    // Why do we need to generate a public nuget source?
     private async Task GeneratePublicNugetSource()
     {
         Directory.CreateDirectory(this.OpenApiToolsDirectoryPath);
