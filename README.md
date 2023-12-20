@@ -9,7 +9,7 @@ Depending if the user chose the Contract-First or Code-First development mode th
 - Validate Spectral rules
 - Compare the given OpenAPI specification file with the generated one
 
-## How it work
+## How it works
 
 - The entry point is `ValidateOpenApiTask.ExecuteAsync()` and will be executed during the build process on project that reference it. This is defined in `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets` as a `UsingTask.TaskName`
 - The default value are defined in the property group on the target `ValidateOpenApi` in this file `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets`
