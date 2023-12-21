@@ -57,7 +57,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper); 
 
-        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager, specGeneratorManager);
+        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
         var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);

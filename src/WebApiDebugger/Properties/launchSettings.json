@@ -4,7 +4,7 @@
     "ContractFirstWithoutCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=disable",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=false",
       "workingDirectory": "$(ProjectDir)"
     },
     "ContractFirstWithCompare": {
