@@ -103,7 +103,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
                 
                 default:
-                    this.Log.LogError("Invalid value for {0}. Allowed values are '{1}' or '{2}'", nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
+                    this.Log.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
                     return false;
             }
         }
