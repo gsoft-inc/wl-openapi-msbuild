@@ -46,8 +46,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
-        this.Log.LogError("NOOOOO");
-        Debugger.Break();
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);

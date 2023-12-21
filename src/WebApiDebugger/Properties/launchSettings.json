@@ -4,7 +4,7 @@
     "ContractFirstWithoutCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=disable",
       "workingDirectory": "$(ProjectDir)"
     },
     "ContractFirstWithCompare": {
@@ -16,7 +16,7 @@
     "CodeFirst": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst2",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst",
       "workingDirectory": "$(ProjectDir)"
     },
     "WebApiDebugger": {

@@ -22,7 +22,11 @@ For the TLDR version:
 
 ### How debug the project
 
-Since it's a MSBuild task named `ValidateOpenApi` you can run it this command: `msbuild /t:ValidateOpenApi`. `./src/WebApiDebugger` already have a `launchSettings.json` named `ValidateOpenApi` that you can run in debug.
+Since it's a MSBuild task named `ValidateOpenApi` you can run it this command: `msbuild /t:ValidateOpenApi`. `./src/WebApiDebugger` already have some preconfigured in `launchSettings.json` that you can run in debug.
+
+Note: Before executing this task it will build the project.
+
+Warming: validate your IDE is in Configuration:Debug otherwise the execution will not be done on the most recent code.
 
 ### With the system test
 

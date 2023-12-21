@@ -26,7 +26,7 @@ internal class CodeFirstProcess
         string openApiSpectralRulesetUrl,
         CancellationToken cancellationToken)
     {
-        var isGenerationEnabled = string.Equals(Environment.GetEnvironmentVariable(DisableSpecGenEnvVarName), "true", StringComparison.OrdinalIgnoreCase);
+        var isGenerationEnabled = !string.Equals(Environment.GetEnvironmentVariable(DisableSpecGenEnvVarName), "true", StringComparison.OrdinalIgnoreCase);
 
         await this.InstallDependencies(isGenerationEnabled, cancellationToken);
         
@@ -46,7 +46,7 @@ internal class CodeFirstProcess
         var installationTasks = new List<Task>();    
         installationTasks.Add(this._spectralManager.InstallSpectralAsync(cancellationToken));        
 
-        if (!isGenerationEnable)
+        if (isGenerationEnable)
         {
             installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
         }

@@ -12,8 +12,6 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
-    <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
   </PropertyGroup>
 

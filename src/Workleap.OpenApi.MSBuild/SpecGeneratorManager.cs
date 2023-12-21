@@ -1,4 +1,6 @@
-﻿namespace Workleap.OpenApi.MSBuild;
+﻿using Microsoft.Build.Framework;
+
+namespace Workleap.OpenApi.MSBuild;
 
 internal class SpecGeneratorManager
 {
@@ -14,7 +16,7 @@ internal class SpecGeneratorManager
     /// </summary>
     public async Task UpdateSpecificationFilesAsync(IEnumerable<string> sourcedControlOpenApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
-        this._loggerWrapper.LogMessage("Starting updating specification files.");
+        this._loggerWrapper.LogMessage("\n ******** Spec Generator: Starting updating specification files. ******** \n", MessageImportance.High);
         
         foreach (var baseSpecFile in sourcedControlOpenApiSpecFiles)
         {
@@ -25,12 +27,14 @@ internal class SpecGeneratorManager
             
             if (generatedSpecFilePath == null)
             {
-                this._loggerWrapper.LogWarning($"Could not find a generated spec file for {baseSpecFile}.");
+                this._loggerWrapper.LogWarning("Could not find a generated spec file for {0}.", MessageImportance.High, baseSpecFile);
                 continue;
             }
             
-            this._loggerWrapper.LogMessage($"Overwriting {baseSpecFile} with {generatedSpecFilePath}.");
+            this._loggerWrapper.LogMessage("=> Overwriting {0} with {1}.", MessageImportance.High, fileName, generatedSpecFilePath);
             File.Copy(generatedSpecFilePath, baseSpecFile, true);
         }
+        
+        this._loggerWrapper.LogMessage("\n **************************************************************** \n", MessageImportance.High);
     }
 }
