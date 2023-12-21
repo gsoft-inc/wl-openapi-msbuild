@@ -16,7 +16,7 @@ internal class SpecGeneratorManager
     /// </summary>
     public async Task UpdateSpecificationFilesAsync(IEnumerable<string> sourcedControlOpenApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
-        this._loggerWrapper.LogMessage("\n ******** Spec Generator: Starting updating specification files. ******** \n", MessageImportance.High);
+        this._loggerWrapper.LogMessage("\n ******** Specification Generator: Updating specification files. ******** \n", MessageImportance.High);
         
         foreach (var baseSpecFile in sourcedControlOpenApiSpecFiles)
         {

@@ -52,7 +52,9 @@ internal sealed class SpectralManager : ISpectralManager
             var outputSpectralReportName = $"spectral-{documentName}.html";
             var htmlReportPath = Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
             
-            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentPath);
+            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ******** \n", MessageImportance.High, documentName);
+            this._loggerWrapper.LogMessage("- File path: {0}", MessageImportance.High, documentPath);
+            this._loggerWrapper.LogMessage("- Ruleset : {0}", MessageImportance.High, rulesetUrl);
             File.Delete(htmlReportPath);
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, htmlReportPath, cancellationToken);
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);

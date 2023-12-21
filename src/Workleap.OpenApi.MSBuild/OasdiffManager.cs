@@ -43,16 +43,18 @@ internal sealed class OasdiffManager : IOasdiffManager
 
         foreach (var baseSpecFile in openApiSpecFiles)
         {
-            this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison with {baseSpecFile} ********", MessageImportance.High);
-            
             var fileName = Path.GetFileName(baseSpecFile);
-            var generatedSpecFilePath = generatedOpenApiSpecFilesList.FirstOrDefault(x => x.Contains(fileName));
+            this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison with {fileName} ******** \n", MessageImportance.High);
             
+            var generatedSpecFilePath = generatedOpenApiSpecFilesList.FirstOrDefault(x => x.Contains(fileName));
             if (generatedSpecFilePath == null)
             {
                 this._loggerWrapper.LogWarning($"Could not find a generated spec file for {baseSpecFile}.");
                 continue;
             }
+
+            this._loggerWrapper.LogMessage("- Specification file path: {0}", MessageImportance.High, baseSpecFile);
+            this._loggerWrapper.LogMessage("- Specification generated from code path: {0}", MessageImportance.High, generatedSpecFilePath);
             
             var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
             this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
