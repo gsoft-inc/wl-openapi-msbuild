@@ -11,15 +11,17 @@ internal class CodeFirstProcess
     
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
+    private readonly SpecGeneratorManager _specGeneratorManager;
 
-    internal CodeFirstProcess(SpectralManager spectralManager, SwaggerManager swaggerManager)
+    internal CodeFirstProcess(SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager)
     {
         this._spectralManager = spectralManager;
         this._swaggerManager = swaggerManager;
+        this._specGeneratorManager = specGeneratorManager;
     }
     
     internal async Task Execute(
-        string[] openApiSpecificationFiles,
+        string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
         string openApiSpectralRulesetUrl,
         CancellationToken cancellationToken)
@@ -31,9 +33,10 @@ internal class CodeFirstProcess
         if (isGenerationEnabled)
         {
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+            await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         }
 
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
+        await this._spectralManager.RunSpectralAsync(openApiSpecificationFilesPath, openApiSpectralRulesetUrl, cancellationToken);
     }
 
     private async Task InstallDependencies(

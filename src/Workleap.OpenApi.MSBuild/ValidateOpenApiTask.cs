@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
@@ -24,27 +25,29 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string StartupAssemblyPath { get; set; } = string.Empty;
     
     /// <summary>The path of the ASP.NET Core project being built.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiWebApiAssemblyPath { get; set; } = string.Empty;
 
     /// <summary>The base directory path where the OpenAPI tools will be downloaded.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string[] OpenApiSwaggerDocumentNames { get; set; } = Array.Empty<string>();
 
     /// <summary>The paths of the OpenAPI specification files to validate against.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
+        this.Log.LogError("NOOOOO");
+        Debugger.Break();
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
@@ -54,8 +57,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper); 
 
-        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager);
+        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager, specGeneratorManager);
         var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);

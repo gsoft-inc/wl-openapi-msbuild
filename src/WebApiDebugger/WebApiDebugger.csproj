@@ -12,12 +12,9 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
     <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
+    <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
   </PropertyGroup>
 
   <ItemGroup>
