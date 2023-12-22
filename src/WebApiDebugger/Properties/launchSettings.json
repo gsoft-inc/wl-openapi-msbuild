@@ -19,6 +19,15 @@
       "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst",
       "workingDirectory": "$(ProjectDir)"
     },
+    "CodeFirstOnCI": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst",
+      "workingDirectory": "$(ProjectDir)",
+      "environmentVariables": {
+        "WL_COMPARE_SPEC": "true"
+      }
+    },
     "WebApiDebugger": {
       "commandName": "Project",
       "dotnetRunMessages": true,

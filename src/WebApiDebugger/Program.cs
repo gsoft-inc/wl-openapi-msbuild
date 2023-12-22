@@ -9,8 +9,6 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI();
 
-throw new Exception("Some exception throw while configuring the application");
-
 app.UseHttpsRedirection();
 app.UseAuthorization();
 

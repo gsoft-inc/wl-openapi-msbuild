@@ -14,20 +14,22 @@ internal class SpecGeneratorManager
     /// <summary>
     /// Will overwrite the sourced-control specification files with the generated ones.
     /// </summary>
-    public async Task UpdateSpecificationFilesAsync(IEnumerable<string> sourcedControlOpenApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
+    public async Task UpdateSpecificationFilesAsync(IReadOnlyCollection<string> sourcedControlOpenApiSpecFiles, IReadOnlyCollection<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("\n ******** Specification Generator: Updating specification files. ******** \n", MessageImportance.High);
+        
+        var filesPath = generatedOpenApiSpecFiles.ToDictionary(Path.GetFileName, x => x);
         
         foreach (var baseSpecFile in sourcedControlOpenApiSpecFiles)
         {
             cancellationToken.ThrowIfCancellationRequested();
             
             var fileName = Path.GetFileName(baseSpecFile);
-            var generatedSpecFilePath = generatedOpenApiSpecFiles.FirstOrDefault(x => x.Contains(fileName));
             
-            if (generatedSpecFilePath == null)
+            var isFileFound = filesPath.TryGetValue(fileName, out var generatedSpecFilePath);
+            if (!isFileFound || string.IsNullOrEmpty(generatedSpecFilePath))
             {
-                this._loggerWrapper.LogWarning("Could not find a generated spec file for {0}.", MessageImportance.High, baseSpecFile);
+                this._loggerWrapper.LogWarning("Could not find a generated spec file for {0}.", fileName);
                 continue;
             }
             
