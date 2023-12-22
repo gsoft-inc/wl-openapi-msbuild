@@ -2,50 +2,65 @@
 
 /// <summary>
 /// For a Code First approach it will:
-///     1. (if not disabled) Generate the OpenAPI specification files from the code
+///     1. Generate the OpenAPI specification files from the code
+///     2. Depending of <see cref="CodeFirstMode"/> it will either will compare the generated OpenAPI specification files against the provided specifications or it will update the source-controlled specification files 
 ///     2. Validate the OpenAPI specification files base on spectral rules 
 /// </summary>
 internal class CodeFirstProcess
 {
-    private const string DisableSpecGenEnvVarName = "WL_DISABLE_SPECGEN";
-    
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
+    private readonly SpecGeneratorManager _specGeneratorManager;
+    private readonly OasdiffManager _oasdiffManager;
 
-    internal CodeFirstProcess(SpectralManager spectralManager, SwaggerManager swaggerManager)
+    internal CodeFirstProcess(SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
     {
         this._spectralManager = spectralManager;
         this._swaggerManager = swaggerManager;
+        this._specGeneratorManager = specGeneratorManager;
+        this._oasdiffManager = oasdiffManager;
+    }
+    
+    internal enum CodeFirstMode
+    {
+        SpecGeneration,
+        SpecComparison,
     }
     
     internal async Task Execute(
-        string[] openApiSpecificationFiles,
+        string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
         string openApiSpectralRulesetUrl,
+        CodeFirstMode mode,
         CancellationToken cancellationToken)
     {
-        var isGenerationEnabled = string.Equals(Environment.GetEnvironmentVariable(DisableSpecGenEnvVarName), "true", StringComparison.OrdinalIgnoreCase);
-
-        await this.InstallDependencies(isGenerationEnabled, cancellationToken);
+        await this.InstallDependencies(mode, cancellationToken);
         
-        if (isGenerationEnabled)
+        var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+
+        if (mode == CodeFirstMode.SpecGeneration)
         {
-            var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+            await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
+        } 
+        else
+        {
+            await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         }
 
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
+        await this._spectralManager.RunSpectralAsync(openApiSpecificationFilesPath, openApiSpectralRulesetUrl, cancellationToken);
     }
 
     private async Task InstallDependencies(
-        bool isGenerationEnable,
+        CodeFirstMode mode,
         CancellationToken cancellationToken)
     {
         var installationTasks = new List<Task>();    
         installationTasks.Add(this._spectralManager.InstallSpectralAsync(cancellationToken));        
-
-        if (!isGenerationEnable)
+        installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
+        
+        if (mode == CodeFirstMode.SpecComparison)
         {
-            installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
+            installationTasks.Add(this._oasdiffManager.InstallOasdiffAsync(cancellationToken));
         }
 
         await Task.WhenAll(installationTasks);

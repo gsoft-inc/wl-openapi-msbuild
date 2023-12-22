@@ -1,10 +1,28 @@
 ﻿{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "ValidateOpenApi": {
+    "ContractFirstWithoutCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=false",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "ContractFirstWithCompare": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=true",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "CodeFirst": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "CodeFirstOnCI": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst /p:OpenApiCompareCodeAgainstSpecFile=true",
       "workingDirectory": "$(ProjectDir)"
     },
     "WebApiDebugger": {

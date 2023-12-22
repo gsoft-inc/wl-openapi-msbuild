@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
@@ -24,23 +25,23 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string StartupAssemblyPath { get; set; } = string.Empty;
     
     /// <summary>The path of the ASP.NET Core project being built.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiWebApiAssemblyPath { get; set; } = string.Empty;
 
     /// <summary>The base directory path where the OpenAPI tools will be downloaded.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string[] OpenApiSwaggerDocumentNames { get; set; } = Array.Empty<string>();
 
     /// <summary>The paths of the OpenAPI specification files to validate against.</summary>
-    [Microsoft.Build.Framework.Required]
+    [Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
@@ -54,8 +55,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper); 
 
-        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager);
+        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
         var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
@@ -83,6 +85,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
                         this.OpenApiSpectralRulesetUrl,
+                        this.OpenApiCompareCodeAgainstSpecFile ? CodeFirstProcess.CodeFirstMode.SpecComparison : CodeFirstProcess.CodeFirstMode.SpecGeneration,
                         cancellationToken);
                     break;
                 
@@ -103,7 +106,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
                 
                 default:
-                    this.Log.LogError("Invalid value for {0}. Allowed values are '{1}' or '{2}'", nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
+                    this.Log.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
                     return false;
             }
         }

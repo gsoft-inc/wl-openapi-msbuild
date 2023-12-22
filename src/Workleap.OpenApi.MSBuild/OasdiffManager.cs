@@ -36,23 +36,28 @@ internal sealed class OasdiffManager : IOasdiffManager
         this._loggerWrapper.LogMessage("Oasdiff installation completed.");
     }
 
-    public async Task RunOasdiffAsync(IEnumerable<string> openApiSpecFiles, IEnumerable<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
+    public async Task RunOasdiffAsync(IReadOnlyCollection<string> openApiSpecFiles, IReadOnlyCollection<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
         var generatedOpenApiSpecFilesList = generatedOpenApiSpecFiles.ToList();
         var oasdiffExecutePath = Path.Combine(this._oasdiffDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "oasdiff.exe" : "oasdiff");
+        
+        var filesPath = generatedOpenApiSpecFiles.ToDictionary(Path.GetFileName, x => x);
 
         foreach (var baseSpecFile in openApiSpecFiles)
         {
-            this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison with {baseSpecFile} ********", MessageImportance.High);
-            
             var fileName = Path.GetFileName(baseSpecFile);
-            var generatedSpecFilePath = generatedOpenApiSpecFilesList.FirstOrDefault(x => x.Contains(fileName));
             
-            if (generatedSpecFilePath == null)
+            this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison with {fileName} ******** \n", MessageImportance.High);
+            
+            var isFileFound = filesPath.TryGetValue(fileName, out var generatedSpecFilePath);
+            if (!isFileFound || string.IsNullOrEmpty(generatedSpecFilePath))
             {
-                this._loggerWrapper.LogWarning($"Could not find a generated spec file for {baseSpecFile}.");
+                this._loggerWrapper.LogWarning($"Could not find a generated spec file for {fileName}.");
                 continue;
             }
+
+            this._loggerWrapper.LogMessage("- Specification file path: {0}", MessageImportance.High, baseSpecFile);
+            this._loggerWrapper.LogMessage("- Specification generated from code path: {0} \n", MessageImportance.High, generatedSpecFilePath);
             
             var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
             this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
