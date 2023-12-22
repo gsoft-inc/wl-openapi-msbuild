@@ -85,6 +85,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
                         this.OpenApiSpectralRulesetUrl,
+                        this.OpenApiCompareCodeAgainstSpecFile ? CodeFirstProcess.CodeFirstMode.SpecComparison : CodeFirstProcess.CodeFirstMode.SpecGeneration,
                         cancellationToken);
                     break;
                 
