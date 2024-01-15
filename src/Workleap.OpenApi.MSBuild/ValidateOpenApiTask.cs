@@ -118,7 +118,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         return true;
     }
 
-    // Why do we need to generate a public nuget source?
+    // To avoid depending on the client feeds, which can can be private, we will exclusively use the public nuget feed.
     private async Task GeneratePublicNugetSource()
     {
         Directory.CreateDirectory(this.OpenApiToolsDirectoryPath);
