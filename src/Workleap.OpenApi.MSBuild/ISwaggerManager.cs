@@ -1,6 +1,6 @@
 namespace Workleap.OpenApi.MSBuild;
 
-public interface ISwaggerManager
+internal interface ISwaggerManager
 {
     Task<IEnumerable<string>> RunSwaggerAsync(string[] openApiSwaggerDocumentNames, CancellationToken cancellationToken);
 
