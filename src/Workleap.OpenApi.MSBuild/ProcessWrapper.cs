@@ -6,7 +6,7 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class ProcessWrapper : IProcessWrapper
 {
     private readonly string _workingDirectory;
-    private readonly Dictionary<string, string?> _defaultEnvVars = new();
+    private static readonly Dictionary<string, string?> _defaultEnvVars = new();
 
     public ProcessWrapper(string workingDirectory)
     {
