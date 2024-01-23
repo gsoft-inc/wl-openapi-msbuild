@@ -51,7 +51,7 @@ internal sealed class SwaggerManager : ISwaggerManager
         {
             var result = await this._processWrapper.RunProcessAsync(
                 "dotnet",
-                new[] { "tool", "update", "Swashbuckle.AspNetCore.Cli", "--ignore-failed-sources", "--tool-path", this._swaggerDirectory, "--configfile", Path.Combine(this._openApiToolsDirectoryPath, "nuget.config"), "--version", SwaggerVersion },
+                ["tool", "update", "Swashbuckle.AspNetCore.Cli", "--ignore-failed-sources", "--tool-path", this._swaggerDirectory, "--configfile", Path.Combine(this._openApiToolsDirectoryPath, "nuget.config"), "--version", SwaggerVersion],
                 cancellationToken);
 
             if (result.ExitCode != 0 && retryCount != 1)
