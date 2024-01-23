@@ -6,11 +6,11 @@
     <PackageProjectUrl>https://github.com/gsoft-inc/wl-openapi-msbuild</PackageProjectUrl>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <LangVersion>10</LangVersion>
+    <LangVersion>12</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Description>TODO.</Description>
-    <AnalysisLevel>6.0-all</AnalysisLevel>
+    <AnalysisLevel>8.0-all</AnalysisLevel>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
