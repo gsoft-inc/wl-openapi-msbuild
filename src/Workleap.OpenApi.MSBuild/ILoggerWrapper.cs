@@ -2,7 +2,7 @@ using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
 
-public interface ILoggerWrapper
+internal interface ILoggerWrapper
 {
     void LogWarning(string message, params object[] messageArgs);
 

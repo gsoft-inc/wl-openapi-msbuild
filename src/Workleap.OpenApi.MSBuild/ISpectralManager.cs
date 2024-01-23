@@ -1,6 +1,6 @@
 namespace Workleap.OpenApi.MSBuild;
 
-public interface ISpectralManager
+internal interface ISpectralManager
 {
     public Task InstallSpectralAsync(CancellationToken cancellationToken);
 
