@@ -76,7 +76,7 @@ internal sealed class SwaggerManager : ISwaggerManager
     public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
         var envVars = new Dictionary<string, string?>() { { "DOTNET_ROLL_FORWARD", "LatestMajor" } };
-        var result = await this._processWrapper.RunProcessAsync(swaggerExePath, new[] { "tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName }, cancellationToken: cancellationToken, envVars: envVars);
+        var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: cancellationToken, envVars: envVars);
         this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
 
         if (result.ExitCode != 0)
