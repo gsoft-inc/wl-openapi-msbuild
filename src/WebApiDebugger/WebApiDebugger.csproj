@@ -5,6 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <IsPackable>false</IsPackable>
     <WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+    <OpenApiEnabled>true</OpenApiEnabled>
   </PropertyGroup>
 
   <ItemGroup>
