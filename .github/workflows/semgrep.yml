@@ -9,6 +9,8 @@ on:
 
 jobs:
   call-workflow-semgrep:
+    permissions:
+      security-events: write
     uses: gsoft-inc/wl-reusable-workflows/.github/workflows/reusable-semgrep-workflow.yml@feature/idp-948_shared_semgrep_workflow
     with:
       github_event_name: ${{ github.event_name }}
