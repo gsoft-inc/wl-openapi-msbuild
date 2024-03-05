@@ -7,7 +7,7 @@ on:
 
 jobs:
   call-workflow-jira:
-    uses: gsoft-inc/wl-renovate-workflow/.github/workflows/jira-workflow.yml@feature/idp-912_shared_jira_workflow
+    uses: gsoft-inc/wl-renovate-workflow/.github/workflows/reusable-jira-workflow.yml@feature/idp-912_shared_jira_workflow
     with:
       branch_name: ${{ github.head_ref }}
     secrets: inherit
