@@ -9,5 +9,5 @@ jobs:
   call-workflow-jira:
     uses: gsoft-inc/wl-renovate-workflow/.github/workflows/jira-workflow.yml@feature/idp-912_shared_jira_workflow
     with:
-      branch_name: $env:GITHUB_HEAD_REF
+      branch_name: ${GITHUB_REF#refs/heads/}
     secrets: inherit
