@@ -53,7 +53,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
 
-        using var httpClientWrapper = new HttpClientWrapper();
+        var httpClientWrapper = new HttpClientWrapper();
 
         var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);

@@ -1,6 +1,4 @@
-﻿using Microsoft.Build.Framework;
-
-namespace Workleap.OpenApi.MSBuild;
+﻿namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
 /// For a Code First approach it will:

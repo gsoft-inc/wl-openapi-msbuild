@@ -47,7 +47,7 @@ internal sealed class SpectralManager : ISpectralManager
         var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
         // We download the file before to isolate flakiness in the spectral execution
-        var rulesetPath = IsLocalFile(rulesetUrl) ? rulesetUrl : await this.DownloadFileAsync(rulesetUrl);
+        var rulesetPath = IsLocalFile(rulesetUrl) ? rulesetUrl : await this.DownloadFileAsync(rulesetUrl, cancellationToken);
 
         foreach (var documentPath in swaggerDocumentPaths)
         {
@@ -94,20 +94,14 @@ internal sealed class SpectralManager : ISpectralManager
         return fileName;
     }
     
-    private async Task<string> DownloadFileAsync(string rulesetUrl)
+    private async Task<string> DownloadFileAsync(string rulesetUrl, CancellationToken cancellationToken)
     {
         try
         {
             this._loggerWrapper.LogMessage("Downloading rule file {0}", MessageImportance.Normal, rulesetUrl);
             
-            using var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync(rulesetUrl);
-            response.EnsureSuccessStatusCode();
-
-            var fileBytes = await response.Content.ReadAsByteArrayAsync();
-
             var outputFilePath = Path.ChangeExtension(Path.GetTempFileName(), "yaml");
-            File.WriteAllBytes(outputFilePath, fileBytes);
+            await this._httpClientWrapper.DownloadFileToDestinationAsync(rulesetUrl, outputFilePath, cancellationToken);
             
             this._loggerWrapper.LogMessage("Download completed", MessageImportance.Normal);
 
