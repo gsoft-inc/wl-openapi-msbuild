@@ -46,6 +46,8 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
+        this.Log.LogMessage(MessageImportance.Normal, "\n******** Starting {0} ********\n", nameof(ValidateOpenApiTask));
+        
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
@@ -57,9 +59,11 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper); 
 
-        var codeFirstProcess = new CodeFirstProcess(spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var codeFirstProcess = new CodeFirstProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
         var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
+        this.Log.LogMessage(MessageImportance.Normal, "{0} = '{1}'", nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
+        this.Log.LogMessage(MessageImportance.Normal, "{0} = '{1}'", nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
         this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
@@ -81,6 +85,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             switch (this.OpenApiDevelopmentMode)
             {
                 case CodeFirst:
+                    this.Log.LogMessage(MessageImportance.Normal, "\nStarting code first...");
                     await codeFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
@@ -90,6 +95,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
                 
                 case ContractFirst:
+                    this.Log.LogMessage(MessageImportance.Normal, "\nStarting contract first...");
                     var isSuccess = await contractFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiToolsDirectoryPath,

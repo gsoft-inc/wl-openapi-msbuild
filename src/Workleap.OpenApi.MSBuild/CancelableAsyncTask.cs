@@ -28,7 +28,7 @@ public abstract class CancelableAsyncTask : Microsoft.Build.Utilities.Task, ICan
                 return false;
             }
 
-            // TODO print a message to the user that the task timed out?
+            this.Log.LogWarningFromException(ocex);
             return false;
         }
         finally

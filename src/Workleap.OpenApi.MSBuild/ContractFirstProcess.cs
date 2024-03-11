@@ -39,14 +39,19 @@ internal class ContractFirstProcess
             return false;
         }
 
+        this._loggerWrapper.LogMessage("Installing dependencies...");
         await this.InstallDependencies(compareCodeAgainstSpecFile, cancellationToken);
         
         if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
+            this._loggerWrapper.LogMessage("Running Swagger...");
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+            
+            this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
 
+        this._loggerWrapper.LogMessage("Running Spectral...");
         await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
 
         return true;
