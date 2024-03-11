@@ -55,9 +55,9 @@ internal sealed class SpectralManager : ISpectralManager
             var outputSpectralReportName = $"spectral-{documentName}.html";
             var htmlReportPath = Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
             
-            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ******** \n", MessageImportance.High, documentName);
+            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentName);
             this._loggerWrapper.LogMessage("- File path: {0}", MessageImportance.High, documentPath);
-            this._loggerWrapper.LogMessage("- Ruleset : {0}", MessageImportance.High, rulesetUrl);
+            this._loggerWrapper.LogMessage("- Ruleset : {0}\n", MessageImportance.High, rulesetUrl);
 
             if (File.Exists(htmlReportPath))
             {
@@ -126,8 +126,8 @@ internal sealed class SpectralManager : ISpectralManager
         {
             return uri.IsFile;
         }
-
-        return false;
+        
+        return true;
     }
 
     private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetPath, string htmlReportPath, CancellationToken cancellationToken)
