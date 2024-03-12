@@ -128,7 +128,7 @@ internal sealed class SpectralManager : ISpectralManager
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            this._loggerWrapper.LogMessage("Providing execute permission to {0}", MessageImportance.Normal, spectralExecutePath);
+            this._loggerWrapper.LogMessage("Granting execute permission to {0}", MessageImportance.Normal, spectralExecutePath);
             await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
 
