@@ -22,11 +22,8 @@ public static class SwaggerHostFactory
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            // Mandatory for Swagger to discover the endpoints (leave as is)
             services.AddControllers();
             
-            /// Should have the same configuration as the main program (document name, filter,...)
-            /// Ideally extract the configuration logic in a extension method (i.e: AddSwagger)
             services.AddSwaggerGen();
         }
 
