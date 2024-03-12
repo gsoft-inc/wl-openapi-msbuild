@@ -25,12 +25,12 @@ Process {
         Push-Location $contractFirstSysTestDir
         
         Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
-        Exec { & dotnet build -c Release }
+        Exec { & dotnet build -c Release -warnaserror }
         
         Push-Location $codeFirstSysTestDir
         
         Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
-        Exec { & dotnet build -c Release }
+        Exec { & dotnet build -c Release -warnaserror }
 
     }
     finally {
