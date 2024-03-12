@@ -27,7 +27,7 @@ jobs:
       - run: ./Build.ps1
         shell: pwsh
         env:
-          NUGET_SOURCE: "https://pkgs.dev.azure.com/gsoft/_packaging/gsoftdev/nuget/v3/index.json"
+          NUGET_SOURCE: ${{ secrets.NUGET_GSOFTDEV_FEED_URL }}
           NUGET_API_KEY: ""
 
       - run: ./Run-SystemTest.ps1
