@@ -1,4 +1,4 @@
 extends: [https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.1.0/.spectral.yaml]
 rules:
-  duplicated-entry-in-enum: false // Disabling a rule
-  license-url: true // Enabling a new rule
+  duplicated-entry-in-enum: false
+  license-url: true
