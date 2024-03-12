@@ -18,19 +18,11 @@ jobs:
 
       - name: Check if feed is empty
         run: |
-          if [ -z "${{  secrets.NUGET_GSOFTDEV_FEED_URL }}" ]; then
+          if [ -z "${{  secrets.DO_NOT_EXIST }}" ]; then
             echo "Feed is empty"
           else
             echo "Feed is not empty"
           fi
-
-      - name: Check if secret is empty
-        run: |
-          if [ -z "${{  secrets.GSOFT_NUGET_API_KEY  }}" ]; then
-            echo "Secret is empty"
-          else
-            echo "Secret is not empty"
-          fi        
 
       - run: ./Build.ps1
         shell: pwsh
