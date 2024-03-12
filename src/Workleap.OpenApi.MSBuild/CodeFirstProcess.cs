@@ -8,13 +8,15 @@
 /// </summary>
 internal class CodeFirstProcess
 {
+    private readonly ILoggerWrapper _loggerWrapper;
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
     private readonly SpecGeneratorManager _specGeneratorManager;
     private readonly OasdiffManager _oasdiffManager;
 
-    internal CodeFirstProcess(SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
+    internal CodeFirstProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
     {
+        this._loggerWrapper = loggerWrapper;
         this._spectralManager = spectralManager;
         this._swaggerManager = swaggerManager;
         this._specGeneratorManager = specGeneratorManager;
@@ -34,19 +36,24 @@ internal class CodeFirstProcess
         CodeFirstMode mode,
         CancellationToken cancellationToken)
     {
+        this._loggerWrapper.LogMessage("Installing dependencies...");
         await this.InstallDependencies(mode, cancellationToken);
         
+        this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
 
         if (mode == CodeFirstMode.SpecGeneration)
         {
+            this._loggerWrapper.LogMessage("Generating specification files...");
             await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         } 
         else
         {
+            this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         }
 
+        this._loggerWrapper.LogMessage("Running Spectral...");
         await this._spectralManager.RunSpectralAsync(openApiSpecificationFilesPath, openApiSpectralRulesetUrl, cancellationToken);
     }
 

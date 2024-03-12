@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: 'WebApiDebugger'
+  title: WebApiDebugger
   version: '1.0'
 paths:
   /WeatherForecast:
@@ -10,7 +10,7 @@ paths:
       operationId: GetWeatherForecast
       responses:
         '200':
-          description: Success --- New Description
+          description: Success
           content:
             application/json:
               schema:

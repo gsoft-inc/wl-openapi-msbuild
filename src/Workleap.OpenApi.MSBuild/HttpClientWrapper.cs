@@ -1,8 +1,8 @@
 namespace Workleap.OpenApi.MSBuild;
 
-internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
+internal sealed class HttpClientWrapper : IHttpClientWrapper
 {
-    private readonly HttpClient _httpClient = new() { Timeout = TimeSpan.FromSeconds(10) };
+    private readonly HttpClient _httpClient = SharedHttpClient.Instance;
 
     public async Task DownloadFileToDestinationAsync(string url, string destination, CancellationToken cancellationToken)
     {
@@ -45,10 +45,5 @@ internal sealed class HttpClientWrapper : IHttpClientWrapper, IDisposable
 
         // In order to use cancellationToken we need to specify a bufferSize, so we just use the default value
         await responseStream.CopyToAsync(fileTarget, 81920, cancellationToken);
-    }
-
-    public void Dispose()
-    {
-        this._httpClient.Dispose();
     }
 }

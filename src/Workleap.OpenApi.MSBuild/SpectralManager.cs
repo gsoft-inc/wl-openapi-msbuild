@@ -45,6 +45,9 @@ internal sealed class SpectralManager : ISpectralManager
         this._loggerWrapper.LogMessage("Starting Spectral report generation.");
         
         var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
+        
+        // We download the file before to isolate flakiness in the spectral execution
+        var rulesetPath = IsLocalFile(rulesetUrl) ? rulesetUrl : await this.DownloadFileAsync(rulesetUrl, cancellationToken);
 
         foreach (var documentPath in swaggerDocumentPaths)
         {
@@ -52,11 +55,17 @@ internal sealed class SpectralManager : ISpectralManager
             var outputSpectralReportName = $"spectral-{documentName}.html";
             var htmlReportPath = Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
             
-            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ******** \n", MessageImportance.High, documentName);
+            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentName);
             this._loggerWrapper.LogMessage("- File path: {0}", MessageImportance.High, documentPath);
-            this._loggerWrapper.LogMessage("- Ruleset : {0}", MessageImportance.High, rulesetUrl);
-            File.Delete(htmlReportPath);
-            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetUrl, htmlReportPath, cancellationToken);
+            this._loggerWrapper.LogMessage("- Ruleset : {0}\n", MessageImportance.High, rulesetUrl);
+
+            if (File.Exists(htmlReportPath))
+            {
+                this._loggerWrapper.LogMessage("\nDeleting existing report: {0}", messageArgs: htmlReportPath);
+                File.Delete(htmlReportPath);
+            }
+            
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetPath, htmlReportPath, cancellationToken);
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
         }
     }
@@ -84,15 +93,48 @@ internal sealed class SpectralManager : ISpectralManager
 
         return fileName;
     }
+    
+    private async Task<string> DownloadFileAsync(string rulesetUrl, CancellationToken cancellationToken)
+    {
+        try
+        {
+            this._loggerWrapper.LogMessage("Downloading rule file {0}", MessageImportance.Normal, rulesetUrl);
+            
+            var outputFilePath = Path.ChangeExtension(Path.GetTempFileName(), "yaml");
+            await this._httpClientWrapper.DownloadFileToDestinationAsync(rulesetUrl, outputFilePath, cancellationToken);
+            
+            this._loggerWrapper.LogMessage("Download completed", MessageImportance.Normal);
 
-    private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetUrl, string htmlReportPath, CancellationToken cancellationToken)
+            return outputFilePath;
+        }
+        catch (Exception e)
+        {
+            this._loggerWrapper.LogWarning(e.Message);
+            throw new OpenApiTaskFailedException($"Failed to download {rulesetUrl}.");
+        }
+    }
+    
+    private static bool IsLocalFile(string url)
+    {
+        if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
+        {
+            return uri.IsFile;
+        }
+        
+        return true;
+    }
+
+    private async Task GenerateSpectralReport(string spectralExecutePath, string swaggerDocumentPath, string rulesetPath, string htmlReportPath, CancellationToken cancellationToken)
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
+            this._loggerWrapper.LogMessage("Granting execute permission to {0}", MessageImportance.Normal, spectralExecutePath);
             await this.AssignExecutePermission(spectralExecutePath, cancellationToken);
         }
 
-        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetUrl, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn" }, cancellationToken);
+        this._loggerWrapper.LogMessage("Running Spectral...", MessageImportance.Normal);
+        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetPath, "--format", "html", "--format", "pretty", "--output.html", htmlReportPath, "--fail-severity=warn", "--verbose" }, cancellationToken);
+        
         this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
         if (!string.IsNullOrEmpty(result.StandardError))
         {
