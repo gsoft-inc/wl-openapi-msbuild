@@ -44,7 +44,7 @@ internal class CodeFirstProcess
 
         if (mode == CodeFirstMode.SpecGeneration)
         {
-            this._loggerWrapper.LogMessage("Updating specification files...");
+            this._loggerWrapper.LogMessage("Generating specification files...");
             await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         } 
         else
