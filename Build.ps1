@@ -28,7 +28,7 @@ Process {
         if (($null -ne $env:NUGET_SOURCE ) -and ($null -ne $env:NUGET_API_KEY)) {
             # Output the NUGET_SOURCE
             Write-Host "NUGET_SOURCE: $env:NUGET_SOURCE"
-            Exec { & dotnet nuget push "$nupkgsPath" }
+            Exec { & dotnet nuget push "$nupkgsPath" -s $env:NUGET_SOURCE -k $env:NUGET_API_KEY }
         }
     }
     finally {
