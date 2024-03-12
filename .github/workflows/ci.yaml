@@ -16,19 +16,11 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
 
-      - name: Check if feed is empty
-        run: |
-          if [ -z "${{  secrets.DO_NOT_EXIST }}" ]; then
-            echo "Feed is empty"
-          else
-            echo "Feed is not empty"
-          fi
-
       - run: ./Build.ps1
         shell: pwsh
         env:
           NUGET_SOURCE: ${{ secrets.NUGET_GSOFTDEV_FEED_URL }}
-          NUGET_API_KEY: ""
+          NUGET_API_KEY: ${{ secrets.GSOFT_NUGET_API_KEY }}
 
       - run: ./Run-SystemTest.ps1
         shell: pwsh
