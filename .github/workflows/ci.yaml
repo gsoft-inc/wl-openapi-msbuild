@@ -16,12 +16,26 @@ jobs:
 
       - uses: actions/setup-dotnet@v4
 
-      - run: echo ${{ secrets.NUGET_GSOFTDEV_FEED_URL }}
+      - name: Check if feed is empty
+        run: |
+          if [ -z "${{  secrets.NUGET_GSOFTDEV_FEED_URL }}" ]; then
+            echo "Feed is empty"
+          else
+            echo "Feed is not empty"
+          fi
+
+      - name: Check if secret is empty
+        run: |
+          if [ -z "${{  secrets.GSOFT_NUGET_API_KEY  }}" ]; then
+            echo "Secret is empty"
+          else
+            echo "Secret is not empty"
+          fi        
 
       - run: ./Build.ps1
         shell: pwsh
         env:
-          NUGET_SOURCE: ${{ secrets.NUGET_GSOFTDEV_FEED_URL }}
+          NUGET_SOURCE: "https://pkgs.dev.azure.com/gsoft/_packaging/gsoftdev/nuget/v3/index.json"
           NUGET_API_KEY: ""
 
       - run: ./Run-SystemTest.ps1
