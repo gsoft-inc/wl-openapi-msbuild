@@ -11,6 +11,7 @@
     <PropertyGroup>
       <OpenApiDevelopmentMode>CodeFirst</OpenApiDevelopmentMode>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

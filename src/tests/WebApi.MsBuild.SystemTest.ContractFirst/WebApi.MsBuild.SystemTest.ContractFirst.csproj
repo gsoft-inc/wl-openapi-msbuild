@@ -14,6 +14,7 @@
       <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
       <OpenApiSpectralRulesetUrl>./custom.spectral.yaml</OpenApiSpectralRulesetUrl>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

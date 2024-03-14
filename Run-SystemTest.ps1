@@ -16,6 +16,8 @@ Process {
     $outputDir = Join-Path $PSScriptRoot ".output"
     $contractFirstSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.ContractFirst"
     $codeFirstSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.CodeFirst"
+    $oasDiffErrorSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.OasDiffError"
+    $spectralErrorSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.SpectralError"
 
     try {
         Push-Location $workingDir
@@ -25,12 +27,22 @@ Process {
         Push-Location $contractFirstSysTestDir
         
         Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
-        Exec { & dotnet build -c Release -warnaserror }
+        Exec { & dotnet build -c Release }
         
         Push-Location $codeFirstSysTestDir
         
         Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
-        Exec { & dotnet build -c Release -warnaserror }
+        Exec { & dotnet build -c Release }
+
+        Push-Location $oasDiffErrorSysTestDir
+        
+        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
+        Exec { & dotnet build -c Release }
+        
+        Push-Location $spectralErrorSysTestDir
+        
+        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $outputDir }
+        Exec { & dotnet build -c Release }
 
     }
     finally {
