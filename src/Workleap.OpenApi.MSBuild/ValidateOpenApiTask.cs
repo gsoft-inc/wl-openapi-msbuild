@@ -44,11 +44,11 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
     /// <summary>If should log error instead of warning</summary>
-    public bool TreatWarningsAsErrors { get; set; }
+    public bool OpenApiTreatWarningsAsErrors { get; set; }
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
-        var loggerWrapper = new LoggerWrapper(this.Log, this.TreatWarningsAsErrors);
+        var loggerWrapper = new LoggerWrapper(this.Log, this.OpenApiTreatWarningsAsErrors);
 
         loggerWrapper.LogMessage("\n******** Starting {0} ********\n", MessageImportance.Normal, nameof(ValidateOpenApiTask));
 
@@ -67,7 +67,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
-        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.TreatWarningsAsErrors), this.TreatWarningsAsErrors);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);

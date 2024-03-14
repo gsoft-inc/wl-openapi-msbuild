@@ -5,7 +5,7 @@ namespace Workleap.OpenApi.MSBuild;
 
 internal sealed class OasdiffManager : IOasdiffManager
 {
-    private const string OasdiffVersion = "1.9.6";
+    private const string OasdiffVersion = "1.10.11";
     private const string OasdiffDownloadUrlFormat = "https://github.com/Tufin/oasdiff/releases/download/v{0}/{1}";
 
     private readonly ILoggerWrapper _loggerWrapper;
@@ -59,9 +59,19 @@ internal sealed class OasdiffManager : IOasdiffManager
             this._loggerWrapper.LogMessage("- Specification file path: {0}", MessageImportance.High, baseSpecFile);
             this._loggerWrapper.LogMessage("- Specification generated from code path: {0} \n", MessageImportance.High, generatedSpecFilePath);
             
-            var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-f", "text", "-o" }, cancellationToken);
-            this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
-            if (!string.IsNullOrEmpty(result.StandardError))
+            var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-o" }, cancellationToken);
+            if (string.IsNullOrEmpty(result.StandardError))
+            {
+                var isChangesDetected = result.ExitCode != 0;
+                this._loggerWrapper.LogMessage("Exit code {0}", MessageImportance.Normal, result.ExitCode);
+                if (isChangesDetected)
+                {
+                    this._loggerWrapper.LogWarning($"Server doesn't match the OpenAPI file: {fileName}. Check the following logs for more details.");
+                }
+                
+                this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+            }
+            else
             {
                 this._loggerWrapper.LogWarning(result.StandardError);
             }
