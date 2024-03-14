@@ -38,11 +38,8 @@
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
       <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
-
-      <!-- Set development mode: ContractFirst or CodeFirst -->
-      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
       
-      <!-- Set development mode: ContractFirst or CodeFirst -->
+      <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiIgnoreErrors -->
       <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' == 'true'">false</OpenApiTreatWarningsAsErrors>
       <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' != 'true'">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
     </PropertyGroup>
