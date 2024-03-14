@@ -50,7 +50,7 @@ Process {
         BuildProject -openApiMsBuildSource $outputDir -projectPath $codeFirstSysTestDir -isFailureExpected $false
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $true
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiIgnoreErrors=true"
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiIgnoreErrors=true"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiIgnoreErrors=true"
     }
     finally {
