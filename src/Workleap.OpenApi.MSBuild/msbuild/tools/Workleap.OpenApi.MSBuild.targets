@@ -64,6 +64,7 @@
       OpenApiSpectralRulesetUrl="$(OpenApiSpectralRulesetUrl)"
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
+      TreatWarningsAsErrors="$(TreatWarningsAsErrors)"
     />
   </Target>
 </Project>

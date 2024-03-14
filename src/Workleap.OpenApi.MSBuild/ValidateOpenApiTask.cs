@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
@@ -7,23 +6,23 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 {
     private const string CodeFirst = "CodeFirst";
     private const string ContractFirst = "ContractFirst";
-    
+
     /// <summary>
-    /// 2 supported modes:
+    ///     2 supported modes:
     ///     - CodeFirst: Generate the OpenAPI specification files from the code
     ///     - ContractFirst: Will use the OpenAPI specification files provided
     /// </summary>
     [Required]
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
-    /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>  
+    /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>
     [Required]
     public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
-    
+
     /// <summary>The path of the ASP.NET Core project startup assembly directory.</summary>
     [Required]
     public string StartupAssemblyPath { get; set; } = string.Empty;
-    
+
     /// <summary>The path of the ASP.NET Core project being built.</summary>
     [Required]
     public string OpenApiWebApiAssemblyPath { get; set; } = string.Empty;
@@ -44,12 +43,16 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     [Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
+    /// <summary>If should log error instead of warning</summary>
+    public bool TreatWarningsAsErrors { get; set; }
+
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
-        this.Log.LogMessage(MessageImportance.Normal, "\n******** Starting {0} ********\n", nameof(ValidateOpenApiTask));
-        
+        var loggerWrapper = new LoggerWrapper(this.Log, this.TreatWarningsAsErrors);
+
+        loggerWrapper.LogMessage("\n******** Starting {0} ********\n", MessageImportance.Normal, nameof(ValidateOpenApiTask));
+
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
-        var loggerWrapper = new LoggerWrapper(this.Log);
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
 
@@ -57,22 +60,23 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
-        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper); 
+        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
         var codeFirstProcess = new CodeFirstProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
         var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
-        this.Log.LogMessage(MessageImportance.Normal, "{0} = '{1}'", nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
-        this.Log.LogMessage(MessageImportance.Normal, "{0} = '{1}'", nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
-        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
-        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
-        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
-        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
-        this.Log.LogMessage(MessageImportance.Low, "{0} = '{1}'", nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.TreatWarningsAsErrors), this.TreatWarningsAsErrors);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            this.Log.LogWarning("You must provide the same amount of open api specification file names and swagger document file names.");
+            loggerWrapper.LogWarning("You must provide the same amount of open api specification file names and swagger document file names.");
 
             return false;
         }
@@ -85,7 +89,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             switch (this.OpenApiDevelopmentMode)
             {
                 case CodeFirst:
-                    this.Log.LogMessage(MessageImportance.Normal, "\nStarting code first...");
+                    loggerWrapper.LogMessage("\nStarting code first...", MessageImportance.Normal);
                     await codeFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
@@ -93,9 +97,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                         this.OpenApiCompareCodeAgainstSpecFile ? CodeFirstProcess.CodeFirstMode.SpecComparison : CodeFirstProcess.CodeFirstMode.SpecGeneration,
                         cancellationToken);
                     break;
-                
+
                 case ContractFirst:
-                    this.Log.LogMessage(MessageImportance.Normal, "\nStarting contract first...");
+                    loggerWrapper.LogMessage("\nStarting contract first...", MessageImportance.Normal);
                     var isSuccess = await contractFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiToolsDirectoryPath,
@@ -110,15 +114,15 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     }
 
                     break;
-                
+
                 default:
-                    this.Log.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(ValidateOpenApiTask.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
+                    loggerWrapper.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(OpenApiDevelopmentMode), ContractFirst, CodeFirst);
                     return false;
             }
         }
         catch (OpenApiTaskFailedException e)
         {
-            this.Log.LogWarning("An error occurred while validating the OpenAPI specification: {0}", e.Message);
+            loggerWrapper.LogWarning("An error occurred while validating the OpenAPI specification: {0}", e.Message);
         }
 
         return true;
