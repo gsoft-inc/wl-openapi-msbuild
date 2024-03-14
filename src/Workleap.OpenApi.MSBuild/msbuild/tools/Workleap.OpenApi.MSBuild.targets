@@ -43,8 +43,8 @@
       <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
       
       <!-- Set development mode: ContractFirst or CodeFirst -->
-      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreError)' == 'true'">false</OpenApiTreatWarningsAsErrors>
-      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreError)' != 'true'">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' == 'true'">false</OpenApiTreatWarningsAsErrors>
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' != 'true'">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
