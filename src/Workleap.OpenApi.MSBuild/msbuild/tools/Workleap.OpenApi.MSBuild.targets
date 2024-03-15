@@ -39,9 +39,9 @@
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
       <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
       
-      <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiIgnoreErrors -->
-      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' == 'true'">false</OpenApiTreatWarningsAsErrors>
-      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiIgnoreErrors)' != 'true'">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
+      <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiTreatWarningsAsErrors, fallback to false if both are unset -->
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">false</OpenApiTreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
