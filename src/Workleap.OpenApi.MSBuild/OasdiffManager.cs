@@ -63,10 +63,10 @@ internal sealed class OasdiffManager : IOasdiffManager
             if (string.IsNullOrEmpty(result.StandardError))
             {
                 var isChangesDetected = result.ExitCode != 0;
-                this._loggerWrapper.LogMessage("Exit code {0}", MessageImportance.Normal, result.ExitCode);
+                this._loggerWrapper.LogMessage("Oasdiff returned: {0}", MessageImportance.Normal, result.ExitCode);
                 if (isChangesDetected)
                 {
-                    this._loggerWrapper.LogWarning($"Server doesn't match the OpenAPI file: {fileName}. Check the following logs for more details.");
+                    this._loggerWrapper.LogWarning($"Your web API does not implement the following OpenAPI specification: {fileName}. Check the following logs for more details.");
                 }
                 
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
