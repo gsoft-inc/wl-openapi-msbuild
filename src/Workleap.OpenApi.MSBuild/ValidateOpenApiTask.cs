@@ -43,7 +43,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     [Required]
     public string[] OpenApiSpecificationFiles { get; set; } = Array.Empty<string>();
 
-    /// <summary>If should log error instead of warning</summary>
+    /// <summary>If warnings should be logged as errors instead.</summary>
     public bool OpenApiTreatWarningsAsErrors { get; set; }
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
