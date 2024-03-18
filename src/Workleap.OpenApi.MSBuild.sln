@@ -23,6 +23,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.CodeFirst", "tests\WebApi.MsBuild.SystemTest.CodeFirst\WebApi.MsBuild.SystemTest.CodeFirst.csproj", "{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.OasDiffError", "tests\WebApi.MsBuild.SystemTest.OasDiffError\WebApi.MsBuild.SystemTest.OasDiffError.csproj", "{3909D38E-7584-4206-9CDC-3E56203BE6DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.SpectralError", "tests\WebApi.MsBuild.SystemTest.SpectralError\WebApi.MsBuild.SystemTest.SpectralError.csproj", "{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,10 +56,20 @@ Global
 		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695} = {07F66FC2-73B9-44C7-843C-36C13905AE9B}
 		{B8A81C76-574B-40FD-B34B-FA893D6C1423} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 	EndGlobalSection
 EndGlobal

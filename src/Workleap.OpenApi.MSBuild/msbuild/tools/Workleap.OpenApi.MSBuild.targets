@@ -38,6 +38,10 @@
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
       <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
+      
+      <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiTreatWarningsAsErrors, fallback to false if both are unset -->
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">false</OpenApiTreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -64,6 +68,7 @@
       OpenApiSpectralRulesetUrl="$(OpenApiSpectralRulesetUrl)"
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
+      OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
     />
   </Target>
 </Project>
