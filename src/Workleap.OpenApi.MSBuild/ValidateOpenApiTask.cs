@@ -89,7 +89,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             switch (this.OpenApiDevelopmentMode)
             {
                 case CodeFirst:
-                    loggerWrapper.LogMessage("\nStarting code first...", MessageImportance.Normal);
+                    loggerWrapper.LogMessage("\nStarting code first process...", MessageImportance.Normal);
                     await codeFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
@@ -99,7 +99,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
 
                 case ContractFirst:
-                    loggerWrapper.LogMessage("\nStarting contract first...", MessageImportance.Normal);
+                    loggerWrapper.LogMessage("\nStarting contract first process...", MessageImportance.Normal);
                     var isSuccess = await contractFirstProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiToolsDirectoryPath,
