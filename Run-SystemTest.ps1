@@ -19,9 +19,9 @@ Process {
         $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
 
         if ($isFailureExpected -and $buildProcess.ExitCode -eq 0 ) {
-            Write-Error "The build did not fail as expected for project $projectPath."
+            Write-Error "The build for project $projectPath was expected to fail, but it succeeded."
         } elseif (!$isFailureExpected -and $buildProcess.ExitCode -ne 0) {
-            Write-Error "The build unexpectedly failed for project $projectPath."
+            Write-Error "The build for project $projectPath was expected to succeed, but it failed."
         }
     }
 
