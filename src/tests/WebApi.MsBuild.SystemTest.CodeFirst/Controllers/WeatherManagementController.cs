@@ -23,8 +23,8 @@ public class WeatherManagementController : ControllerBase
     [HttpGet(Name = "GetWeatherSources")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IEnumerable<string> Get()
+    public IEnumerable<WeatherSource> Get()
     {
-        return Sources;
+        return Sources.Select(x => new WeatherSource { Source = x });
     }
 }

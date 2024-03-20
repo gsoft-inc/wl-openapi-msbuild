@@ -16,7 +16,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: string
+                  $ref: '#/components/schemas/WeatherSource'
         '403':
           description: Forbidden
           content:
@@ -44,4 +44,11 @@ components:
         instance:
           type: string
           nullable: true
-      additionalProperties: {}
+      additionalProperties: { }
+    WeatherSource:
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+      additionalProperties: false
