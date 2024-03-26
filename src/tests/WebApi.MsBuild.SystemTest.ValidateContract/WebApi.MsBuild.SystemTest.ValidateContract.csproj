@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-      <OpenApiDevelopmentMode>ContractFirst</OpenApiDevelopmentMode>
+      <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
       <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
       <OpenApiSpectralRulesetUrl>./custom.spectral.yaml</OpenApiSpectralRulesetUrl>
@@ -19,10 +19,6 @@
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-        <PackageReference Include="Workleap.OpenApi.MSBuild" Version="0.4.0">
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-          <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

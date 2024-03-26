@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-      <OpenApiDevelopmentMode>CodeFirst</OpenApiDevelopmentMode>
+      <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
       <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

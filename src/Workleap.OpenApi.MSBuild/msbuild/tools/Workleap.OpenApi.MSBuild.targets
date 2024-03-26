@@ -17,10 +17,10 @@
   <!-- We can only analyze the OpenAPI spec after the project has been built -->
   <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build" Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
-      <!-- Set development mode: ContractFirst or CodeFirst -->
-      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
+      <!-- Set development mode: ValidateContract or GenerateContract -->
+      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">GenerateContract</OpenApiDevelopmentMode>
 
-      <!-- When ContractFirst, validate if the provided specification files match the code -->
+      <!-- When ValidateContract, validate if the provided specification files match the code -->
       <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
       
       <!-- The path of the ASP.NET Core project build output directory -->

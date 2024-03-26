@@ -2,7 +2,7 @@
 
 Validates at build time that the OpenAPI specification files extracted from the ASP.NET Core Web API being built conform to Workleap API guidelines.
 
-Depending if the user chose the Contract-First or Code-First development mode this MSBuild task will:
+Depending if the user chose the ValidateContract or GenerateContract development mode this MSBuild task will:
 
 - Install tools: [OasDiff](https://github.com/Tufin/oasdiff), [Spectral](https://github.com/stoplightio/spectral), [SwashbuckleCLI](https://github.com/domaindrivendev/Swashbuckle.AspNetCore?tab=readme-ov-file#swashbuckleaspnetcorecli)
 - Generate the OpenAPI specification file from the associated Web API

@@ -1,12 +1,12 @@
-﻿namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
-/// For a Code First approach it will:
+/// For a GenerateContract approach it will:
 ///     1. Generate the OpenAPI specification files from the code
-///     2. Depending of <see cref="CodeFirstMode"/> it will either will compare the generated OpenAPI specification files against the provided specifications or it will update the source-controlled specification files 
+///     2. Depending of <see cref="GenerateContractMode"/> it will either will compare the generated OpenAPI specification files against the provided specifications or it will update the source-controlled specification files 
 ///     2. Validate the OpenAPI specification files base on spectral rules 
 /// </summary>
-internal class CodeFirstProcess
+internal class GenerateContractProcess
 {
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly SpectralManager _spectralManager;
@@ -14,7 +14,7 @@ internal class CodeFirstProcess
     private readonly SpecGeneratorManager _specGeneratorManager;
     private readonly OasdiffManager _oasdiffManager;
 
-    internal CodeFirstProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
+    internal GenerateContractProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
         this._spectralManager = spectralManager;
@@ -23,7 +23,7 @@ internal class CodeFirstProcess
         this._oasdiffManager = oasdiffManager;
     }
     
-    internal enum CodeFirstMode
+    internal enum GenerateContractMode
     {
         SpecGeneration,
         SpecComparison,
@@ -33,7 +33,7 @@ internal class CodeFirstProcess
         string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
         string openApiSpectralRulesetUrl,
-        CodeFirstMode mode,
+        GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("Installing dependencies...");
@@ -42,7 +42,7 @@ internal class CodeFirstProcess
         this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
 
-        if (mode == CodeFirstMode.SpecGeneration)
+        if (mode == GenerateContractMode.SpecGeneration)
         {
             this._loggerWrapper.LogMessage("Generating specification files...");
             await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
@@ -58,14 +58,14 @@ internal class CodeFirstProcess
     }
 
     private async Task InstallDependencies(
-        CodeFirstMode mode,
+        GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
         var installationTasks = new List<Task>();    
         installationTasks.Add(this._spectralManager.InstallSpectralAsync(cancellationToken));        
         installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
         
-        if (mode == CodeFirstMode.SpecComparison)
+        if (mode == GenerateContractMode.SpecComparison)
         {
             installationTasks.Add(this._oasdiffManager.InstallOasdiffAsync(cancellationToken));
         }
