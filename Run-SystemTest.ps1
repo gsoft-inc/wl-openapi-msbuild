@@ -12,16 +12,25 @@ Process {
             [bool]$isFailureExpected,
             [string]$extraArgs
         )
-        Push-Location $projectPath
+
+        try
+        {
+            Push-Location $projectPath
         
-        Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $openApiMsBuildSource }
-
-        $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
-
-        if ($isFailureExpected -and $buildProcess.ExitCode -eq 0 ) {
-            Write-Error "The build for project $projectPath was expected to fail, but it succeeded."
-        } elseif (!$isFailureExpected -and $buildProcess.ExitCode -ne 0) {
-            Write-Error "The build for project $projectPath was expected to succeed, but it failed."
+            Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $openApiMsBuildSource }
+    
+            $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
+    
+            Exec { & dotnet remove package Workleap.OpenApi.MSBuild }
+    
+            if ($isFailureExpected -and $buildProcess.ExitCode -eq 0 ) {
+                Write-Error "The build for project $projectPath was expected to fail, but it succeeded."
+            } elseif (!$isFailureExpected -and $buildProcess.ExitCode -ne 0) {
+                Write-Error "The build for project $projectPath was expected to succeed, but it failed."
+            }
+        }
+        finally {
+            Pop-Location
         }
     }
 
@@ -58,7 +67,7 @@ Process {
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
     }
     finally {
-        Pop-Location
+        
         Pop-Location
     }
 }

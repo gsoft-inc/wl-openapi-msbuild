@@ -10,6 +10,7 @@
 
     <PropertyGroup>
       <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
+      <OpenApiCompareCodeAgainstSpecFile>false</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>

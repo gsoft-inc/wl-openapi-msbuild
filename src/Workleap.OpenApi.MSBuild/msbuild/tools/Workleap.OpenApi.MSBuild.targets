@@ -20,7 +20,11 @@
       <!-- Set development mode: ValidateContract or GenerateContract -->
       <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">GenerateContract</OpenApiDevelopmentMode>
 
-      <!-- When ValidateContract, validate if the provided specification files match the code -->
+      <!-- Validate if the provided specification files match the code -->
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'ValidateContract'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'ContractFirst'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'GenerateContract' and '$(Configuration)' == 'Release'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'CodeFirst' and '$(Configuration)' == 'Release'">true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
       
       <!-- The path of the ASP.NET Core project build output directory -->
