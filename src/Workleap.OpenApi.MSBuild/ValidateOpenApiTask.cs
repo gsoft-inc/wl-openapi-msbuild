@@ -4,18 +4,20 @@ namespace Workleap.OpenApi.MSBuild;
 
 public sealed class ValidateOpenApiTask : CancelableAsyncTask
 {
-    private const string CodeFirst = "CodeFirst";
-    private const string ContractFirst = "ContractFirst";
+    private const string GenerateContract = "GenerateContract";
+    private const string CodeFirst = "CodeFirst"; // For backward compatibility
+    private const string ValidateContract = "ValidateContract";
+    private const string ContractFirst = "ContractFirst"; // For backward compatibility
 
     /// <summary>
     ///     2 supported modes:
-    ///     - CodeFirst: Generate the OpenAPI specification files from the code
-    ///     - ContractFirst: Will use the OpenAPI specification files provided
+    ///     - GenerateContract: Generate the OpenAPI specification files from the code
+    ///     - ValidateContract: Will use the OpenAPI specification files provided
     /// </summary>
     [Required]
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
-    /// <summary>When Development mode is Contract first, will validate if the specification match the code.</summary>
+    /// <summary>When Development mode is ValidateContract, will validate if the specification match the code.</summary>
     [Required]
     public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
 
@@ -62,8 +64,8 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
-        var codeFirstProcess = new CodeFirstProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
-        var contractFirstProcess = new ContractFirstProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
+        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
@@ -88,24 +90,26 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
             switch (this.OpenApiDevelopmentMode)
             {
-                case CodeFirst:
-                    loggerWrapper.LogMessage("\nStarting code first process...", MessageImportance.Normal);
-                    await codeFirstProcess.Execute(
+                case GenerateContract:
+                case CodeFirst: // For backward compatibility
+                    loggerWrapper.LogMessage("\nStarting generate contract process...", MessageImportance.Normal);
+                    await generateContractProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
                         this.OpenApiSpectralRulesetUrl,
-                        this.OpenApiCompareCodeAgainstSpecFile ? CodeFirstProcess.CodeFirstMode.SpecComparison : CodeFirstProcess.CodeFirstMode.SpecGeneration,
+                        this.OpenApiCompareCodeAgainstSpecFile ? GenerateContractProcess.GenerateContractMode.SpecComparison : GenerateContractProcess.GenerateContractMode.SpecGeneration,
                         cancellationToken);
                     break;
 
-                case ContractFirst:
-                    loggerWrapper.LogMessage("\nStarting contract first process...", MessageImportance.Normal);
-                    var isSuccess = await contractFirstProcess.Execute(
+                case ValidateContract:
+                case ContractFirst: // For backward compatibility
+                    loggerWrapper.LogMessage("\nStarting validate contract process...", MessageImportance.Normal);
+                    var isSuccess = await validateContractProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiToolsDirectoryPath,
                         this.OpenApiSwaggerDocumentNames,
                         this.OpenApiSpectralRulesetUrl,
-                        this.OpenApiCompareCodeAgainstSpecFile ? ContractFirstProcess.CompareCodeAgainstSpecFile.Enabled : ContractFirstProcess.CompareCodeAgainstSpecFile.Disabled,
+                        this.OpenApiCompareCodeAgainstSpecFile ? ValidateContractProcess.CompareCodeAgainstSpecFile.Enabled : ValidateContractProcess.CompareCodeAgainstSpecFile.Disabled,
                         cancellationToken);
 
                     if (!isSuccess)
@@ -116,7 +120,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     break;
 
                 default:
-                    loggerWrapper.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(this.OpenApiDevelopmentMode), ContractFirst, CodeFirst);
+                    loggerWrapper.LogError("Invalid value of '{0}' for {1}. Allowed values are '{2}' or '{3}'", this.OpenApiDevelopmentMode, nameof(this.OpenApiDevelopmentMode), ValidateContract, GenerateContract);
                     return false;
             }
         }

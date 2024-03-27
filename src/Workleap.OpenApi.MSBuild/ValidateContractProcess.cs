@@ -1,18 +1,18 @@
-﻿namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
-/// For a Contract First approach it will:
+/// For a ValidateContract approach it will:
 ///     1. Validate the OpenAPI specification files base on spectral rules
 ///     2. If <see cref="CompareCodeAgainstSpecFile"/> is enabled, will generate the OpenAPI specification files from the code and validate if it match the provided specifications.
 /// </summary>
-internal class ContractFirstProcess
+internal class ValidateContractProcess
 {
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
     private readonly OasdiffManager _oasdiffManager;
     
-    internal ContractFirstProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, OasdiffManager oasdiffManager)
+    internal ValidateContractProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
         this._spectralManager = spectralManager;

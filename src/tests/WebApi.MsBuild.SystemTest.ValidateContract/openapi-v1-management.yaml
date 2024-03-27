@@ -1,0 +1,54 @@
+openapi: 3.0.1
+info:
+  title: V1 API management
+  version: v1-management
+paths:
+  /WeatherManagement:
+    get:
+      tags:
+        - WeatherManagement
+      operationId: GetWeatherSources
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherSource'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+components:
+  schemas:
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          nullable: true
+        title:
+          type: string
+          nullable: true
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+          nullable: true
+        instance:
+          type: string
+          nullable: true
+      additionalProperties: { }
+    WeatherSource:
+      type: object
+      properties:
+        source:
+          type: string
+          nullable: true
+      additionalProperties: false

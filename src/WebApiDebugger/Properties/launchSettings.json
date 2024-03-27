@@ -1,28 +1,28 @@
-﻿{
+{
   "$schema": "https://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "ContractFirstWithoutCompare": {
+    "ValidateContractWithoutCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=false",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=false",
       "workingDirectory": "$(ProjectDir)"
     },
-    "ContractFirstWithCompare": {
+    "ValidateContractWithCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ContractFirst /p:OpenApiCompareCodeAgainstSpecFile=true",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
       "workingDirectory": "$(ProjectDir)"
     },
-    "CodeFirst": {
+    "GenerateContract": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract",
       "workingDirectory": "$(ProjectDir)"
     },
-    "CodeFirstOnCI": {
+    "GenerateContractOnCI": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=CodeFirst /p:OpenApiCompareCodeAgainstSpecFile=true",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
       "workingDirectory": "$(ProjectDir)"
     },
     "WebApiDebugger": {

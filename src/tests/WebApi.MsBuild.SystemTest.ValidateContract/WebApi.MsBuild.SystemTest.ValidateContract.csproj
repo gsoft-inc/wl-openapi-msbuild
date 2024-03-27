@@ -10,14 +10,21 @@
     </PropertyGroup>
 
     <PropertyGroup>
-      <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
+      <OpenApiDevelopmentMode>ValidateContract</OpenApiDevelopmentMode>
       <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
+      <OpenApiSpectralRulesetUrl>./custom.spectral.yaml</OpenApiSpectralRulesetUrl>
       <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="custom.spectral.yaml">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
