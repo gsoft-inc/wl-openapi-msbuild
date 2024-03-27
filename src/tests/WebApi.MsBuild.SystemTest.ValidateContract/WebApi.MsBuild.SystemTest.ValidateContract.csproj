@@ -10,7 +10,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-      <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
+      <OpenApiDevelopmentMode>ValidateContract</OpenApiDevelopmentMode>
       <OpenApiCompareCodeAgainstSpecFile>true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiSwaggerDocumentNames>v1;v1-management</OpenApiSwaggerDocumentNames>
       <OpenApiSpectralRulesetUrl>./custom.spectral.yaml</OpenApiSpectralRulesetUrl>
