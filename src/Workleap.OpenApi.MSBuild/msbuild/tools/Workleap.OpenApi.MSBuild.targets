@@ -2,10 +2,10 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <OpenApiEnabled Condition="'$(OpenApiEnabled)' == ''">true</OpenApiEnabled>
-    
     <!-- We use this property when developing this MSBuild task in an IDE, -->
     <!-- so we can reference the task assembly that is built in its bin folder instead of the one in the distributed NuGet package -->
-    <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>    
+    <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>
+    <!-- <ShouldValidateOpenApi_Validate>false</ShouldValidateOpenApi_Validate> -->
   </PropertyGroup>
 
   <!-- This is the location of this task assembly when it is distributed as a NuGet package -->
@@ -14,15 +14,23 @@
   <!-- This is the location of this task assembly when debugging the task in an IDE -->
   <UsingTask Condition="'$(OpenApiDebuggingEnabled)' == 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netstandard2.0\$(MSBuildThisFileName).dll" />
 
-  <!-- We can only analyze the OpenAPI spec after the project has been built -->
-  <Target Name="ValidateOpenApi" DependsOnTargets="ResolveProjectReferences" AfterTargets="Build" Condition="'$(OpenApiEnabled)' == 'true'">
+  <!-- We validate and regenerate OpenAPI specs after the build stage. -->
+  <!-- This task is executed only if the compiled outputs are newer than the last task execution. -->
+  <Target Name="ValidateOpenApi" AfterTargets="Build"
+      Inputs="$(MSBuildAllProjects);
+              @(DocFileItem);
+              @(IntermediateAssembly);
+              @(IntermediateRefAssembly);
+              @(CustomAdditionalCompileOutputs)"
+      Outputs="$(IntermediateOutputPath)openapi_spec_validated.txt"
+      Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
       <!-- Set development mode: ContractFirst or CodeFirst -->
       <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
 
       <!-- When ContractFirst, validate if the provided specification files match the code -->
       <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
-      
+
       <!-- The path of the ASP.NET Core project build output directory -->
       <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(OutputPath)))\</StartupAssemblyPath>
       
@@ -65,5 +73,6 @@
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
     />
+    <Touch Files="$(IntermediateOutputPath)openapi_spec_validated.txt" AlwaysCreate="true" />
   </Target>
 </Project>
