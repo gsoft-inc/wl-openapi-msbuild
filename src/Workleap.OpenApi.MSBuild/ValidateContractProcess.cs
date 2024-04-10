@@ -1,18 +1,18 @@
-﻿namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
-/// For a Contract First approach it will:
+/// For a ValidateContract approach it will:
 ///     1. Validate the OpenAPI specification files base on spectral rules
 ///     2. If <see cref="CompareCodeAgainstSpecFile"/> is enabled, will generate the OpenAPI specification files from the code and validate if it match the provided specifications.
 /// </summary>
-internal class ContractFirstProcess
+internal class ValidateContractProcess
 {
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly SpectralManager _spectralManager;
     private readonly SwaggerManager _swaggerManager;
     private readonly OasdiffManager _oasdiffManager;
     
-    internal ContractFirstProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, OasdiffManager oasdiffManager)
+    internal ValidateContractProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
         this._spectralManager = spectralManager;
@@ -39,14 +39,19 @@ internal class ContractFirstProcess
             return false;
         }
 
+        this._loggerWrapper.LogMessage("Installing dependencies...");
         await this.InstallDependencies(compareCodeAgainstSpecFile, cancellationToken);
         
         if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
+            this._loggerWrapper.LogMessage("Running Swagger...");
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+            
+            this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
 
+        this._loggerWrapper.LogMessage("Running Spectral...");
         await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
 
         return true;

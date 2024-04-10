@@ -25,10 +25,14 @@
       Outputs="$(IntermediateOutputPath)openapi_spec_validated.txt"
       Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
-      <!-- Set development mode: ContractFirst or CodeFirst -->
-      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">ContractFirst</OpenApiDevelopmentMode>
+      <!-- Set development mode: ValidateContract or GenerateContract -->
+      <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">GenerateContract</OpenApiDevelopmentMode>
 
-      <!-- When ContractFirst, validate if the provided specification files match the code -->
+      <!-- Validate if the provided specification files match the code -->
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'ValidateContract'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'ContractFirst'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'GenerateContract' and '$(Configuration)' == 'Release'">true</OpenApiCompareCodeAgainstSpecFile>
+      <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == '' and '$(OpenApiDevelopmentMode)' == 'CodeFirst' and '$(Configuration)' == 'Release'">true</OpenApiCompareCodeAgainstSpecFile>
       <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
 
       <!-- The path of the ASP.NET Core project build output directory -->
@@ -41,11 +45,15 @@
       <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(StartupAssemblyPath)openapi</OpenApiToolsDirectoryPath>
 
       <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
-      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.1.0/.spectral.yaml</OpenApiSpectralRulesetUrl>
+      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.4.0/.spectral.yaml</OpenApiSpectralRulesetUrl>
 
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
       <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
+      
+      <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiTreatWarningsAsErrors, fallback to false if both are unset -->
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
+      <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">false</OpenApiTreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -72,6 +80,7 @@
       OpenApiSpectralRulesetUrl="$(OpenApiSpectralRulesetUrl)"
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
+      OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
     />
     <Touch Files="$(IntermediateOutputPath)openapi_spec_validated.txt" AlwaysCreate="true" />
   </Target>

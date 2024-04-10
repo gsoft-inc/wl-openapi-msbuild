@@ -3,33 +3,38 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workleap.OpenApi.MSBuild", "Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj", "{4479DD41-F9CE-4DFD-8F7C-4ACC25BE203C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Workleap.OpenApi.MSBuild", "Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj", "{4479DD41-F9CE-4DFD-8F7C-4ACC25BE203C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "files", "files", "{3B3625CC-919B-4216-9B50-BCFE297AA184}"
 	ProjectSection(SolutionItems) = preProject
-		Directory.Build.props = Directory.Build.props
 		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workleap.OpenApi.MSBuild.Tests", "Workleap.OpenApi.MSBuild.Tests\Workleap.OpenApi.MSBuild.Tests.csproj", "{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Workleap.OpenApi.MSBuild.Tests", "Workleap.OpenApi.MSBuild.Tests\Workleap.OpenApi.MSBuild.Tests.csproj", "{2A5429CC-E179-47E7-85BB-C1E33E2AFD8A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "debug", "debug", "{07F66FC2-73B9-44C7-843C-36C13905AE9B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiDebugger", "WebApiDebugger\WebApiDebugger.csproj", "{A4C90BE2-889F-46BB-8B4D-2219B1084695}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiDebugger", "WebApiDebugger\WebApiDebugger.csproj", "{A4C90BE2-889F-46BB-8B4D-2219B1084695}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{4DDE83BF-D190-4CC9-AD36-E9250DABB27D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.ContractFirst", "tests\WebApi.MsBuild.SystemTest.ContractFirst\WebApi.MsBuild.SystemTest.ContractFirst.csproj", "{B8A81C76-574B-40FD-B34B-FA893D6C1423}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.OasDiffError", "tests\WebApi.MsBuild.SystemTest.OasDiffError\WebApi.MsBuild.SystemTest.OasDiffError.csproj", "{3909D38E-7584-4206-9CDC-3E56203BE6DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.CodeFirst", "tests\WebApi.MsBuild.SystemTest.CodeFirst\WebApi.MsBuild.SystemTest.CodeFirst.csproj", "{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.SpectralError", "tests\WebApi.MsBuild.SystemTest.SpectralError\WebApi.MsBuild.SystemTest.SpectralError.csproj", "{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.ValidateContract", "tests\WebApi.MsBuild.SystemTest.ValidateContract\WebApi.MsBuild.SystemTest.ValidateContract.csproj", "{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.GenerateContract", "tests\WebApi.MsBuild.SystemTest.GenerateContract\WebApi.MsBuild.SystemTest.GenerateContract.csproj", "{502CEF5F-350E-4498-BA3C-3C09C9620737}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.CodeFirst", "tests\WebApi.MsBuild.SystemTest.CodeFirst\WebApi.MsBuild.SystemTest.CodeFirst.csproj", "{49EEB542-9B68-4389-810D-0C1222E5FD17}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.ContractFirst", "tests\WebApi.MsBuild.SystemTest.ContractFirst\WebApi.MsBuild.SystemTest.ContractFirst.csproj", "{DE929AE5-5A69-4E82-8246-7AD5BF97983B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4479DD41-F9CE-4DFD-8F7C-4ACC25BE203C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -44,18 +49,44 @@ Global
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B8A81C76-574B-40FD-B34B-FA893D6C1423}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B8A81C76-574B-40FD-B34B-FA893D6C1423}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B8A81C76-574B-40FD-B34B-FA893D6C1423}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B8A81C76-574B-40FD-B34B-FA893D6C1423}.Release|Any CPU.Build.0 = Release|Any CPU
-		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695} = {07F66FC2-73B9-44C7-843C-36C13905AE9B}
-		{B8A81C76-574B-40FD-B34B-FA893D6C1423} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
-		{575E14D8-52E8-4B5B-A93C-D3E86E30BD3C} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{3909D38E-7584-4206-9CDC-3E56203BE6DB} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{502CEF5F-350E-4498-BA3C-3C09C9620737} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{49EEB542-9B68-4389-810D-0C1222E5FD17} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{DE929AE5-5A69-4E82-8246-7AD5BF97983B} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCD029BE-FB3E-45A2-8DD4-FDE33D87544D}
 	EndGlobalSection
 EndGlobal
