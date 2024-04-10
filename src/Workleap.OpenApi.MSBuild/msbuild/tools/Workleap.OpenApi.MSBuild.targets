@@ -5,7 +5,7 @@
     <!-- We use this property when developing this MSBuild task in an IDE, -->
     <!-- so we can reference the task assembly that is built in its bin folder instead of the one in the distributed NuGet package -->
     <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>
-    <TouchFileName>openapi_spec_validated.txt</TouchFileName>
+    <OpenApiTouchFileName>openapi_spec_validated.txt</OpenApiTouchFileName>
   </PropertyGroup>
 
   <!-- This is the location of this task assembly when it is distributed as a NuGet package -->
@@ -22,7 +22,7 @@
               @(IntermediateAssembly);
               @(IntermediateRefAssembly);
               @(CustomAdditionalCompileOutputs)"
-      Outputs="$(IntermediateOutputPath)$(TouchFileName)"
+      Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
       Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
       <!-- Set development mode: ValidateContract or GenerateContract -->
@@ -82,6 +82,6 @@
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
       OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
     />
-    <Touch Files="$(IntermediateOutputPath)$(TouchFileName)" AlwaysCreate="true" />
+    <Touch Files="$(IntermediateOutputPath)$(OpenApiTouchFileName)" AlwaysCreate="true" />
   </Target>
 </Project>
