@@ -21,11 +21,5 @@
     <ProjectReference Include="..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="openapi-v1.yaml">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
   <Import Project="..\Workleap.OpenApi.MSBuild\msbuild\build\Workleap.OpenApi.MSBuild.targets" />
 </Project>
