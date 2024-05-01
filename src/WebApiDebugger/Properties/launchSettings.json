@@ -16,7 +16,7 @@
     "GenerateContract": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:DoValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract",
       "workingDirectory": "$(ProjectDir)"
     },
     "GenerateContractOnCI": {

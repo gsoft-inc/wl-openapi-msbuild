@@ -14,22 +14,17 @@
   <!-- This is the location of this task assembly when debugging the task in an IDE -->
   <UsingTask Condition="'$(OpenApiDebuggingEnabled)' == 'true'" TaskName="$(MSBuildThisFileName).ValidateOpenApiTask" AssemblyFile="$(MSBuildThisFileDirectory)..\..\bin\$(Configuration)\netstandard2.0\$(MSBuildThisFileName).dll" />
 
-  <Target Name="ValidateOpenApi" 
-          AfterTargets="Build"
-          DependsOnTargets="DoValidateOpenApi"
-          Inputs="$(MSBuildAllProjects);
+  <!-- We validate and regenerate OpenAPI specs after the build stage. This task is executed only if the compiled outputs are newer than the last task execution. -->
+  <!-- We decide to use compared a touched files strategy with the output of the CoreCompile target along with project files. Use Binlog to obtain target inputs/outputs -->
+  <Target Name="ValidateOpenApi"
+        AfterTargets="Build"
+        Inputs="$(MSBuildAllProjects);
               @(DocFileItem);
               @(IntermediateAssembly);
               @(IntermediateRefAssembly);
               @(CustomAdditionalCompileOutputs)"
-          Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
-          Condition="'$(OpenApiEnabled)' == 'true'">
-
-  </Target>
-  
-  <!-- We validate and regenerate OpenAPI specs after the build stage. This task is executed only if the compiled outputs are newer than the last task execution. -->
-  <!-- We decide to use compared a touched files strategy with the output of the CoreCompile target along with project files. Use Binlog to obtain target inputs/outputs -->
-  <Target Name="DoValidateOpenApi">
+        Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
+        Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
       <!-- Set development mode: ValidateContract or GenerateContract -->
       <OpenApiDevelopmentMode Condition="'$(OpenApiDevelopmentMode)' == ''">GenerateContract</OpenApiDevelopmentMode>
@@ -51,7 +46,7 @@
       <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(StartupAssemblyPath)openapi</OpenApiToolsDirectoryPath>
 
       <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
-      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.3.0/.spectral.yaml</OpenApiSpectralRulesetUrl>
+      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.4.0/.spectral.yaml</OpenApiSpectralRulesetUrl>
 
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->

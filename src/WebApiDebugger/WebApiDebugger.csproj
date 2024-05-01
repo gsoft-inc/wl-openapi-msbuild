@@ -14,7 +14,7 @@
 
   <PropertyGroup>
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
-    <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
+    <OpenApiDevelopmentMode>ValidateContract</OpenApiDevelopmentMode>
   </PropertyGroup>
 
   <ItemGroup>

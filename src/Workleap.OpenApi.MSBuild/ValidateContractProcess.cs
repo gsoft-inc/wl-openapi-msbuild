@@ -48,15 +48,10 @@ internal class ValidateContractProcess
             
             this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
-            
-            this._loggerWrapper.LogMessage("Running Spectral...");
-            await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, openApiSpecificationFiles, cancellationToken);
         }
-        else
-        {
-            this._loggerWrapper.LogMessage("Running Spectral...");
-            await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, Array.Empty<string>(), cancellationToken);
-        }
+        
+        this._loggerWrapper.LogMessage("Running Spectral...");
+        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, cancellationToken);
 
         return true;
     }
