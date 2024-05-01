@@ -20,10 +20,10 @@
       Name="ValidateOpenApi"
       AfterTargets="Build"
       Inputs="$(MSBuildAllProjects);
-            @(DocFileItem);
-            @(IntermediateAssembly);
-            @(IntermediateRefAssembly);
-            @(CustomAdditionalCompileOutputs)"
+              @(DocFileItem);
+              @(IntermediateAssembly);
+              @(IntermediateRefAssembly);
+              @(CustomAdditionalCompileOutputs)"
       Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
       Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
