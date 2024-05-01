@@ -1,3 +1,5 @@
+using System.Security.Cryptography;
+
 namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
@@ -32,7 +34,6 @@ internal class GenerateContractProcess
     internal async Task Execute(
         string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
-        string openApiSpectralRulesetUrl,
         GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
@@ -41,6 +42,9 @@ internal class GenerateContractProcess
         
         this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
+
+        this._loggerWrapper.LogMessage("Running Spectral...");
+        await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, openApiSpecificationFilesPath,  cancellationToken);
 
         if (mode == GenerateContractMode.SpecGeneration)
         {
@@ -52,9 +56,6 @@ internal class GenerateContractProcess
             this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         }
-
-        this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFilesPath, openApiSpectralRulesetUrl, cancellationToken);
     }
 
     private async Task InstallDependencies(

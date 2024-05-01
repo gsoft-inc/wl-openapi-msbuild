@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild;
@@ -7,6 +8,7 @@ internal sealed class SpectralManager : ISpectralManager
 {
     private const string SpectralVersion = "6.11.0";
     private const string SpectralDownloadUrlFormat = "https://github.com/stoplightio/spectral/releases/download/v{0}/{1}";
+    private const string SpectralRulesetChecksumFileName = "spectral-ruleset-checksum.txt";
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
@@ -14,13 +16,16 @@ internal sealed class SpectralManager : ISpectralManager
     private readonly string _openApiReportsDirectoryPath;
     private readonly IProcessWrapper _processWrapper;
     
-    public SpectralManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, string openApiReportsDirectoryPath, IHttpClientWrapper httpClientWrapper)
+    private string _spectralRulesetPath;
+    
+    public SpectralManager(ILoggerWrapper loggerWrapper, IProcessWrapper processWrapper, string openApiToolsDirectoryPath, string openApiReportsDirectoryPath, string rulesetUrl, IHttpClientWrapper httpClientWrapper)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
         this._openApiReportsDirectoryPath = openApiReportsDirectoryPath;
         this._spectralDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
         this._processWrapper = processWrapper;
+        this._spectralRulesetPath = rulesetUrl;
     }
     
     private string ExecutablePath { get; set; } = string.Empty;
@@ -36,28 +41,45 @@ internal sealed class SpectralManager : ISpectralManager
         var destination = Path.Combine(this._spectralDirectory, this.ExecutablePath);
         
         await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
-            
+
+        if (!IsLocalFile(this._spectralRulesetPath))
+        {
+            // We download the file before to isolate flakiness in the spectral execution
+            this._loggerWrapper.LogMessage("Downloading ruleset.");
+            this._spectralRulesetPath = await this.DownloadFileAsync(this._spectralRulesetPath, cancellationToken);
+        }
+
         this._loggerWrapper.LogMessage("Spectral installation completed.");
     }
 
-    public async Task RunSpectralAsync(IEnumerable<string> swaggerDocumentPaths, string rulesetUrl, CancellationToken cancellationToken)
+    public async Task RunSpectralAsync(IReadOnlyCollection<string> generatedOpenApiDocumentPaths, IReadOnlyCollection<string> sourcedControlOpenApiDocumentPaths, CancellationToken cancellationToken)
     {
-        this._loggerWrapper.LogMessage("Starting Spectral report generation.");
+        this._loggerWrapper.LogMessage("\n ******** Spectral: Validating OpenApi Documents against ruleset ********", MessageImportance.High);
         
-        var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
-        
-        // We download the file before to isolate flakiness in the spectral execution
-        var rulesetPath = IsLocalFile(rulesetUrl) ? rulesetUrl : await this.DownloadFileAsync(rulesetUrl, cancellationToken);
+        var shouldRunSpectral = await this.ShouldRunSpectral(generatedOpenApiDocumentPaths, sourcedControlOpenApiDocumentPaths);
+        if (!shouldRunSpectral)
+        {
+            this._loggerWrapper.LogMessage("\n=> Spectral step skipped since the OpenAPI document and ruleset have not changed.", MessageImportance.High);
+            foreach (var documentPath in generatedOpenApiDocumentPaths)
+            {
+                this._loggerWrapper.LogMessage("- Check previous report here: {0}", MessageImportance.High, messageArgs: this.GetReportPath(documentPath));
+            }
+            
+            this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
+            return;
+        }
 
-        foreach (var documentPath in swaggerDocumentPaths)
+        this._loggerWrapper.LogMessage("Starting Spectral report generation.");
+        var spectralExecutePath = Path.Combine(this._spectralDirectory, this.ExecutablePath);
+
+        foreach (var documentPath in generatedOpenApiDocumentPaths)
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
-            var outputSpectralReportName = $"spectral-{documentName}.html";
-            var htmlReportPath = Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
+            var htmlReportPath = this.GetReportPath(documentPath);
             
-            this._loggerWrapper.LogMessage("\n ******** Spectral: Validating {0} against ruleset ********", MessageImportance.High, documentName);
+            this._loggerWrapper.LogMessage("\n *** Spectral: Validating {0} against ruleset ***", MessageImportance.High, documentName);
             this._loggerWrapper.LogMessage("- File path: {0}", MessageImportance.High, documentPath);
-            this._loggerWrapper.LogMessage("- Ruleset : {0}\n", MessageImportance.High, rulesetUrl);
+            this._loggerWrapper.LogMessage("- Ruleset : {0}\n", MessageImportance.High, this._spectralRulesetPath);
 
             if (File.Exists(htmlReportPath))
             {
@@ -65,9 +87,99 @@ internal sealed class SpectralManager : ISpectralManager
                 File.Delete(htmlReportPath);
             }
             
-            await this.GenerateSpectralReport(spectralExecutePath, documentPath, rulesetPath, htmlReportPath, cancellationToken);
+            await this.GenerateSpectralReport(spectralExecutePath, documentPath, this._spectralRulesetPath, htmlReportPath, cancellationToken);
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
         }
+        
+        var rulesChecksum = GetChecksum(this._spectralRulesetPath);
+        this.UpdateSpectralRulesetChecksum(rulesChecksum);
+    }
+    
+    private async Task<bool> ShouldRunSpectral(IReadOnlyCollection<string> generatedDocumentPaths, IReadOnlyCollection<string> openApiSpecificationFilesPath)
+    {
+        if (this.HasRulesetChangedSinceLastExecution())
+        {
+            return true;
+        }
+
+        if (HasOpenApiDocumentChangedSinceLastExecution(generatedDocumentPaths, openApiSpecificationFilesPath))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool HasRulesetChangedSinceLastExecution()
+    {
+        var preciousRulesetChecksum = this.GetSpectralRulesetChecksum();
+        var currentRulesetChecksum = GetChecksum(this._spectralRulesetPath);
+
+        var hasRulesetChanged = !string.Equals(preciousRulesetChecksum, currentRulesetChecksum, StringComparison.InvariantCultureIgnoreCase); 
+
+        return hasRulesetChanged;
+    }
+    
+    private static bool HasOpenApiDocumentChangedSinceLastExecution(IReadOnlyCollection<string> generatedDocumentPaths, IReadOnlyCollection<string> openApiSpecificationFilesPath)
+    {
+        var existingDocumentChecksums = new Dictionary<string, string>();
+        foreach (var filePath in openApiSpecificationFilesPath)
+        {
+            existingDocumentChecksums.Add(Path.GetFileNameWithoutExtension(filePath), GetChecksum(filePath));
+        }
+        
+        var generatedDocumentChecksums = new Dictionary<string, string>();
+        foreach (var filePath in generatedDocumentPaths)
+        {
+            generatedDocumentChecksums.Add(Path.GetFileNameWithoutExtension(filePath), GetChecksum(filePath));
+        }
+
+        foreach (var generatedFileCheksum in generatedDocumentChecksums)
+        {
+            if (existingDocumentChecksums.TryGetValue(generatedFileCheksum.Key, out var previousChecksum))
+            {
+                if (!string.Equals(previousChecksum, generatedFileCheksum.Value, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private static string GetChecksum(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            return string.Empty;
+        }
+
+        using var sha256 = SHA256.Create();
+        using var stream = File.OpenRead(filePath);
+        
+        var hash = sha256.ComputeHash(stream);
+        return BitConverter.ToString(hash).Replace("-", string.Empty).ToLowerInvariant();
+    }
+    
+    private void UpdateSpectralRulesetChecksum(string checksum)
+    {
+        File.WriteAllText(Path.Combine(this._openApiReportsDirectoryPath, SpectralRulesetChecksumFileName), checksum);
+    }
+    
+    private string GetSpectralRulesetChecksum()
+    {
+        var checksumFilePath = Path.Combine(this._openApiReportsDirectoryPath, SpectralRulesetChecksumFileName);
+        if (!File.Exists(checksumFilePath))
+        {
+            return string.Empty;
+        }
+
+        return File.ReadAllText(checksumFilePath);
     }
 
     private static string GetSpectralFileName()
@@ -92,6 +204,13 @@ internal sealed class SpectralManager : ISpectralManager
         }
 
         return fileName;
+    }
+    
+    private string GetReportPath(string documentPath)
+    {
+        var documentName = Path.GetFileNameWithoutExtension(documentPath);
+        var outputSpectralReportName = $"spectral-{documentName}.html";
+        return Path.Combine(this._openApiReportsDirectoryPath, outputSpectralReportName);
     }
     
     private async Task<string> DownloadFileAsync(string rulesetUrl, CancellationToken cancellationToken)

@@ -30,7 +30,6 @@ internal class ValidateContractProcess
         string[] openApiSpecificationFiles,
         string openApiToolsDirectoryPath,
         string[] openApiSwaggerDocumentNames,
-        string openApiSpectralRulesetUrl,
         CompareCodeAgainstSpecFile compareCodeAgainstSpecFile,
         CancellationToken cancellationToken)
     {
@@ -49,10 +48,15 @@ internal class ValidateContractProcess
             
             this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
+            
+            this._loggerWrapper.LogMessage("Running Spectral...");
+            await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, openApiSpecificationFiles, cancellationToken);
         }
-
-        this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
+        else
+        {
+            this._loggerWrapper.LogMessage("Running Spectral...");
+            await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, Array.Empty<string>(), cancellationToken);
+        }
 
         return true;
     }
