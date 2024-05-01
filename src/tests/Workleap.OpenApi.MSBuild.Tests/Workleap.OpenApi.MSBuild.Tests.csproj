@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" />
+    <ProjectReference Include="..\..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" />
   </ItemGroup>
 
   <ItemGroup>
