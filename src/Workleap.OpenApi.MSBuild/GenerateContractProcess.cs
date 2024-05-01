@@ -42,7 +42,7 @@ internal class GenerateContractProcess
         
         this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
-        
+
         if (mode == GenerateContractMode.SpecGeneration)
         {
             this._loggerWrapper.LogMessage("Generating specification files...");
@@ -53,7 +53,7 @@ internal class GenerateContractProcess
             this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
         }
-        
+
         this._loggerWrapper.LogMessage("Running Spectral...");
         await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, cancellationToken);
     }
