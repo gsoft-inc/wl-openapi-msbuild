@@ -19,7 +19,7 @@ internal sealed class SpectralDiffCalculator
         var preciousRulesetChecksum = this.GetItemChecksum(SpectralRulesetChecksumItemName);
         var currentRulesetChecksum = GetFileChecksum(spectralRulset);
 
-        var hasRulesetChanged = !string.Equals(preciousRulesetChecksum, currentRulesetChecksum, StringComparison.InvariantCultureIgnoreCase); 
+        var hasRulesetChanged = !string.Equals(preciousRulesetChecksum, currentRulesetChecksum, StringComparison.OrdinalIgnoreCase); 
 
         return hasRulesetChanged;
     }
