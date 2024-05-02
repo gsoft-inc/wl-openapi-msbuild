@@ -41,6 +41,25 @@ internal sealed class SpectralDiffCalculator
 
         return false;
     }
+    
+    public void SaveCurrentExecutionChecksum(string spectralRulesetPath, IReadOnlyCollection<string> openApiDocumentPaths)
+    {
+        if (Directory.Exists(this._spectralOutputDirectoryPath))
+        {
+            Directory.Delete(this._spectralOutputDirectoryPath, true);
+        }
+
+        Directory.CreateDirectory(this._spectralOutputDirectoryPath);
+        
+        this.SetItemChecksum(SpectralRulesetChecksumItemName, GetFileChecksum(spectralRulesetPath));
+        
+        foreach (var documentPath in openApiDocumentPaths)
+        {
+            var itemName = Path.GetFileNameWithoutExtension(documentPath);
+            var checksum = GetFileChecksum(documentPath);
+            this.SetItemChecksum(itemName, checksum);
+        }
+    }
 
     private static string GetFileChecksum(string filePath)
     {
@@ -76,24 +95,5 @@ internal sealed class SpectralDiffCalculator
     private string GetItemChecksumPath(string itemName)
     {
         return Path.Combine(this._spectralOutputDirectoryPath, $"{itemName}.{ChecksumExtension}");
-    }
-    
-    public void SaveCurrentExecutionChecksum(string spectralRulesetPath, IReadOnlyCollection<string> openApiDocumentPaths)
-    {
-        if (Directory.Exists(this._spectralOutputDirectoryPath))
-        {
-            Directory.Delete(this._spectralOutputDirectoryPath, true);
-        }
-
-        Directory.CreateDirectory(this._spectralOutputDirectoryPath);
-        
-        this.SetItemChecksum(SpectralRulesetChecksumItemName, GetFileChecksum(spectralRulesetPath));
-        
-        foreach (var documentPath in openApiDocumentPaths)
-        {
-            var itemName = Path.GetFileNameWithoutExtension(documentPath);
-            var checksum = GetFileChecksum(documentPath);
-            this.SetItemChecksum(itemName, checksum);
-        }
     }
 }

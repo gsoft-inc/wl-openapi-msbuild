@@ -54,7 +54,7 @@ internal sealed class SpectralManager : ISpectralManager
 
     public async Task RunSpectralAsync(IReadOnlyCollection<string> openApiDocumentPaths, CancellationToken cancellationToken)
     {
-        this._loggerWrapper.LogMessage("\n ******** Spectral: Validating OpenApi Documents against ruleset ********", MessageImportance.High);
+        this._loggerWrapper.LogMessage("\n ******** Spectral: Validating OpenAPI Documents against ruleset ********", MessageImportance.High);
         
         var shouldRunSpectral = await this.ShouldRunSpectral(openApiDocumentPaths);
         if (!shouldRunSpectral)

@@ -16,9 +16,7 @@
 
   <!-- We validate and regenerate OpenAPI specs after the build stage. This task is executed only if the compiled outputs are newer than the last task execution. -->
   <!-- We decide to use compared a touched files strategy with the output of the CoreCompile target along with project files. Use Binlog to obtain target inputs/outputs -->
-  <Target 
-      Name="ValidateOpenApi"
-      AfterTargets="Build"
+  <Target Name="ValidateOpenApi" AfterTargets="Build"
       Inputs="$(MSBuildAllProjects);
               @(DocFileItem);
               @(IntermediateAssembly);

@@ -16,7 +16,7 @@ internal class SpecGeneratorManager
     /// </summary>
     public async Task UpdateSpecificationFilesAsync(IReadOnlyCollection<string> sourcedControlOpenApiSpecFiles, IReadOnlyCollection<string> generatedOpenApiSpecFiles, CancellationToken cancellationToken)
     {
-        this._loggerWrapper.LogMessage("\n ******** OpenApi Document Generator: Updating specification files. ******** \n", MessageImportance.High);
+        this._loggerWrapper.LogMessage("\n ******** OpenAPI Document Generator: Updating specification files. ******** \n", MessageImportance.High);
         
         var filesPath = generatedOpenApiSpecFiles.ToDictionary(Path.GetFileName, x => x);
         
