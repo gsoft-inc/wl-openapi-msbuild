@@ -33,7 +33,7 @@ internal sealed class SpectralDiffCalculator
 
             var previousChecksums = this.GetItemChecksum(itemName);
             
-            if (!string.Equals(previousChecksums, checksum, StringComparison.InvariantCultureIgnoreCase))
+            if (!string.Equals(previousChecksums, checksum, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
