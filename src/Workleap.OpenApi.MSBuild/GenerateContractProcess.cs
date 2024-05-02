@@ -32,7 +32,6 @@ internal class GenerateContractProcess
     internal async Task Execute(
         string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
-        string openApiSpectralRulesetUrl,
         GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
@@ -54,7 +53,7 @@ internal class GenerateContractProcess
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFilesPath, openApiSpectralRulesetUrl, cancellationToken);
+        await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, cancellationToken);
     }
 
     private async Task InstallDependencies(

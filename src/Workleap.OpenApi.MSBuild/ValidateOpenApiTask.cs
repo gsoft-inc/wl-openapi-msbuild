@@ -57,10 +57,11 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        var spectralDiffCalculator = new SpectralDiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
 
         var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, reportsPath, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, spectralDiffCalculator, this.OpenApiToolsDirectoryPath, reportsPath, this.OpenApiSpectralRulesetUrl, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
@@ -78,7 +79,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
-            loggerWrapper.LogWarning("You must provide the same amount of open api specification file names and swagger document file names.");
+            loggerWrapper.LogWarning("You must provide the same amount of OpenAPI documents file names and swagger document file names.");
 
             return false;
         }
@@ -96,7 +97,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                     await generateContractProcess.Execute(
                         this.OpenApiSpecificationFiles,
                         this.OpenApiSwaggerDocumentNames,
-                        this.OpenApiSpectralRulesetUrl,
                         this.OpenApiCompareCodeAgainstSpecFile ? GenerateContractProcess.GenerateContractMode.SpecComparison : GenerateContractProcess.GenerateContractMode.SpecGeneration,
                         cancellationToken);
                     break;
@@ -108,7 +108,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
                         this.OpenApiSpecificationFiles,
                         this.OpenApiToolsDirectoryPath,
                         this.OpenApiSwaggerDocumentNames,
-                        this.OpenApiSpectralRulesetUrl,
                         this.OpenApiCompareCodeAgainstSpecFile ? ValidateContractProcess.CompareCodeAgainstSpecFile.Enabled : ValidateContractProcess.CompareCodeAgainstSpecFile.Disabled,
                         cancellationToken);
 

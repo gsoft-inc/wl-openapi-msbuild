@@ -30,7 +30,6 @@ internal class ValidateContractProcess
         string[] openApiSpecificationFiles,
         string openApiToolsDirectoryPath,
         string[] openApiSwaggerDocumentNames,
-        string openApiSpectralRulesetUrl,
         CompareCodeAgainstSpecFile compareCodeAgainstSpecFile,
         CancellationToken cancellationToken)
     {
@@ -52,7 +51,7 @@ internal class ValidateContractProcess
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, openApiSpectralRulesetUrl, cancellationToken);
+        await this._spectralManager.RunSpectralAsync(openApiSpecificationFiles, cancellationToken);
 
         return true;
     }
