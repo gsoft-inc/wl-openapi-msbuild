@@ -28,3 +28,10 @@ jobs:
 
       - run: ./Run-SystemTest.ps1
         shell: pwsh
+
+  linearb:
+    needs: [ci]
+    uses: gsoft-inc/wl-reusable-workflows/.github/workflows/linearb-deployment.yml@main
+    with:
+      environment: development
+    secrets: inherit
