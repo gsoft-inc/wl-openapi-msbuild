@@ -47,14 +47,14 @@ internal sealed class SwaggerManager : ISwaggerManager
         }
 
         var retryCount = 0;
-        while (retryCount < 2)
+        while (retryCount < 3)
         {
             var result = await this._processWrapper.RunProcessAsync(
                 "dotnet",
                 ["tool", "update", "Swashbuckle.AspNetCore.Cli", "--ignore-failed-sources", "--tool-path", this._swaggerDirectory, "--configfile", Path.Combine(this._openApiToolsDirectoryPath, "nuget.config"), "--version", SwaggerVersion],
                 cancellationToken);
 
-            if (result.ExitCode != 0 && retryCount != 1)
+            if (result.ExitCode != 0 && retryCount != 2)
             {
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
                 this._loggerWrapper.LogWarning(result.StandardError);
@@ -64,7 +64,7 @@ internal sealed class SwaggerManager : ISwaggerManager
                 continue;
             }
 
-            if (retryCount == 1 && result.ExitCode != 0)
+            if (retryCount == 2 && result.ExitCode != 0)
             {
                 throw new OpenApiTaskFailedException("Swashbuckle CLI could not be installed.");
             }
