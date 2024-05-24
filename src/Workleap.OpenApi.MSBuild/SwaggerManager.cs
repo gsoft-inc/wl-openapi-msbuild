@@ -6,6 +6,7 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class SwaggerManager : ISwaggerManager
 {
     private const string SwaggerVersion = "6.5.0";
+    private const int MaxRetryCount = 3;
     private readonly IProcessWrapper _processWrapper;
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly string _openApiWebApiAssemblyPath;
@@ -46,57 +47,59 @@ internal sealed class SwaggerManager : ISwaggerManager
             return;
         }
 
-        var retryCount = 0;
-        while (retryCount < 3)
+        var willRetry = true;
+        for (var retryCount = 0; willRetry && retryCount < MaxRetryCount; retryCount++)
         {
             var result = await this._processWrapper.RunProcessAsync(
                 "dotnet",
                 ["tool", "update", "Swashbuckle.AspNetCore.Cli", "--ignore-failed-sources", "--tool-path", this._swaggerDirectory, "--configfile", Path.Combine(this._openApiToolsDirectoryPath, "nuget.config"), "--version", SwaggerVersion],
                 cancellationToken);
 
-            if (result.ExitCode != 0 && retryCount != 2)
+            var isLastRetry = retryCount == MaxRetryCount - 1;
+            if (result.ExitCode != 0)
             {
+                if (isLastRetry)
+                {
+                    throw new OpenApiTaskFailedException("Swashbuckle CLI could not be installed.");
+                }
+
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
                 this._loggerWrapper.LogWarning(result.StandardError);
                 this._loggerWrapper.LogWarning("Swashbuckle download failed. Retrying once more...");
 
-                retryCount++;
                 continue;
             }
 
-            if (retryCount == 2 && result.ExitCode != 0)
-            {
-                throw new OpenApiTaskFailedException("Swashbuckle CLI could not be installed.");
-            }
-
-            break;
+            willRetry = false;
         }
     }
 
     public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
         var envVars = new Dictionary<string, string?>() { { "DOTNET_ROLL_FORWARD", "LatestMajor" } };
-        var retryCount = 0;
-        while (retryCount < 3)
-        {
-            var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: cancellationToken, envVars: envVars);
+        var swaggerCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        swaggerCancellationToken.CancelAfter(TimeSpan.FromMinutes(1));
 
-            if (result.ExitCode != 0 && retryCount != 2)
+        var willRetry = true;
+        for (var retryCount = 0; willRetry && retryCount < MaxRetryCount; retryCount++)
+        {
+            var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: swaggerCancellationToken.Token, envVars: envVars);
+
+            var isLastRetry = retryCount == MaxRetryCount - 1;
+            if (result.ExitCode != 0)
             {
+                if (isLastRetry)
+                {
+                    throw new OpenApiTaskFailedException($"OpenApi file for {outputOpenApiSpecPath} could not be generated.");
+                }
+
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
                 this._loggerWrapper.LogWarning(result.StandardError);
                 this._loggerWrapper.LogWarning($"OpenAPI spec generation failed for {outputOpenApiSpecPath}. Retrying again...");
-
-                retryCount++;
                 continue;
             }
 
-            if (retryCount == 2 && result.ExitCode != 0)
-            {
-                throw new OpenApiTaskFailedException($"OpenApi file for {outputOpenApiSpecPath} could not be generated.");
-            }
-
-            break;
+            willRetry = false;
         }
 
         return outputOpenApiSpecPath;
