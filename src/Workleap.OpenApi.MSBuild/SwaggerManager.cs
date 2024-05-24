@@ -47,8 +47,7 @@ internal sealed class SwaggerManager : ISwaggerManager
             return;
         }
 
-        var willRetry = true;
-        for (var retryCount = 0; willRetry && retryCount < MaxRetryCount; retryCount++)
+        for (var retryCount = 0; retryCount < MaxRetryCount; retryCount++)
         {
             var result = await this._processWrapper.RunProcessAsync(
                 "dotnet",
@@ -70,7 +69,7 @@ internal sealed class SwaggerManager : ISwaggerManager
                 continue;
             }
 
-            willRetry = false;
+            break;
         }
     }
 
@@ -81,7 +80,7 @@ internal sealed class SwaggerManager : ISwaggerManager
         swaggerCancellationToken.CancelAfter(TimeSpan.FromMinutes(1));
 
         var willRetry = true;
-        for (var retryCount = 0; willRetry && retryCount < MaxRetryCount; retryCount++)
+        for (var retryCount = 0; retryCount < MaxRetryCount; retryCount++)
         {
             var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: swaggerCancellationToken.Token, envVars: envVars);
 
@@ -99,7 +98,7 @@ internal sealed class SwaggerManager : ISwaggerManager
                 continue;
             }
 
-            willRetry = false;
+            break;
         }
 
         return outputOpenApiSpecPath;
