@@ -27,6 +27,7 @@ internal sealed class SwaggerManager : ISwaggerManager
     {
         var taskList = new List<Task<string>>();
 
+        // add a retry here for the logs here.
         foreach (var documentName in openApiSwaggerDocumentNames)
         {
             var outputOpenApiSpecName = $"openapi-{documentName.ToLowerInvariant()}.yaml";
@@ -76,13 +77,27 @@ internal sealed class SwaggerManager : ISwaggerManager
     public async Task<string> GenerateOpenApiSpecAsync(string swaggerExePath, string outputOpenApiSpecPath, string documentName, CancellationToken cancellationToken)
     {
         var envVars = new Dictionary<string, string?>() { { "DOTNET_ROLL_FORWARD", "LatestMajor" } };
-        var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: cancellationToken, envVars: envVars);
-        this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
-
-        if (result.ExitCode != 0)
+        var retryCount = 0;
+        while (retryCount < 2)
         {
-            this._loggerWrapper.LogWarning(result.StandardError);
-            throw new OpenApiTaskFailedException($"OpenApi file {outputOpenApiSpecPath} could not be created.");
+            var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: cancellationToken, envVars: envVars);
+
+            if (result.ExitCode != 0 && retryCount != 1)
+            {
+                this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
+                this._loggerWrapper.LogWarning(result.StandardError);
+                this._loggerWrapper.LogWarning($"OpenAPI spec generation failed for {outputOpenApiSpecPath}. Retrying once more...");
+
+                retryCount++;
+                continue;
+            }
+
+            if (retryCount == 1 && result.ExitCode != 0)
+            {
+                throw new OpenApiTaskFailedException($"OpenApi file {outputOpenApiSpecPath} could not be created.");
+            }
+
+            break;
         }
 
         return outputOpenApiSpecPath;

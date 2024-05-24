@@ -1,3 +1,5 @@
+using Microsoft.Build.Framework;
+
 namespace Workleap.OpenApi.MSBuild;
 
 /// <summary>
@@ -56,6 +58,7 @@ internal class GenerateContractProcess
         await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, cancellationToken);
     }
 
+    // should have a retry or timeout here?
     private async Task InstallDependencies(
         GenerateContractMode mode,
         CancellationToken cancellationToken)
@@ -70,5 +73,6 @@ internal class GenerateContractProcess
         }
 
         await Task.WhenAll(installationTasks);
+        this._loggerWrapper.LogMessage("Finished installing OpenAPI dependencies.", MessageImportance.High);
     }
 }
