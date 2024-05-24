@@ -27,7 +27,6 @@ internal sealed class SwaggerManager : ISwaggerManager
     {
         var taskList = new List<Task<string>>();
 
-        // add a retry here for the logs here.
         foreach (var documentName in openApiSwaggerDocumentNames)
         {
             var outputOpenApiSpecName = $"openapi-{documentName.ToLowerInvariant()}.yaml";
