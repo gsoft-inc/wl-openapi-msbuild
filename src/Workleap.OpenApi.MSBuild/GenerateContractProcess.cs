@@ -58,7 +58,6 @@ internal class GenerateContractProcess
         await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, cancellationToken);
     }
 
-    // should have a retry or timeout here?
     private async Task InstallDependencies(
         GenerateContractMode mode,
         CancellationToken cancellationToken)
