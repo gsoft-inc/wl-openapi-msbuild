@@ -77,23 +77,23 @@ internal sealed class SwaggerManager : ISwaggerManager
     {
         var envVars = new Dictionary<string, string?>() { { "DOTNET_ROLL_FORWARD", "LatestMajor" } };
         var retryCount = 0;
-        while (retryCount < 2)
+        while (retryCount < 3)
         {
             var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: cancellationToken, envVars: envVars);
 
-            if (result.ExitCode != 0 && retryCount != 1)
+            if (result.ExitCode != 0 && retryCount != 2)
             {
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
                 this._loggerWrapper.LogWarning(result.StandardError);
-                this._loggerWrapper.LogWarning($"OpenAPI spec generation failed for {outputOpenApiSpecPath}. Retrying once more...");
+                this._loggerWrapper.LogWarning($"OpenAPI spec generation failed for {outputOpenApiSpecPath}. Retrying again...");
 
                 retryCount++;
                 continue;
             }
 
-            if (retryCount == 1 && result.ExitCode != 0)
+            if (retryCount == 2 && result.ExitCode != 0)
             {
-                throw new OpenApiTaskFailedException($"OpenApi file {outputOpenApiSpecPath} could not be created.");
+                throw new OpenApiTaskFailedException($"OpenApi file for {outputOpenApiSpecPath} could not be generated.");
             }
 
             break;
