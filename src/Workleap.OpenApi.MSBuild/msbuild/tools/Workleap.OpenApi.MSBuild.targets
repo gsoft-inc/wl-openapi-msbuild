@@ -46,7 +46,7 @@
       <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(StartupAssemblyPath)openapi</OpenApiToolsDirectoryPath>
 
       <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
-      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/main/.spectral.$(SpectralProfile).yaml</OpenApiSpectralRulesetUrl>
+      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.9.0/.spectral.$(SpectralProfile).yaml</OpenApiSpectralRulesetUrl>
 
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
