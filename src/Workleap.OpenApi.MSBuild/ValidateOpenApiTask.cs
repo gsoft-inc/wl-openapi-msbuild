@@ -8,6 +8,8 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private const string CodeFirst = "CodeFirst"; // For backward compatibility
     private const string ValidateContract = "ValidateContract";
     private const string ContractFirst = "ContractFirst"; // For backward compatibility
+    private const string Backend = "backend";
+    private const string Frontend = "frontend";
 
     /// <summary>
     ///     2 supported modes:
@@ -16,6 +18,14 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     /// </summary>
     [Required]
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     2 supported profiles]:
+    ///     - backend (default): Uses the backend ruleset to validate the API spec
+    ///     - frontend: Uses the frontend ruleset to validate the API spec
+    /// </summary>
+    [Required]
+    public string OpenApiServiceProfile { get; set; } = string.Empty;
 
     /// <summary>When Development mode is ValidateContract, will validate if the specification match the code.</summary>
     [Required]
@@ -69,6 +79,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiServiceProfile), this.OpenApiServiceProfile);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
@@ -81,6 +92,12 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             loggerWrapper.LogWarning("You must provide the same amount of OpenAPI documents file names and swagger document file names.");
 
+            return false;
+        }
+
+        if (!this.OpenApiServiceProfile.Equals(Backend, StringComparison.Ordinal) && !this.OpenApiServiceProfile.Equals(Frontend, StringComparison.Ordinal))
+        {
+            loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed values are {2} or {3}", this.OpenApiServiceProfile, nameof(this.OpenApiServiceProfile), Backend, Frontend);
             return false;
         }
 

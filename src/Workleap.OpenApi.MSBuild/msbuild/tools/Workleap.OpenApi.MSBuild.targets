@@ -2,6 +2,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <OpenApiEnabled Condition="'$(OpenApiEnabled)' == ''">true</OpenApiEnabled>
+    <OpenApiServiceProfile Condition="'$(OpenApiServiceProfile)' == ''">backend</OpenApiServiceProfile>
     <!-- We use this property when developing this MSBuild task in an IDE, -->
     <!-- so we can reference the task assembly that is built in its bin folder instead of the one in the distributed NuGet package -->
     <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>
@@ -45,7 +46,7 @@
       <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(StartupAssemblyPath)openapi</OpenApiToolsDirectoryPath>
 
       <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
-      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.8.0/.spectral.yaml</OpenApiSpectralRulesetUrl>
+      <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''">https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.9.0/.spectral.$(OpenApiServiceProfile).yaml</OpenApiSpectralRulesetUrl>
 
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
@@ -81,6 +82,7 @@
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
       OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
+      OpenApiServiceProfile="$(OpenApiServiceProfile)"
     />
     <Touch Files="$(IntermediateOutputPath)$(OpenApiTouchFileName)" AlwaysCreate="true" />
   </Target>
