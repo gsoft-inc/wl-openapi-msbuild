@@ -48,6 +48,7 @@ Process {
     $validateContractSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.ValidateContract"
     $codeFirstSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.CodeFirst"
     $generateContractSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.GenerateContract"
+    $generateContractWithFrontendSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.GenerateWithFrontend"
     $oasDiffErrorSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.OasDiffError"
     $spectralErrorSysTestDir = Join-Path $PSScriptRoot "src/tests/WebApi.MsBuild.SystemTest.SpectralError"
 
@@ -61,6 +62,7 @@ Process {
         BuildProject -openApiMsBuildSource $outputDir -projectPath $validateContractSysTestDir -isFailureExpected $false
         BuildProject -openApiMsBuildSource $outputDir -projectPath $codeFirstSysTestDir -isFailureExpected $false
         BuildProject -openApiMsBuildSource $outputDir -projectPath $generateContractSysTestDir -isFailureExpected $false
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $generateContractWithFrontendSysTestDir -isFailureExpected $false
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $true
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"

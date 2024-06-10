@@ -31,6 +31,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workleap.OpenApi.MSBuild.Tests", "tests\Workleap.OpenApi.MSBuild.Tests\Workleap.OpenApi.MSBuild.Tests.csproj", "{7CD01912-BA30-4F96-A397-E79A7E670E27}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApi.MsBuild.SystemTest.GenerateWithFrontend", "tests\WebApi.MsBuild.SystemTest.GenerateWithFrontend\WebApi.MsBuild.SystemTest.GenerateWithFrontend.csproj", "{A9E67832-2774-4080-A5A5-4B3F597826A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9E67832-2774-4080-A5A5-4B3F597826A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9E67832-2774-4080-A5A5-4B3F597826A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9E67832-2774-4080-A5A5-4B3F597826A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9E67832-2774-4080-A5A5-4B3F597826A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +92,7 @@ Global
 		{49EEB542-9B68-4389-810D-0C1222E5FD17} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{DE929AE5-5A69-4E82-8246-7AD5BF97983B} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{7CD01912-BA30-4F96-A397-E79A7E670E27} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
+		{A9E67832-2774-4080-A5A5-4B3F597826A5} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {BCD029BE-FB3E-45A2-8DD4-FDE33D87544D}
