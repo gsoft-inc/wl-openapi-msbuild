@@ -5,12 +5,12 @@ namespace Workleap.OpenApi.MSBuild.Spectral;
 
 internal sealed class SpectralRulesetManager
 {
-    private const string SpectralVersion = "0.8.0";
+    private const string SpectralVersion = "0.9.0";
     private const string SpectralDownloadUrlFormat = "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/{0}/.spectral.{1}.yaml";
     
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
-    private readonly string spectralProfile;
+    private readonly string _spectralProfile;
     private readonly string _spectralRulesetPath;
 
     public SpectralRulesetManager(
@@ -22,7 +22,7 @@ internal sealed class SpectralRulesetManager
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
 
-        this.spectralProfile = string.Format(SpectralDownloadUrlFormat, SpectralVersion, spectralProfile);
+        this._spectralProfile = spectralProfile;
 
         if (spectralFilePathInput != null && !string.IsNullOrEmpty(spectralFilePathInput))
         {
@@ -30,7 +30,7 @@ internal sealed class SpectralRulesetManager
         }
         else
         {
-            this._spectralRulesetPath = GetProfileRulesetUrl(this.spectralProfile);
+            this._spectralRulesetPath = GetProfileRulesetUrl(this._spectralProfile);
         }
     }
 
@@ -41,24 +41,32 @@ internal sealed class SpectralRulesetManager
 
     public async Task<string> GetSpectralRulesetFile(CancellationToken cancellationToken)
     {
-        // For remote ruleset we download the file for optimization and reduce spectral flakyness
-        if (!IsLocalFile(this._spectralRulesetPath))
+        try
         {
-            this._loggerWrapper.LogMessage("Downloading ruleset.");
-            var downloadedFilePath = await this.DownloadFileAsync(this._spectralRulesetPath, cancellationToken);
-
-            return downloadedFilePath;
-        }
         
-        // For local custom rules if they are not extendings any rules we extend them with Workleap rules
-        if (IsLocalFile(this._spectralRulesetPath) && !IsRulesetHaveExtendsProperty(this._spectralRulesetPath))
-        {
-            this._loggerWrapper.LogMessage("Extending ruleset with Workleap rules.");
-            var copiedFilePath = await CopyAndExtendRuleset(this._spectralRulesetPath, GetProfileRulesetUrl(this.spectralProfile), cancellationToken);
-            return copiedFilePath;
-        }
+            // For remote ruleset we download the file for optimization and reduce spectral flakyness
+            if (!IsLocalFile(this._spectralRulesetPath))
+            {
+                this._loggerWrapper.LogMessage("Downloading ruleset.");
+                var downloadedFilePath = await this.DownloadFileAsync(this._spectralRulesetPath, cancellationToken);
 
-        return this._spectralRulesetPath;
+                return downloadedFilePath;
+            }
+        
+            // For local custom rules if they are not extendings any rules we extend them with Workleap rules
+            if (IsLocalFile(this._spectralRulesetPath) && !IsRulesetHaveExtendsProperty(this._spectralRulesetPath))
+            {
+                this._loggerWrapper.LogMessage("Extending ruleset with Workleap rules.");
+                var copiedFilePath = await CopyAndExtendRuleset(this._spectralRulesetPath, GetProfileRulesetUrl(this._spectralProfile), cancellationToken);
+                return copiedFilePath;
+            }
+
+            return this._spectralRulesetPath;
+        }
+        catch (Exception e)
+        {
+            return this._spectralRulesetPath;
+        }
     }
     
     private static bool IsRulesetHaveExtendsProperty(string customSpectralFilePath)

@@ -45,8 +45,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    [Required]
-    public string OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
+    public string? OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
     [Required]
@@ -72,7 +71,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper);
+        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
         var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);

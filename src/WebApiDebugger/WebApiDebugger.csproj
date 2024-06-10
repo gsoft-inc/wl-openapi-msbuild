@@ -11,8 +11,8 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
-
   <PropertyGroup>
+    <OpenApiEnabled>false</OpenApiEnabled>
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
     <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
   </PropertyGroup>

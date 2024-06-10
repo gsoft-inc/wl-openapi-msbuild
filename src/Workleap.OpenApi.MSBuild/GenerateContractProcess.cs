@@ -67,7 +67,7 @@ internal class GenerateContractProcess
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralRunner.RunSpectralAsync(generateOpenApiDocsPath, dependenciesResult.SpectralRulesetPath, dependenciesResult.SpectralRulesetPath, cancellationToken);
+        await this._spectralRunner.RunSpectralAsync(generateOpenApiDocsPath, dependenciesResult.SpectralExecutablePath, dependenciesResult.SpectralRulesetPath, cancellationToken);
     }
 
     private async Task<DependenciesResult> InstallDependencies(
@@ -100,14 +100,14 @@ internal class GenerateContractProcess
     
     private class DependenciesResult
     {
-        public DependenciesResult(string spectralRulesetPath, string generateOpenApiDocsPath)
+        public DependenciesResult(string spectralRulesetPath, string spectralExecutablePath)
         {
             this.SpectralRulesetPath = spectralRulesetPath;
-            this.GenerateOpenApiDocsPath = generateOpenApiDocsPath;
+            this.SpectralExecutablePath = spectralExecutablePath;
         }
 
         public string SpectralRulesetPath { get; }
         
-        public string GenerateOpenApiDocsPath { get; }
+        public string SpectralExecutablePath { get; }
     }
 }
