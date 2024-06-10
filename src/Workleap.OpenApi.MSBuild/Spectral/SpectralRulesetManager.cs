@@ -1,40 +1,67 @@
 ﻿using Microsoft.Build.Framework;
 using YamlDotNet.RepresentationModel;
 
-namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild.Spectral;
 
-internal sealed class SpectralRuleEnricher
+internal sealed class SpectralRulesetManager
 {
+    private const string SpectralVersion = "0.8.0";
+    private const string SpectralDownloadUrlFormat = "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/{0}/.spectral.{1}.yaml";
+    
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
+    private readonly string spectralProfile;
+    private readonly string _spectralRulesetPath;
 
-    public SpectralRuleEnricher(ILoggerWrapper loggerWrapper, IHttpClientWrapper httpClientWrapper)
+    public SpectralRulesetManager(
+        ILoggerWrapper loggerWrapper, 
+        IHttpClientWrapper httpClientWrapper,
+        string spectralProfile,
+        string? spectralFilePathInput)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
+
+        this.spectralProfile = string.Format(SpectralDownloadUrlFormat, SpectralVersion, spectralProfile);
+
+        if (spectralFilePathInput != null && !string.IsNullOrEmpty(spectralFilePathInput))
+        {
+            this._spectralRulesetPath = spectralFilePathInput;
+        }
+        else
+        {
+            this._spectralRulesetPath = GetProfileRulesetUrl(this.spectralProfile);
+        }
     }
 
-    public async Task<string> GetSpectralFile(string initialpath, CancellationToken cancellationToken)
+    private static string GetProfileRulesetUrl(string spectralProfile)
     {
-        var updatedPath = initialpath;
-        
-        if (!IsLocalFile(initialpath))
+        return string.Format(SpectralDownloadUrlFormat, SpectralVersion, spectralProfile);
+    }
+
+    public async Task<string> GetSpectralRulesetFile(CancellationToken cancellationToken)
+    {
+        // For remote ruleset we download the file for optimization and reduce spectral flakyness
+        if (!IsLocalFile(this._spectralRulesetPath))
         {
-            // We download the file before to isolate flakiness in the spectral execution
             this._loggerWrapper.LogMessage("Downloading ruleset.");
-            updatedPath = await this.DownloadFileAsync(initialpath, cancellationToken);
+            var downloadedFilePath = await this.DownloadFileAsync(this._spectralRulesetPath, cancellationToken);
+
+            return downloadedFilePath;
         }
-        else if (!IsRulesetHaveExtendedsProperty(initialpath))
+        
+        // For local custom rules if they are not extendings any rules we extend them with Workleap rules
+        if (IsLocalFile(this._spectralRulesetPath) && !IsRulesetHaveExtendsProperty(this._spectralRulesetPath))
         {
-            // We download the file before to isolate flakiness in the spectral execution
             this._loggerWrapper.LogMessage("Extending ruleset with Workleap rules.");
-            updatedPath = await CopyAndExtendRuleset(initialpath, "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/main/.spectral.frontend.yaml", cancellationToken);
+            var copiedFilePath = await CopyAndExtendRuleset(this._spectralRulesetPath, GetProfileRulesetUrl(this.spectralProfile), cancellationToken);
+            return copiedFilePath;
         }
 
-        return updatedPath;
+        return this._spectralRulesetPath;
     }
     
-    private static bool IsRulesetHaveExtendedsProperty(string customSpectralFilePath)
+    private static bool IsRulesetHaveExtendsProperty(string customSpectralFilePath)
     {
         using var reader = new StreamReader(customSpectralFilePath);
         var yamlStream = new YamlStream();
@@ -46,10 +73,6 @@ internal sealed class SpectralRuleEnricher
         return hasExtendsProperty;
     }
     
-    /// <summary>
-    /// Extends ruleset with spectral profile
-    /// </summary>
-    /// <returns>Updated ruleset path</returns>
     private static async Task<string> CopyAndExtendRuleset(string initialPath, string extendsUrl, CancellationToken cancellationToken)
     {
         var outputFilePath = Path.ChangeExtension(Path.GetTempFileName(), "yaml");

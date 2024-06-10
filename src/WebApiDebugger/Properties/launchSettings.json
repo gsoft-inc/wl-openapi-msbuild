@@ -19,6 +19,12 @@
       "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract",
       "workingDirectory": "$(ProjectDir)"
     },
+    "CustomSpectral": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract /p:OpenApiSpectralRulesetUrl=./custom.spectral.yaml",
+      "workingDirectory": "$(ProjectDir)"
+    },
     "GenerateContractOnCI": {
       "commandName": "Executable",
       "executablePath": "dotnet",

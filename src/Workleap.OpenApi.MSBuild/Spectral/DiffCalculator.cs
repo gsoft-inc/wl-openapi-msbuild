@@ -2,14 +2,14 @@
 
 namespace Workleap.OpenApi.MSBuild;
 
-internal sealed class SpectralDiffCalculator
+internal sealed class DiffCalculator
 {
     private const string ChecksumExtension = "spectral-checksum";
     private const string SpectralRulesetChecksumItemName = "spectral-ruleset-checksum";
     
     private readonly string _spectralOutputDirectoryPath;
 
-    public SpectralDiffCalculator(string spectralChecksumOutputDirectoryPath)
+    public DiffCalculator(string spectralChecksumOutputDirectoryPath)
     {
         this._spectralOutputDirectoryPath = spectralChecksumOutputDirectoryPath;
     }

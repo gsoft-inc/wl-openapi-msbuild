@@ -1,4 +1,5 @@
 using Microsoft.Build.Framework;
+using Workleap.OpenApi.MSBuild.Spectral;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -57,17 +58,18 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
-        var spectralDiffCalculator = new SpectralDiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
+        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
 
         var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralRuleEnricher = new SpectralRuleEnricher(loggerWrapper, httpClientWrapper);
-        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, spectralDiffCalculator, spectralRuleEnricher, this.OpenApiToolsDirectoryPath, reportsPath, this.OpenApiSpectralRulesetUrl, httpClientWrapper);
+        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper);
+        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
-        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
-        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
+        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);

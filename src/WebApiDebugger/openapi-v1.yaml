@@ -7,10 +7,10 @@ paths:
     get:
       tags:
         - WeatherForecast
-      operationId: GetWeatherForecast
+      operationId: GetWeatherForecast2
       responses:
         '200':
-          description: Success
+          description: OK
           content:
             application/json:
               schema:

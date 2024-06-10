@@ -1,6 +1,6 @@
 namespace Workleap.OpenApi.MSBuild.Tests;
 
-public class SpectralDiffCalculatorTests
+public class DiffCalculatorTests
 {
     private const string RulesetV1 = "./Spectral/v1/spectral-ruleset.yaml";
     private const string RulesetV2 = "./Spectral/v2/spectral-ruleset.yaml";
@@ -8,11 +8,11 @@ public class SpectralDiffCalculatorTests
     private const string OpenApiDocumentV2 = "./Spectral/v2/openapi.yaml";
     private const string OpenApiDocumentAdminV2 = "./Spectral/v2/openapi-admin.yaml";
     
-    private readonly SpectralDiffCalculator _spectralDiffCalculator;
+    private readonly DiffCalculator _diffCalculator;
 
-    public SpectralDiffCalculatorTests()
+    public DiffCalculatorTests()
     {
-        this._spectralDiffCalculator = new SpectralDiffCalculator(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
+        this._diffCalculator = new DiffCalculator(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
     }
     
     [Fact]
@@ -21,7 +21,7 @@ public class SpectralDiffCalculatorTests
         // Given
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasRulesetChangedSinceLastExecution(RulesetV1);
+        var hasChanged = this._diffCalculator.HasRulesetChangedSinceLastExecution(RulesetV1);
 
         // Assert
         Assert.True(hasChanged);
@@ -31,10 +31,10 @@ public class SpectralDiffCalculatorTests
     public void Given_Spectral_Rules_Saved_When_HasRulesetChangedSinceLastExecution_With_Same_Ruleset_Then_False()
     {
         // Given
-        this._spectralDiffCalculator.SaveCurrentExecutionChecksum(RulesetV1, Array.Empty<string>());
+        this._diffCalculator.SaveCurrentExecutionChecksum(RulesetV1, Array.Empty<string>());
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasRulesetChangedSinceLastExecution(RulesetV1);
+        var hasChanged = this._diffCalculator.HasRulesetChangedSinceLastExecution(RulesetV1);
 
         // Assert
         Assert.False(hasChanged);
@@ -44,10 +44,10 @@ public class SpectralDiffCalculatorTests
     public void Given_Spectral_Rules_Saved_When_HasRulesetChangedSinceLastExecution_With_Other_Ruleset_Then_True()
     {
         // Given
-        this._spectralDiffCalculator.SaveCurrentExecutionChecksum(RulesetV1, Array.Empty<string>());
+        this._diffCalculator.SaveCurrentExecutionChecksum(RulesetV1, Array.Empty<string>());
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasRulesetChangedSinceLastExecution(RulesetV2);
+        var hasChanged = this._diffCalculator.HasRulesetChangedSinceLastExecution(RulesetV2);
 
         // Assert
         Assert.True(hasChanged);
@@ -59,7 +59,7 @@ public class SpectralDiffCalculatorTests
         // Given
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1 });
+        var hasChanged = this._diffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1 });
 
         // Assert
         Assert.True(hasChanged);
@@ -69,10 +69,10 @@ public class SpectralDiffCalculatorTests
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_Same_Ruleset_Then_False()
     {
         // Given
-        this._spectralDiffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
+        this._diffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1 });
+        var hasChanged = this._diffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1 });
 
         // Assert
         Assert.False(hasChanged);
@@ -82,10 +82,10 @@ public class SpectralDiffCalculatorTests
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_New_Version_Then_True()
     {
         // Given
-        this._spectralDiffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
+        this._diffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV2 });
+        var hasChanged = this._diffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV2 });
 
         // Assert
         Assert.True(hasChanged);
@@ -95,10 +95,10 @@ public class SpectralDiffCalculatorTests
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_Extra_Version_Then_True()
     {
         // Given
-        this._spectralDiffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
+        this._diffCalculator.SaveCurrentExecutionChecksum(RulesetV1, new[] { OpenApiDocumentV1 });
 
         // When
-        var hasChanged = this._spectralDiffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1, OpenApiDocumentAdminV2 });
+        var hasChanged = this._diffCalculator.HasOpenApiDocumentChangedSinceLastExecution(new[] { OpenApiDocumentV1, OpenApiDocumentAdminV2 });
 
         // Assert
         Assert.True(hasChanged);
