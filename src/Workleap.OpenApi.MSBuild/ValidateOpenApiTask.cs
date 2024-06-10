@@ -19,6 +19,14 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     [Required]
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
+    /// <summary>
+    ///     2 supported profiles]:
+    ///     - backend (default): Uses the backend ruleset to validate the API spec
+    ///     - frontend: Uses the frontend ruleset to validate the API spec
+    /// </summary>
+    [Required]
+    public string OpenApiServiceProfile { get; set; } = string.Empty;
+
     /// <summary>When Development mode is ValidateContract, will validate if the specification match the code.</summary>
     [Required]
     public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
@@ -49,14 +57,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
     /// <summary>If warnings should be logged as errors instead.</summary>
     public bool OpenApiTreatWarningsAsErrors { get; set; }
-
-    /// <summary>
-    ///     2 supported profiles]:
-    ///     - backend (default): Uses the backend ruleset to validate the API spec
-    ///     - frontend: Uses the frontend ruleset to validate the API spec
-    /// </summary>
-    [Required]
-    public string OpenApiServiceProfile { get; set; } = string.Empty;
 
     protected override async Task<bool> ExecuteAsync(CancellationToken cancellationToken)
     {
