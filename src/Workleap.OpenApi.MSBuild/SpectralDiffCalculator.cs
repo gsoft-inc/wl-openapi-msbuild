@@ -14,10 +14,10 @@ internal sealed class SpectralDiffCalculator
         this._spectralOutputDirectoryPath = spectralChecksumOutputDirectoryPath;
     }
     
-    public bool HasRulesetChangedSinceLastExecution(string spectralRulset)
+    public bool HasRulesetChangedSinceLastExecution(string spectralRulsetPath)
     {
         var preciousRulesetChecksum = this.GetItemChecksum(SpectralRulesetChecksumItemName);
-        var currentRulesetChecksum = GetFileChecksum(spectralRulset);
+        var currentRulesetChecksum = GetFileChecksum(spectralRulsetPath);
 
         var hasRulesetChanged = !string.Equals(preciousRulesetChecksum, currentRulesetChecksum, StringComparison.OrdinalIgnoreCase); 
 

@@ -61,7 +61,8 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, spectralDiffCalculator, this.OpenApiToolsDirectoryPath, reportsPath, this.OpenApiSpectralRulesetUrl, httpClientWrapper);
+        var spectralRuleEnricher = new SpectralRuleEnricher(loggerWrapper, httpClientWrapper);
+        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, spectralDiffCalculator, spectralRuleEnricher, this.OpenApiToolsDirectoryPath, reportsPath, this.OpenApiSpectralRulesetUrl, httpClientWrapper);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
