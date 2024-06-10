@@ -68,5 +68,3 @@ Process {
         Pop-Location
     }
 }
-
-# pass parameters for the test projects
