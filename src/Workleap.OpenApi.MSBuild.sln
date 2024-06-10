@@ -21,13 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.O
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.SpectralError", "tests\WebApi.MsBuild.SystemTest.SpectralError\WebApi.MsBuild.SystemTest.SpectralError.csproj", "{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.ValidateContract", "tests\WebApi.MsBuild.SystemTest.ValidateContract\WebApi.MsBuild.SystemTest.ValidateContract.csproj", "{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.GenerateContract", "tests\WebApi.MsBuild.SystemTest.GenerateContract\WebApi.MsBuild.SystemTest.GenerateContract.csproj", "{502CEF5F-350E-4498-BA3C-3C09C9620737}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.CodeFirst", "tests\WebApi.MsBuild.SystemTest.CodeFirst\WebApi.MsBuild.SystemTest.CodeFirst.csproj", "{49EEB542-9B68-4389-810D-0C1222E5FD17}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.ContractFirst", "tests\WebApi.MsBuild.SystemTest.ContractFirst\WebApi.MsBuild.SystemTest.ContractFirst.csproj", "{DE929AE5-5A69-4E82-8246-7AD5BF97983B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi.MsBuild.SystemTest.GenericTest", "tests\WebApi.MsBuild.SystemTest.GenericTest\WebApi.MsBuild.SystemTest.GenericTest.csproj", "{502CEF5F-350E-4498-BA3C-3C09C9620737}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Workleap.OpenApi.MSBuild.Tests", "tests\Workleap.OpenApi.MSBuild.Tests\Workleap.OpenApi.MSBuild.Tests.csproj", "{7CD01912-BA30-4F96-A397-E79A7E670E27}"
 EndProject
@@ -53,22 +47,10 @@ Global
 		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{502CEF5F-350E-4498-BA3C-3C09C9620737}.Release|Any CPU.Build.0 = Release|Any CPU
-		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{49EEB542-9B68-4389-810D-0C1222E5FD17}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE929AE5-5A69-4E82-8246-7AD5BF97983B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7CD01912-BA30-4F96-A397-E79A7E670E27}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -81,10 +63,7 @@ Global
 		{A4C90BE2-889F-46BB-8B4D-2219B1084695} = {07F66FC2-73B9-44C7-843C-36C13905AE9B}
 		{3909D38E-7584-4206-9CDC-3E56203BE6DB} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{C42C2836-4997-49D3-9BC6-E6A0E1B8C472} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
-		{CCDEB7C9-EE1C-416D-871B-00FD8269B5FA} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{502CEF5F-350E-4498-BA3C-3C09C9620737} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
-		{49EEB542-9B68-4389-810D-0C1222E5FD17} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
-		{DE929AE5-5A69-4E82-8246-7AD5BF97983B} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 		{7CD01912-BA30-4F96-A397-E79A7E670E27} = {4DDE83BF-D190-4CC9-AD36-E9250DABB27D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
