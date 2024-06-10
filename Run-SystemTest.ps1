@@ -56,9 +56,10 @@ Process {
 
         BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=CodeFirst"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ContractFirst"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract" "/p:OpenApiCompareCodeAgainstSpecFile=true"
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract;OpenApiCompareCodeAgainstSpecFile=true"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract" "/p:OpenApiProfile=frontend"
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=frontend"
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=scrap"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true

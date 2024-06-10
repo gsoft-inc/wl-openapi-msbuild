@@ -82,6 +82,7 @@
       OpenApiSwaggerDocumentNames="$(OpenApiSwaggerDocumentNames)"
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
       OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
+      OpenApiServiceProfile="$(OpenApiServiceProfile)"
     />
     <Touch Files="$(IntermediateOutputPath)$(OpenApiTouchFileName)" AlwaysCreate="true" />
   </Target>
