@@ -95,7 +95,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             return false;
         }
 
-        if (this.OpenApiServiceProfile != Backend && this.OpenApiServiceProfile != Frontend)
+        if (!this.OpenApiServiceProfile.Equals(Backend, StringComparison.Ordinal) && !this.OpenApiServiceProfile.Equals(Frontend, StringComparison.Ordinal))
         {
             loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed values are {2} or {3}", this.OpenApiServiceProfile, nameof(this.OpenApiServiceProfile), Backend, Frontend);
             return false;
