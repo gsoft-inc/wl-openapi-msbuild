@@ -6,7 +6,7 @@ namespace WebApi.MsBuild.SystemTest.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Produces("application/json")]
+[Produces("text/plain")]
 [ApiExplorerSettings(GroupName = "v1-management")]
 public class WeatherManagementController : ControllerBase
 {
