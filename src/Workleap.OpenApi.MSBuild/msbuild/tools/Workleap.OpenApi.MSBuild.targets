@@ -22,7 +22,8 @@
                 @(DocFileItem);
                 @(IntermediateAssembly);
                 @(IntermediateRefAssembly);
-                @(CustomAdditionalCompileOutputs)"
+                @(CustomAdditionalCompileOutputs)" 
+        Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
       Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>
       <!-- Set development mode: ValidateContract or GenerateContract -->
