@@ -24,7 +24,7 @@ Process {
             Exec { & dotnet remove package Workleap.OpenApi.MSBuild }
 
             if ($isFailureExpected -and $buildProcess.ExitCode -eq 0 ) {
-                Write-Error "The build for project $projectPath was expected to fail, but it succeeded."
+                Write-Error "The build for project $projectPath was expected to fail, but it succeeded!"
             } elseif (!$isFailureExpected -and $buildProcess.ExitCode -ne 0) {
                 Write-Error "The build for project $projectPath was expected to succeed, but it failed."
             }
