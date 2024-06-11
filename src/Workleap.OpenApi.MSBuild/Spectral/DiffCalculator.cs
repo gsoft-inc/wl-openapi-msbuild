@@ -1,7 +1,10 @@
 ﻿using System.Security.Cryptography;
 
-namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild.Spectral;
 
+/// <summary>
+/// Class that contains methods to check if some elements has changed since the last execution.
+/// </summary>
 internal sealed class DiffCalculator
 {
     private const string ChecksumExtension = "spectral-checksum";

@@ -51,7 +51,7 @@ internal class ValidateContractProcess
             return false;
         }
 
-        this._loggerWrapper.LogMessage("Installing dependencies...");
+        this._loggerWrapper.LogMessage("Installing dependencies...  ");
         var dependenciesResult = await this.InstallDependencies(compareCodeAgainstSpecFile, cancellationToken);
         
         if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
@@ -98,7 +98,7 @@ internal class ValidateContractProcess
     {
         var installationTasks = new List<Task>();    
         
-        var spectralRulesetTask = this._spectralRulesetManager.GetSpectralRulesetFile(cancellationToken);
+        var spectralRulesetTask = this._spectralRulesetManager.GetLocalSpectralRulesetFile(cancellationToken);
         installationTasks.Add(spectralRulesetTask);        
 
         var spectralInstallerTask = this._spectralInstaller.InstallSpectralAsync(cancellationToken);

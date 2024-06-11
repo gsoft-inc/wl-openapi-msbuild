@@ -7,7 +7,7 @@ paths:
     get:
       tags:
         - WeatherForecast
-      operationId: GetWeatherForecast2
+      operationId: GetWeatherForecast
       responses:
         '200':
           description: OK

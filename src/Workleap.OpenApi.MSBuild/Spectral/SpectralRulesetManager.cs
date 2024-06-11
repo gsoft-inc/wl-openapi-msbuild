@@ -5,8 +5,8 @@ namespace Workleap.OpenApi.MSBuild.Spectral;
 
 internal sealed class SpectralRulesetManager
 {
-    private const string SpectralVersion = "0.9.0";
-    private const string SpectralDownloadUrlFormat = "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/{0}/.spectral.{1}.yaml";
+    private const string WorkleapRulesetVersion = "0.9.0";
+    private const string WorkleapRulesetDownloadUrlFormat = "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/{0}/.spectral.{1}.yaml";
     
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IHttpClientWrapper _httpClientWrapper;
@@ -17,56 +17,40 @@ internal sealed class SpectralRulesetManager
         ILoggerWrapper loggerWrapper, 
         IHttpClientWrapper httpClientWrapper,
         string spectralProfile,
-        string? spectralFilePathInput)
+        string? customSpectralFilePath)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
 
         this._spectralProfile = spectralProfile;
 
-        if (spectralFilePathInput != null && !string.IsNullOrEmpty(spectralFilePathInput))
-        {
-            this._spectralRulesetPath = spectralFilePathInput;
-        }
-        else
-        {
-            this._spectralRulesetPath = GetProfileRulesetUrl(this._spectralProfile);
-        }
+        this._spectralRulesetPath = customSpectralFilePath ?? GetProfileRulesetUrl(this._spectralProfile);
     }
 
     private static string GetProfileRulesetUrl(string spectralProfile)
     {
-        return string.Format(SpectralDownloadUrlFormat, SpectralVersion, spectralProfile);
+        return string.Format(WorkleapRulesetDownloadUrlFormat, WorkleapRulesetVersion, spectralProfile);
     }
 
-    public async Task<string> GetSpectralRulesetFile(CancellationToken cancellationToken)
+    public async Task<string> GetLocalSpectralRulesetFile(CancellationToken cancellationToken)
     {
-        try
-        {
+        var rulesetPath = this._spectralRulesetPath;
         
-            // For remote ruleset we download the file for optimization and reduce spectral flakyness
-            if (!IsLocalFile(this._spectralRulesetPath))
-            {
-                this._loggerWrapper.LogMessage("Downloading ruleset.");
-                var downloadedFilePath = await this.DownloadFileAsync(this._spectralRulesetPath, cancellationToken);
-
-                return downloadedFilePath;
-            }
-        
-            // For local custom rules if they are not extendings any rules we extend them with Workleap rules
-            if (IsLocalFile(this._spectralRulesetPath) && !IsRulesetHaveExtendsProperty(this._spectralRulesetPath))
-            {
-                this._loggerWrapper.LogMessage("Extending ruleset with Workleap rules.");
-                var copiedFilePath = await CopyAndExtendRuleset(this._spectralRulesetPath, GetProfileRulesetUrl(this._spectralProfile), cancellationToken);
-                return copiedFilePath;
-            }
-
-            return this._spectralRulesetPath;
-        }
-        catch (Exception e)
+        // For remote ruleset we download the file for optimization and reduce spectral flakiness
+        if (!IsLocalFile(rulesetPath))
         {
-            return this._spectralRulesetPath;
+            this._loggerWrapper.LogMessage("Downloading ruleset.");
+            rulesetPath = await this.DownloadFileAsync(rulesetPath, cancellationToken);
         }
+    
+        // If they are not extending any rules we extend them with Workleap rules
+        if (!IsRulesetHaveExtendsProperty(rulesetPath))
+        {
+            this._loggerWrapper.LogMessage("Extending ruleset with Workleap rules.");
+            rulesetPath = await CopyAndExtendRuleset(rulesetPath, GetProfileRulesetUrl(this._spectralProfile), cancellationToken);
+        }
+
+        return rulesetPath;
     }
     
     private static bool IsRulesetHaveExtendsProperty(string customSpectralFilePath)
@@ -127,5 +111,4 @@ internal sealed class SpectralRulesetManager
             throw new OpenApiTaskFailedException($"Failed to download {rulesetUrl}.");
         }
     }
-
 }

@@ -1,0 +1,2 @@
+rules:
+  duplicated-entry-in-enum: false

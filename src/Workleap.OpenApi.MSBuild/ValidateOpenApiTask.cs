@@ -45,7 +45,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    public string? OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
+    public string? OpenApiSpectralRulesetUrl { get; set; }
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
     [Required]
@@ -86,7 +86,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
-        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl ?? "No custom ruleset provided");
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
 

@@ -76,7 +76,7 @@ internal class GenerateContractProcess
     {
         var installationTasks = new List<Task>();    
         
-        var spectralRulesetTask = this._spectralRulesetManager.GetSpectralRulesetFile(cancellationToken);
+        var spectralRulesetTask = this._spectralRulesetManager.GetLocalSpectralRulesetFile(cancellationToken);
         installationTasks.Add(spectralRulesetTask);        
 
         var spectralInstallerTask = this._spectralInstaller.InstallSpectralAsync(cancellationToken);

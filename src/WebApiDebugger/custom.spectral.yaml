@@ -1,3 +1,1 @@
-#extends: [https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.1.0/.spectral.yaml]
-rules:
-  duplicated-entry-in-enum: false
+extends: [https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.1.0/.spectral.yaml]
