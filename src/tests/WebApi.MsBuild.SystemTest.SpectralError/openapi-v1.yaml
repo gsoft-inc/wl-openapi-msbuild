@@ -3,16 +3,26 @@ info:
   title: V1 API General
   version: v1
 paths:
-  /WeatherForecast2:
+  /WeatherForecast:
     get:
       tags:
         - WeatherForecast
-      operationId: GetWeatherForecast
+      operationId: GetWeatherForecast2
       responses:
         '200':
           description: Success
           content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherForecast'
             application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeatherForecast'
+            text/json:
               schema:
                 type: array
                 items:
@@ -20,7 +30,13 @@ paths:
         '403':
           description: Forbidden
           content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
             application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+            text/json:
               schema:
                 $ref: '#/components/schemas/ProblemDetails'
 components:
@@ -44,7 +60,7 @@ components:
         instance:
           type: string
           nullable: true
-      additionalProperties: {}
+      additionalProperties: { }
     WeatherForecast:
       type: object
       properties:

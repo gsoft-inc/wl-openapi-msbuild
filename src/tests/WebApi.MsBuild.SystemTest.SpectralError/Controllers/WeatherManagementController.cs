@@ -4,7 +4,6 @@ namespace WebApi.MsBuild.SystemTest.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Produces("application/json")]
 [ApiExplorerSettings(GroupName = "v1-management")]
 public class WeatherManagementController : ControllerBase
 {
@@ -21,10 +20,10 @@ public class WeatherManagementController : ControllerBase
     }
     
     [HttpGet(Name = "GetWeatherSources")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<string[]>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public IEnumerable<string> Get()
+    public IActionResult Get()
     {
-        return Sources;
+        return this.Ok(Sources);
     }
 }

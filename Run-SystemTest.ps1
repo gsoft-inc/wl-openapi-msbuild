@@ -51,21 +51,50 @@ Process {
     try {
         Push-Location $workingDir
 
+
         # Build the OpenApi.MSBuild package to be used in the system tests
         Exec { & dotnet pack -c Release -o "$outputDir" }
 
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=CodeFirst"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ContractFirst"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract;OpenApiCompareCodeAgainstSpecFile=true"
+        ### Testing Generate Contract Mode ###
+
+        # Then Should Successfully Build
         BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=frontend"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=scrap"
+        # When using legacy name / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=CodeFirst"
+        # When Comparing Spec and No Diff Error / Then Should Successfully Build 
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiCompareCodeAgainstSpecFile=true"
+        # When Comparing Spec and Have Diff / Then Should Fail Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiCompareCodeAgainstSpecFile=true"
+
+
+        ### Testing Compare Contract Mode ###
+
+        # Given no diff / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract"
+        # Given no diff / When using legacy name / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=ContractFirst"
+        # Given diff / Then Should Fail Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract"
+        # Given diff / When OpenApiTreatWarningsAsErrors=false / Then Should Successfully Build
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true
+
+
+        ### Testing Spectral Validation ###
+
+        # Given no spectral violation / When using frontend profile / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=frontend"
+        # Given no spectral violation / When using invalid profile / Then Should Fail Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $genericSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiServiceProfile=scrap"
+        # Given spectral violations / When using default ruleset / Then Should Fail Build
         BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $true
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiSpectralRulesetUrl=./eject.spectral.yaml"
-        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiSpectralRulesetUrl=./override.spectral.yaml"
+        # Given spectral violations / When using default ruleset And OpenApiTreatWarningsAsErrors=false / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
+        # Given workleap spectral violations / When ejecting ruleset / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiSpectralRulesetUrl=./eject.spectral.yaml"
+        # Given spectral violations / When overriding ruleset without disabling problematic ruleset / Then Should Fail Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiSpectralRulesetUrl=./override.spectral.yaml"
+        # Given spectral violations / When overriding ruleset while disabling problematic ruleset / Then Should Successfully Build
+        BuildProject -openApiMsBuildSource $outputDir -projectPath $spectralErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiSpectralRulesetUrl=./override.fixed.spectral.yaml"
     }
     finally {
         Pop-Location
