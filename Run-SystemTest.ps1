@@ -19,6 +19,8 @@ Process {
 
             Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $openApiMsBuildSource }
 
+            Write-Information "dotnet build build -c Release $extraArgs"
+
             $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
 
             Exec { & dotnet remove package Workleap.OpenApi.MSBuild }
@@ -27,6 +29,9 @@ Process {
                 Write-Error "The build for project $projectPath was expected to fail, but it succeeded."
             } elseif (!$isFailureExpected -and $buildProcess.ExitCode -ne 0) {
                 Write-Error "The build for project $projectPath was expected to succeed, but it failed."
+            } else {
+                Write-Information "The validation succeeded."
+            
             }
         }
         finally {
