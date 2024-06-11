@@ -1,3 +1,5 @@
+using Workleap.OpenApi.MSBuild.Spectral;
+
 namespace Workleap.OpenApi.MSBuild.Tests;
 
 public class DiffCalculatorTests
