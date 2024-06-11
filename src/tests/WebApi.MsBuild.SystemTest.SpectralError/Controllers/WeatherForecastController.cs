@@ -19,7 +19,7 @@ public class WeatherForecastController : ControllerBase
         this._logger = logger;
     }
 
-    [HttpGet(Name = "GetWeatherForecast2")]
+    [HttpGet(Name = "GetWeatherForecast")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     public IEnumerable<WeatherForecast> Get()
