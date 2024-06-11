@@ -20,7 +20,6 @@ Process {
             Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $openApiMsBuildSource }
 
             Write-Information "dotnet build build -c Release $extraArgs"
-
             $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
 
             Exec { & dotnet remove package Workleap.OpenApi.MSBuild }

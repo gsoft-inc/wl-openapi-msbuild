@@ -1,5 +1,5 @@
 ﻿using Microsoft.Build.Framework;
-using YamlDotNet.RepresentationModel;
+/* using YamlDotNet.RepresentationModel; */
 
 namespace Workleap.OpenApi.MSBuild.Spectral;
 
@@ -55,14 +55,16 @@ internal sealed class SpectralRulesetManager
     
     private static bool IsRulesetHaveExtendsProperty(string customSpectralFilePath)
     {
-        using var reader = new StreamReader(customSpectralFilePath);
-        var yamlStream = new YamlStream();
-        yamlStream.Load(reader);
-
-        var hasExtendsProperty = yamlStream.Documents.FirstOrDefault()?.RootNode is YamlMappingNode root && 
-               root.Children.ContainsKey(new YamlScalarNode("extends"));
-
-        return hasExtendsProperty;
+        return false;
+        
+        // using var reader = new StreamReader(customSpectralFilePath);
+        // var yamlStream = new YamlStream();
+        // yamlStream.Load(reader);
+        //
+        // var hasExtendsProperty = yamlStream.Documents.FirstOrDefault()?.RootNode is YamlMappingNode root && 
+        //        root.Children.ContainsKey(new YamlScalarNode("extends"));
+        //
+        // return hasExtendsProperty;
     }
     
     private static async Task<string> CopyAndExtendRuleset(string initialPath, string extendsUrl, CancellationToken cancellationToken)
