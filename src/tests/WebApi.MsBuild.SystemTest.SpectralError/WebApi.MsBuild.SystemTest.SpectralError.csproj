@@ -29,6 +29,6 @@
       <None Update="override.fixed.spectral.yaml">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-    </ItemGroup>
+  </ItemGroup>
   
 </Project>

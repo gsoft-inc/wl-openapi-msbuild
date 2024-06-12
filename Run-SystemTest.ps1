@@ -19,7 +19,7 @@ Process {
 
             Exec { & dotnet add package Workleap.OpenApi.MSBuild --prerelease --source $openApiMsBuildSource }
 
-            Write-Information "dotnet build build -c Release $extraArgs"
+            Write-Information "dotnet build -c Release $extraArgs"
             $buildProcess = Start-Process -FilePath "dotnet" -ArgumentList "build -c Release $extraArgs" -NoNewWindow -PassThru -Wait
 
             Exec { & dotnet remove package Workleap.OpenApi.MSBuild }
@@ -30,7 +30,6 @@ Process {
                 Write-Error "The build for project $projectPath was expected to succeed, but it failed."
             } else {
                 Write-Information "The validation succeeded."
-            
             }
         }
         finally {
@@ -55,7 +54,6 @@ Process {
     try {
         Push-Location $workingDir
 
-
         # Build the OpenApi.MSBuild package to be used in the system tests
         Exec { & dotnet pack -c Release -o "$outputDir" }
 
@@ -70,7 +68,6 @@ Process {
         # When Comparing Spec and Have Diff / Then Should Fail Build
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=GenerateContract;OpenApiCompareCodeAgainstSpecFile=true"
 
-
         ### Testing Compare Contract Mode ###
 
         # Given no diff / Then Should Successfully Build
@@ -81,7 +78,6 @@ Process {
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $true -extraArgs "/p:OpenApiDevelopmentMode=ValidateContract"
         # Given diff / When OpenApiTreatWarningsAsErrors=false / Then Should Successfully Build
         BuildProject -openApiMsBuildSource $outputDir -projectPath $oasDiffErrorSysTestDir -isFailureExpected $false -extraArgs "/p:OpenApiTreatWarningsAsErrors=false"
-
 
         ### Testing Spectral Validation ###
 

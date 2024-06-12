@@ -22,7 +22,7 @@
               @(DocFileItem);
               @(IntermediateAssembly);
               @(IntermediateRefAssembly);
-              @(CustomAdditionalCompileOutputs)" 
+              @(CustomAdditionalCompileOutputs)"
       Outputs="$(IntermediateOutputPath)$(OpenApiTouchFileName)"
       Condition="'$(OpenApiEnabled)' == 'true'">
     <PropertyGroup>

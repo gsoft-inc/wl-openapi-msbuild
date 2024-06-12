@@ -37,7 +37,7 @@ internal sealed class SpectralRulesetManager
         var rulesetPath = this._spectralRulesetPath;
         
         // For remote ruleset we download the file for optimization and reduce spectral flakiness
-        if (!IsLocalFile(rulesetPath))
+        if (IsRemote(rulesetPath))
         {
             this._loggerWrapper.LogMessage("Downloading ruleset.");
             rulesetPath = await this.DownloadFileAsync(rulesetPath, cancellationToken);
@@ -82,11 +82,11 @@ internal sealed class SpectralRulesetManager
         return outputFilePath;
     }
     
-    private static bool IsLocalFile(string url)
+    private static bool IsRemote(string url)
     {
         if (Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
-            return uri.IsFile;
+            return !uri.IsFile;
         }
         
         return true;
