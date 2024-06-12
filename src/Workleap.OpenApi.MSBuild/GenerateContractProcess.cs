@@ -1,4 +1,5 @@
 using Microsoft.Build.Framework;
+using Workleap.OpenApi.MSBuild.Spectral;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -11,15 +12,26 @@ namespace Workleap.OpenApi.MSBuild;
 internal class GenerateContractProcess
 {
     private readonly ILoggerWrapper _loggerWrapper;
-    private readonly SpectralManager _spectralManager;
+    private readonly SpectralInstaller _spectralInstaller;
+    private readonly SpectralRulesetManager _spectralRulesetManager;
+    private readonly SpectralRunner _spectralRunner;
     private readonly SwaggerManager _swaggerManager;
     private readonly SpecGeneratorManager _specGeneratorManager;
     private readonly OasdiffManager _oasdiffManager;
 
-    internal GenerateContractProcess(ILoggerWrapper loggerWrapper, SpectralManager spectralManager, SwaggerManager swaggerManager, SpecGeneratorManager specGeneratorManager, OasdiffManager oasdiffManager)
+    internal GenerateContractProcess(
+        ILoggerWrapper loggerWrapper, 
+        SpectralInstaller spectralInstaller,
+        SpectralRulesetManager spectralRulesetManager,
+        SpectralRunner spectralRunner, 
+        SwaggerManager swaggerManager, 
+        SpecGeneratorManager specGeneratorManager, 
+        OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
-        this._spectralManager = spectralManager;
+        this._spectralInstaller = spectralInstaller;
+        this._spectralRulesetManager = spectralRulesetManager;
+        this._spectralRunner = spectralRunner;
         this._swaggerManager = swaggerManager;
         this._specGeneratorManager = specGeneratorManager;
         this._oasdiffManager = oasdiffManager;
@@ -38,7 +50,7 @@ internal class GenerateContractProcess
         CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("Installing dependencies...");
-        await this.InstallDependencies(mode, cancellationToken);
+        var dependenciesResult = await this.InstallDependencies(mode, cancellationToken);
         
         this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
@@ -55,15 +67,21 @@ internal class GenerateContractProcess
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...");
-        await this._spectralManager.RunSpectralAsync(generateOpenApiDocsPath, cancellationToken);
+        await this._spectralRunner.RunSpectralAsync(generateOpenApiDocsPath, dependenciesResult.SpectralExecutablePath, dependenciesResult.SpectralRulesetPath, cancellationToken);
     }
 
-    private async Task InstallDependencies(
+    private async Task<DependenciesResult> InstallDependencies(
         GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
         var installationTasks = new List<Task>();    
-        installationTasks.Add(this._spectralManager.InstallSpectralAsync(cancellationToken));        
+        
+        var spectralRulesetTask = this._spectralRulesetManager.GetLocalSpectralRulesetFile(cancellationToken);
+        installationTasks.Add(spectralRulesetTask);        
+
+        var spectralInstallerTask = this._spectralInstaller.InstallSpectralAsync(cancellationToken);
+        installationTasks.Add(spectralInstallerTask);
+        
         installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
         
         if (mode == GenerateContractMode.SpecComparison)
@@ -73,5 +91,23 @@ internal class GenerateContractProcess
 
         await Task.WhenAll(installationTasks);
         this._loggerWrapper.LogMessage("Finished installing OpenAPI dependencies.", MessageImportance.High);
+
+        var spectralRulesetPath = await spectralRulesetTask;
+        var spectralExecutablePath = await spectralInstallerTask;
+        
+        return new DependenciesResult(spectralRulesetPath, spectralExecutablePath);
+    }
+    
+    private class DependenciesResult
+    {
+        public DependenciesResult(string spectralRulesetPath, string spectralExecutablePath)
+        {
+            this.SpectralRulesetPath = spectralRulesetPath;
+            this.SpectralExecutablePath = spectralExecutablePath;
+        }
+
+        public string SpectralRulesetPath { get; }
+        
+        public string SpectralExecutablePath { get; }
     }
 }

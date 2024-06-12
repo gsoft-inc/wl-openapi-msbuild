@@ -4,25 +4,31 @@
     "ValidateContractWithoutCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=false",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiEnabled=true /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=false",
       "workingDirectory": "$(ProjectDir)"
     },
     "ValidateContractWithCompare": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiEnabled=true /p:OpenApiDevelopmentMode=ValidateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
       "workingDirectory": "$(ProjectDir)"
     },
     "GenerateContract": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiEnabled=true /p:OpenApiEnabled=true /p:OpenApiDevelopmentMode=GenerateContract",
+      "workingDirectory": "$(ProjectDir)"
+    },
+    "CustomSpectral": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiEnabled=true /p:OpenApiDevelopmentMode=GenerateContract /p:OpenApiSpectralRulesetUrl=./custom.spectral.yaml",
       "workingDirectory": "$(ProjectDir)"
     },
     "GenerateContractOnCI": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiDevelopmentMode=GenerateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
+      "commandLineArgs": "msbuild /t:ValidateOpenApi /p:OpenApiEnabled=true /p:OpenApiDevelopmentMode=GenerateContract /p:OpenApiCompareCodeAgainstSpecFile=true",
       "workingDirectory": "$(ProjectDir)"
     },
     "WebApiDebugger": {

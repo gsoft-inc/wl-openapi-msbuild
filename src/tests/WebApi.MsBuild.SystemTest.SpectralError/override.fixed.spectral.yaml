@@ -1,0 +1,2 @@
+rules:
+  must-return-content-types: false

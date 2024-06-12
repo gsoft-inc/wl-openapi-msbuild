@@ -1,4 +1,5 @@
 using Microsoft.Build.Framework;
+using Workleap.OpenApi.MSBuild.Spectral;
 
 namespace Workleap.OpenApi.MSBuild;
 
@@ -44,8 +45,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiToolsDirectoryPath { get; set; } = string.Empty;
 
     /// <summary>The URL of the OpenAPI Spectral ruleset to validate against.</summary>
-    [Required]
-    public string OpenApiSpectralRulesetUrl { get; set; } = string.Empty;
+    public string? OpenApiSpectralRulesetUrl { get; set; }
 
     /// <summary>The names of the Swagger documents to generate OpenAPI specifications for.</summary>
     [Required]
@@ -67,16 +67,18 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
-        var spectralDiffCalculator = new SpectralDiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
+        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
 
         var httpClientWrapper = new HttpClientWrapper();
 
-        var spectralManager = new SpectralManager(loggerWrapper, processWrapper, spectralDiffCalculator, this.OpenApiToolsDirectoryPath, reportsPath, this.OpenApiSpectralRulesetUrl, httpClientWrapper);
+        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
+        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
-        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
-        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralManager, swaggerManager, oasdiffManager);
+        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiServiceProfile), this.OpenApiServiceProfile);
@@ -84,7 +86,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiToolsDirectoryPath), this.OpenApiToolsDirectoryPath);
-        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpectralRulesetUrl), this.OpenApiSpectralRulesetUrl ?? "No custom ruleset provided");
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSwaggerDocumentNames), string.Join(", ", this.OpenApiSwaggerDocumentNames));
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiSpecificationFiles), string.Join(", ", this.OpenApiSpecificationFiles));
 

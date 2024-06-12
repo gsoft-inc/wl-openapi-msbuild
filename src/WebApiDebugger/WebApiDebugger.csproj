@@ -11,14 +11,20 @@
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
-
   <PropertyGroup>
+    <OpenApiEnabled>false</OpenApiEnabled>
     <OpenApiDebuggingEnabled>true</OpenApiDebuggingEnabled>
     <OpenApiDevelopmentMode>GenerateContract</OpenApiDevelopmentMode>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Workleap.OpenApi.MSBuild\Workleap.OpenApi.MSBuild.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="custom.spectral.yaml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <Import Project="..\Workleap.OpenApi.MSBuild\msbuild\build\Workleap.OpenApi.MSBuild.targets" />

@@ -1,23 +1,26 @@
 ﻿using System.Security.Cryptography;
 
-namespace Workleap.OpenApi.MSBuild;
+namespace Workleap.OpenApi.MSBuild.Spectral;
 
-internal sealed class SpectralDiffCalculator
+/// <summary>
+/// Class that contains methods to check if some elements has changed since the last execution.
+/// </summary>
+internal sealed class DiffCalculator
 {
     private const string ChecksumExtension = "spectral-checksum";
     private const string SpectralRulesetChecksumItemName = "spectral-ruleset-checksum";
     
     private readonly string _spectralOutputDirectoryPath;
 
-    public SpectralDiffCalculator(string spectralChecksumOutputDirectoryPath)
+    public DiffCalculator(string spectralChecksumOutputDirectoryPath)
     {
         this._spectralOutputDirectoryPath = spectralChecksumOutputDirectoryPath;
     }
     
-    public bool HasRulesetChangedSinceLastExecution(string spectralRulset)
+    public bool HasRulesetChangedSinceLastExecution(string spectralRulsetPath)
     {
         var preciousRulesetChecksum = this.GetItemChecksum(SpectralRulesetChecksumItemName);
-        var currentRulesetChecksum = GetFileChecksum(spectralRulset);
+        var currentRulesetChecksum = GetFileChecksum(spectralRulsetPath);
 
         var hasRulesetChanged = !string.Equals(preciousRulesetChecksum, currentRulesetChecksum, StringComparison.OrdinalIgnoreCase); 
 

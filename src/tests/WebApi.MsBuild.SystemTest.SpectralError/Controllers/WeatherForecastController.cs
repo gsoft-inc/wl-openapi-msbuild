@@ -4,7 +4,6 @@ namespace WebApi.MsBuild.SystemTest.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[Produces("application/json")]
 [ApiExplorerSettings(GroupName = "v1")]
 public class WeatherForecastController : ControllerBase
 {

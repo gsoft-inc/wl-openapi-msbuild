@@ -1,0 +1,3 @@
+﻿extends: []
+rules:
+  duplicated-entry-in-enum: true
