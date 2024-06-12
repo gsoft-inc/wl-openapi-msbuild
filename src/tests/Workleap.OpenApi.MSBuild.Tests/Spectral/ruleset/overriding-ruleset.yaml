@@ -1,0 +1,12 @@
+﻿rules:
+  duplicated-entry-in-enum: true
+  no-eval-in-markdown: true
+  no-script-tags-in-markdown: true
+  openapi-tags-uniqueness: true
+  operation-operationId-unique: true
+  operation-success-response: true
+  path-keys-no-trailing-slash: true
+  path-params: true
+  typed-enum: true
+  oas3-schema: true
+  oas3-operation-security-defined: true
