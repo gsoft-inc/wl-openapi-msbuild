@@ -89,7 +89,7 @@ internal sealed class SpectralRulesetManager
             return !uri.IsFile;
         }
         
-        return true;
+        return false;
     }
     
     private async Task<string> DownloadFileAsync(string rulesetUrl, CancellationToken cancellationToken)

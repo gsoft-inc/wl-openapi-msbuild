@@ -112,14 +112,14 @@ public class SpectralRulesetManagerTests
         return spectralFile;
     }
     
-    private class SpectralFile
+    private sealed class SpectralFile
     {
         public object[]? Extends { get; set; }
         
         public Dictionary<string, object>? Rules { get; set; }
     }
 
-    private class FakeLogger : ILoggerWrapper
+    private sealed class FakeLogger : ILoggerWrapper
     {
         public void LogWarning(string message, params object[] messageArgs)
         {
