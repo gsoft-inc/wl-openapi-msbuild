@@ -37,13 +37,13 @@
       <OpenApiCompareCodeAgainstSpecFile Condition="'$(OpenApiCompareCodeAgainstSpecFile)' == ''">false</OpenApiCompareCodeAgainstSpecFile>
 
       <!-- The path of the ASP.NET Core project build output directory -->
-      <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(OutputPath)))\</StartupAssemblyPath>
-      
+      <StartupAssemblyPath Condition="'$(StartupAssemblyPath)' == ''">$([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(OutputPath)))</StartupAssemblyPath>
+
       <!-- The path of the ASP.NET Core project DLL being executed after built -->
-      <OpenApiWebApiAssemblyPath Condition="'$(OpenApiWebApiAssemblyPath)' == ''">$(StartupAssemblyPath)$(AssemblyName).dll</OpenApiWebApiAssemblyPath>
+      <OpenApiWebApiAssemblyPath Condition="'$(OpenApiWebApiAssemblyPath)' == ''">$([System.IO.Path]::Combine($(StartupAssemblyPath), $(AssemblyName))).dll</OpenApiWebApiAssemblyPath>
 
       <!-- The base directory path where the OpenAPI tools will be downloaded -->
-      <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$(StartupAssemblyPath)openapi</OpenApiToolsDirectoryPath>
+      <OpenApiToolsDirectoryPath Condition="'$(OpenApiToolsDirectoryPath)' == ''">$([System.IO.Path]::Combine($(StartupAssemblyPath), openapi))</OpenApiToolsDirectoryPath>
 
       <!-- The URL of the OpenAPI Spectral ruleset to validate against -->
       <OpenApiSpectralRulesetUrl Condition="'$(OpenApiSpectralRulesetUrl)' == ''" />
@@ -51,7 +51,7 @@
       <!-- The names of the Swagger documents to generate OpenAPI specifications for -->
       <!-- "v1" is the default Swagger document name. Users can specify multiple values separated by semicolons -->
       <OpenApiSwaggerDocumentNames Condition="'$(OpenApiSwaggerDocumentNames)' == ''">v1</OpenApiSwaggerDocumentNames>
-      
+
       <!-- Use TreatWarningsAsErrors property unless it is opt-out with OpenApiTreatWarningsAsErrors, fallback to false if both are unset -->
       <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">$(TreatWarningsAsErrors)</OpenApiTreatWarningsAsErrors>
       <OpenApiTreatWarningsAsErrors Condition="'$(OpenApiTreatWarningsAsErrors)' == ''">false</OpenApiTreatWarningsAsErrors>
@@ -65,7 +65,7 @@
       <!-- The directory where to find the OpenAPI spec files to validate against the spec generated from Swagger -->
       <!-- When absolute, keep it as is, otherwise, combine it with the csproj directory and remove any trailing slashes -->
       <OpenApiSpecDirectoryPath Condition="'$(OpenApiSpecDirectoryPath)' == ''">$(MSBuildProjectDirectory)</OpenApiSpecDirectoryPath>
-      <OpenApiSpecDirectoryPath Condition="'$([System.IO.Path]::IsPathRooted($(OpenApiSpecDirectoryPath)))' == 'false'">$(MSBuildProjectDirectory)\$(OpenApiSpecDirectoryPath)</OpenApiSpecDirectoryPath>
+      <OpenApiSpecDirectoryPath Condition="'$([System.IO.Path]::IsPathRooted($(OpenApiSpecDirectoryPath)))' == 'false'">$([System.IO.Path]::Combine($(MSBuildProjectDirectory), $(OpenApiSpecDirectoryPath)))</OpenApiSpecDirectoryPath>
       <OpenApiSpecDirectoryPath>$(OpenApiSpecDirectoryPath.TrimEnd('/\'))</OpenApiSpecDirectoryPath>
 
       <!-- We assume that the OpenAPI spec filename pattern is openapi-{documentname}.yaml -->
