@@ -11,6 +11,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private const string ContractFirst = "ContractFirst"; // For backward compatibility
     private const string Backend = "backend";
     private const string Frontend = "frontend";
+    private const string Ado = "ado";
 
     /// <summary>
     ///     2 supported modes:
@@ -21,12 +22,19 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
     /// <summary>
-    ///     2 supported profiles]:
+    ///     2 supported profiles:
     ///     - backend (default): Uses the backend ruleset to validate the API spec
     ///     - frontend: Uses the frontend ruleset to validate the API spec
     /// </summary>
     [Required]
     public string OpenApiServiceProfile { get; set; } = string.Empty;
+
+    /// <summary>
+    ///     1 supported CI environment for Spectral report export:
+    ///     - ado (default): Exports the Spectral report in an ADO compatible format
+    /// </summary>
+    [Required]
+    public string OpenApiCiReportEnvironment { get; set; } = string.Empty;
 
     /// <summary>When Development mode is ValidateContract, will validate if the specification match the code.</summary>
     [Required]
@@ -64,24 +72,9 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         loggerWrapper.LogMessage("\n******** Starting {0} ********\n", MessageImportance.Normal, nameof(ValidateOpenApiTask));
 
-        var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
-        var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
-        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
-        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
-
-        var httpClientWrapper = new HttpClientWrapper();
-
-        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
-        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
-        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
-        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
-        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
-
-        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
-        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
-
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiServiceProfile), this.OpenApiServiceProfile);
+        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCiReportEnvironment), this.OpenApiCiReportEnvironment);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
@@ -93,7 +86,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
             loggerWrapper.LogWarning("You must provide the same amount of OpenAPI documents file names and swagger document file names.");
-
             return false;
         }
 
@@ -102,6 +94,30 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed values are {2} or {3}", this.OpenApiServiceProfile, nameof(this.OpenApiServiceProfile), Backend, Frontend);
             return false;
         }
+
+        if (!this.OpenApiCiReportEnvironment.Equals(Ado, StringComparison.Ordinal))
+        {
+            loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed value is {2}", this.OpenApiCiReportEnvironment, nameof(this.OpenApiCiReportEnvironment), Ado);
+            return false;
+        }
+
+        var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
+        var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
+        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
+
+        var httpClientWrapper = new HttpClientWrapper();
+
+        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
+        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+
+        var ciReportRenderer = this.InitializeCiReportRenderer();
+        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, ciReportRenderer, this.OpenApiToolsDirectoryPath, reportsPath);
+        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
+
+        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
 
         try
         {
@@ -159,6 +175,18 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             var path = Path.Combine(this.OpenApiToolsDirectoryPath, "nuget.config");
             File.WriteAllText(path, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<configuration>\n  <packageSources>\n    <clear />\n    <add key=\"nuget\" value=\"https://api.nuget.org/v3/index.json\" />\n  </packageSources>\n</configuration>");
+        }
+    }
+
+    // In the future, we will want to support both ADO and Github CI environments
+    private AdoCiReportRenderer InitializeCiReportRenderer()
+    {
+        switch (this.OpenApiCiReportEnvironment)
+        {
+            case Ado:
+                return new AdoCiReportRenderer();
+            default:
+                return new AdoCiReportRenderer();
         }
     }
 }
