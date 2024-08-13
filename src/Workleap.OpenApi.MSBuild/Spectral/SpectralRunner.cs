@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild.Spectral;
@@ -13,13 +14,13 @@ internal sealed class SpectralRunner
     private readonly ICiReportRenderer _ciReportRenderer;
     private readonly string _spectralDirectory;
     private readonly string _openApiReportsDirectoryPath;
-    
+
     public SpectralRunner(
-        ILoggerWrapper loggerWrapper, 
-        IProcessWrapper processWrapper, 
+        ILoggerWrapper loggerWrapper,
+        IProcessWrapper processWrapper,
         DiffCalculator diffCalculator,
         ICiReportRenderer ciReportRenderer,
-        string openApiToolsDirectoryPath, 
+        string openApiToolsDirectoryPath,
         string openApiReportsDirectoryPath)
     {
         this._loggerWrapper = loggerWrapper;
@@ -29,11 +30,11 @@ internal sealed class SpectralRunner
         this._diffCalculator = diffCalculator;
         this._ciReportRenderer = ciReportRenderer;
     }
-    
+
     public async Task RunSpectralAsync(IReadOnlyCollection<string> openApiDocumentPaths, string spectralExecutablePath, string spectralRulesetPath, CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("\n ******** Spectral: Validating OpenAPI Documents against ruleset ********", MessageImportance.High);
-        
+
         var shouldRunSpectral = await this.ShouldRunSpectral(spectralRulesetPath, openApiDocumentPaths);
         if (!shouldRunSpectral)
         {
@@ -41,8 +42,9 @@ internal sealed class SpectralRunner
             foreach (var documentPath in openApiDocumentPaths)
             {
                 this._loggerWrapper.LogMessage("- Check previous report here: {0}", MessageImportance.High, messageArgs: this.GetReportPath(documentPath));
+                this.DisplayPreviousSpectralReport(documentPath);
             }
-            
+
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
             return;
         }
@@ -54,7 +56,7 @@ internal sealed class SpectralRunner
         {
             var documentName = Path.GetFileNameWithoutExtension(documentPath);
             var spectralReportPath = this.GetReportPath(documentPath);
-            
+
             this._loggerWrapper.LogMessage("\n *** Spectral: Validating {0} against ruleset ***", MessageImportance.High, documentName);
             this._loggerWrapper.LogMessage("- File path: {0}", MessageImportance.High, documentPath);
             this._loggerWrapper.LogMessage("- Ruleset : {0}\n", MessageImportance.High, spectralRulesetPath);
@@ -64,15 +66,38 @@ internal sealed class SpectralRunner
                 this._loggerWrapper.LogMessage("\nDeleting existing report: {0}", messageArgs: spectralReportPath);
                 File.Delete(spectralReportPath);
             }
-            
+
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, spectralRulesetPath, spectralReportPath, cancellationToken);
             await this._ciReportRenderer.AttachReportToBuildAsync(spectralReportPath);
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
         }
-        
+
         this._diffCalculator.SaveCurrentExecutionChecksum(spectralRulesetPath, openApiDocumentPaths);
     }
-    
+
+    // Display previous spectral report and log warning if there are any previous spectral errors or warnings
+    private void DisplayPreviousSpectralReport(string documentPath)
+    {
+        var pattern = @"\d+ problem(|s) \((\d+) error(|s), (\d+) warning(|s), \d+ info(|s), \d+ hint(|s)\)";
+        var regex = new Regex(pattern);
+        var lines = File.ReadLines(this.GetReportPath(documentPath));
+        foreach (var line in lines)
+        {
+            var match = regex.Match(line);
+            if (match.Success)
+            {
+                var errors = int.Parse(match.Groups[2].Value);
+                var warnings = int.Parse(match.Groups[4].Value);
+                if (errors > 0 || warnings > 0)
+                {
+                    this._loggerWrapper.LogWarning(line);
+                }
+            }
+
+            this._loggerWrapper.LogMessage(line, MessageImportance.High);
+        }
+    }
+
     private async Task<bool> ShouldRunSpectral(string spectralRulesetPath, IReadOnlyCollection<string> openApiDocumentPaths)
     {
         if (this._diffCalculator.HasRulesetChangedSinceLastExecution(spectralRulesetPath))
@@ -85,9 +110,20 @@ internal sealed class SpectralRunner
             return true;
         }
 
+        // If we can't find a report for any of the documents, then run spectral
+        foreach (var documentPath in openApiDocumentPaths)
+        {
+            var spectralReportPath = this.GetReportPath(documentPath);
+
+            if (!File.Exists(spectralReportPath))
+            {
+                return true;
+            }
+        }
+
         return false;
     }
-    
+
     private string GetReportPath(string documentPath)
     {
         var documentName = Path.GetFileNameWithoutExtension(documentPath);
@@ -104,14 +140,14 @@ internal sealed class SpectralRunner
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...", MessageImportance.Normal);
-        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetPath, "--format", "stylish", "--output", spectralReportPath, "--fail-severity=warn", "--verbose" }, cancellationToken);
-        
+        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetPath, "--format", "pretty", "--format", "stylish", "--output.stylish", spectralReportPath, "--fail-severity=warn", "--verbose" }, cancellationToken);
+
         this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
         if (!string.IsNullOrEmpty(result.StandardError))
         {
             this._loggerWrapper.LogWarning(result.StandardError);
         }
-        
+
         if (!File.Exists(spectralReportPath))
         {
             throw new OpenApiTaskFailedException($"Spectral report for {swaggerDocumentPath} could not be created. Please check the CONSOLE output above for more details.");
@@ -127,7 +163,7 @@ internal sealed class SpectralRunner
 
     private async Task AssignExecutePermission(string spectralExecutePath, CancellationToken cancellationToken)
     {
-        var result = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x",  spectralExecutePath }, cancellationToken);
+        var result = await this._processWrapper.RunProcessAsync("chmod", new[] { "+x", spectralExecutePath }, cancellationToken);
         if (result.ExitCode != 0)
         {
             this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
