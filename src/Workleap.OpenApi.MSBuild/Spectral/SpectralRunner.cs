@@ -104,7 +104,7 @@ internal sealed class SpectralRunner
         }
 
         this._loggerWrapper.LogMessage("Running Spectral...", MessageImportance.Normal);
-        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetPath, "--format", "stylish", "--output", spectralReportPath, "--fail-severity=warn", "--verbose" }, cancellationToken);
+        var result = await this._processWrapper.RunProcessAsync(spectralExecutePath, new[] { "lint", swaggerDocumentPath, "--ruleset", rulesetPath, "--format", "pretty", "--format", "stylish", "--output.stylish", spectralReportPath, "--fail-severity=warn", "--verbose" }, cancellationToken);
         
         this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
         if (!string.IsNullOrEmpty(result.StandardError))
