@@ -21,7 +21,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     public string OpenApiDevelopmentMode { get; set; } = string.Empty;
 
     /// <summary>
-    ///     2 supported profiles]:
+    ///     2 supported profiles:
     ///     - backend (default): Uses the backend ruleset to validate the API spec
     ///     - frontend: Uses the frontend ruleset to validate the API spec
     /// </summary>
@@ -64,22 +64,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         loggerWrapper.LogMessage("\n******** Starting {0} ********\n", MessageImportance.Normal, nameof(ValidateOpenApiTask));
 
-        var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
-        var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
-        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
-        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
-
-        var httpClientWrapper = new HttpClientWrapper();
-
-        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
-        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
-        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
-        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
-        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
-
-        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
-        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
-
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiServiceProfile), this.OpenApiServiceProfile);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
@@ -93,7 +77,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         if (this.OpenApiSpecificationFiles.Length != this.OpenApiSwaggerDocumentNames.Length)
         {
             loggerWrapper.LogWarning("You must provide the same amount of OpenAPI documents file names and swagger document file names.");
-
             return false;
         }
 
@@ -102,6 +85,23 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed values are {2} or {3}", this.OpenApiServiceProfile, nameof(this.OpenApiServiceProfile), Backend, Frontend);
             return false;
         }
+
+        var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
+        var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
+        var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
+        var diffCalculator = new DiffCalculator(Path.Combine(this.OpenApiToolsDirectoryPath, "spectral-state"));
+
+        var httpClientWrapper = new HttpClientWrapper();
+
+        var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
+        var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+
+        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
+        var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
+        var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
+
+        var generateContractProcess = new GenerateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, specGeneratorManager, oasdiffManager);
+        var validateContractProcess = new ValidateContractProcess(loggerWrapper, spectralInstaller, spectralRulesetManager, spectralManager, swaggerManager, oasdiffManager);
 
         try
         {
