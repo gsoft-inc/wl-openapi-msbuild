@@ -5,6 +5,7 @@ namespace Workleap.OpenApi.MSBuild.Spectral;
 
 internal sealed class SpectralRunner
 {
+    // If the line below changes, make sure to update the corresponding regex on the renovate.json file
     private const string SpectralVersion = "6.11.0";
 
     private readonly ILoggerWrapper _loggerWrapper;
