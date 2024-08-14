@@ -63,7 +63,7 @@ internal sealed class SpectralRunner
             }
             
             await this.GenerateSpectralReport(spectralExecutePath, documentPath, spectralRulesetPath, spectralReportPath, cancellationToken);
-            CiReportRenderer.AttachReportToBuildAsync(spectralReportPath);
+            CiReportRenderer.AttachReportToBuild(spectralReportPath);
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
         }
         

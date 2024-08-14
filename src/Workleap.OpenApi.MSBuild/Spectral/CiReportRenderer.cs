@@ -2,7 +2,7 @@ namespace Workleap.OpenApi.MSBuild.Spectral;
 
 internal static class CiReportRenderer
 {
-    public static void AttachReportToBuildAsync(string reportPath)
+    public static void AttachReportToBuild(string reportPath)
     {
         // Check if we are in ADO context and attach the report to the build summary
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("SYSTEM_TEAMFOUNDATIONCOLLECTIONURI")))
