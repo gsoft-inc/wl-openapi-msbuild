@@ -8,6 +8,9 @@ internal sealed class SpectralRunner
 {
     private const string SpectralVersion = "6.11.0";
 
+    // Matches logs with the format of: 0 problems (0 errors, 0 warnings, 0 infos, 0 hints)
+    private static readonly Regex SpectralLogWarningPattern = new(@"\d+ problems? \((?<errors>\d+) errors?, (?<warnings>\d+) warnings?, \d+ infos?, \d+ hints?\)");
+
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IProcessWrapper _processWrapper;
     private readonly DiffCalculator _diffCalculator;
@@ -75,19 +78,17 @@ internal sealed class SpectralRunner
     // Display previous spectral report and log warning if there are any previous spectral errors or warnings
     private void DisplayPreviousSpectralReport(string documentPath)
     {
-        var pattern = @"\d+ problem(|s) \((\d+) error(|s), (\d+) warning(|s), \d+ info(|s), \d+ hint(|s)\)";
-        var regex = new Regex(pattern);
         var lines = File.ReadLines(this.GetReportPath(documentPath));
         foreach (var line in lines)
         {
-            var match = regex.Match(line);
+            var match = SpectralLogWarningPattern.Match(line);
             if (match.Success)
             {
-                var errors = int.Parse(match.Groups[2].Value);
-                var warnings = int.Parse(match.Groups[4].Value);
+                var errors = int.Parse(match.Groups["errors"].Value);
+                var warnings = int.Parse(match.Groups["warnings"].Value);
                 if (errors > 0 || warnings > 0)
                 {
-                    this._loggerWrapper.LogWarning(line);
+                    this._loggerWrapper.LogWarning("Spectral errors from previous run: {0}", line);
                 }
             }
             else
