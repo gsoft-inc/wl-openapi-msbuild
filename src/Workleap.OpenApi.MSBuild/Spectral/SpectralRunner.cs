@@ -11,7 +11,6 @@ internal sealed class SpectralRunner
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IProcessWrapper _processWrapper;
     private readonly DiffCalculator _diffCalculator;
-    private readonly ICiReportRenderer _ciReportRenderer;
     private readonly string _spectralDirectory;
     private readonly string _openApiReportsDirectoryPath;
 
@@ -27,7 +26,6 @@ internal sealed class SpectralRunner
         this._spectralDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
         this._processWrapper = processWrapper;
         this._diffCalculator = diffCalculator;
-        this._ciReportRenderer = ciReportRenderer;
     }
 
     public async Task RunSpectralAsync(IReadOnlyCollection<string> openApiDocumentPaths, string spectralExecutablePath, string spectralRulesetPath, CancellationToken cancellationToken)

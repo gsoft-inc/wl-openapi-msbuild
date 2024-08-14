@@ -29,13 +29,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     [Required]
     public string OpenApiServiceProfile { get; set; } = string.Empty;
 
-    /// <summary>
-    ///     1 supported CI environment for Spectral report export:
-    ///     - ado (default): Exports the Spectral report in an ADO compatible format
-    /// </summary>
-    [Required]
-    public string OpenApiCiReportEnvironment { get; set; } = string.Empty;
-
     /// <summary>When Development mode is ValidateContract, will validate if the specification match the code.</summary>
     [Required]
     public bool OpenApiCompareCodeAgainstSpecFile { get; set; } = false;
@@ -74,7 +67,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
 
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiDevelopmentMode), this.OpenApiDevelopmentMode);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiServiceProfile), this.OpenApiServiceProfile);
-        loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCiReportEnvironment), this.OpenApiCiReportEnvironment);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Normal, nameof(this.OpenApiCompareCodeAgainstSpecFile), this.OpenApiCompareCodeAgainstSpecFile);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiTreatWarningsAsErrors), this.OpenApiTreatWarningsAsErrors);
         loggerWrapper.LogMessage("{0} = '{1}'", MessageImportance.Low, nameof(this.OpenApiWebApiAssemblyPath), this.OpenApiWebApiAssemblyPath);
@@ -168,18 +160,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         {
             var path = Path.Combine(this.OpenApiToolsDirectoryPath, "nuget.config");
             File.WriteAllText(path, "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<configuration>\n  <packageSources>\n    <clear />\n    <add key=\"nuget\" value=\"https://api.nuget.org/v3/index.json\" />\n  </packageSources>\n</configuration>");
-        }
-    }
-
-    // In the future, we will want to support both ADO and Github CI environments
-    private AdoCiReportRenderer InitializeCiReportRenderer()
-    {
-        switch (this.OpenApiCiReportEnvironment)
-        {
-            case Ado:
-                return new AdoCiReportRenderer();
-            default:
-                return new AdoCiReportRenderer();
         }
     }
 }
