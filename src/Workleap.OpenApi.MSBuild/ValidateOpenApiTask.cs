@@ -95,12 +95,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
             return false;
         }
 
-        if (!this.OpenApiCiReportEnvironment.Equals(Ado, StringComparison.Ordinal))
-        {
-            loggerWrapper.LogWarning("Invalid value of '{0}' for {1}. Allowed value is {2}", this.OpenApiCiReportEnvironment, nameof(this.OpenApiCiReportEnvironment), Ado);
-            return false;
-        }
-
         var reportsPath = Path.Combine(this.OpenApiToolsDirectoryPath, "reports");
         var processWrapper = new ProcessWrapper(this.StartupAssemblyPath);
         var swaggerManager = new SwaggerManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, this.OpenApiWebApiAssemblyPath);
@@ -111,8 +105,7 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
         var spectralRulesetManager = new SpectralRulesetManager(loggerWrapper, httpClientWrapper, this.OpenApiServiceProfile, this.OpenApiSpectralRulesetUrl);
         var spectralInstaller = new SpectralInstaller(loggerWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
 
-        var ciReportRenderer = this.InitializeCiReportRenderer();
-        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, ciReportRenderer, this.OpenApiToolsDirectoryPath, reportsPath);
+        var spectralManager = new SpectralRunner(loggerWrapper, processWrapper, diffCalculator, this.OpenApiToolsDirectoryPath, reportsPath);
         var oasdiffManager = new OasdiffManager(loggerWrapper, processWrapper, this.OpenApiToolsDirectoryPath, httpClientWrapper);
         var specGeneratorManager = new SpecGeneratorManager(loggerWrapper);
 
