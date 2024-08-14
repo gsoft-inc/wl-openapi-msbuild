@@ -11,7 +11,6 @@ public sealed class ValidateOpenApiTask : CancelableAsyncTask
     private const string ContractFirst = "ContractFirst"; // For backward compatibility
     private const string Backend = "backend";
     private const string Frontend = "frontend";
-    private const string Ado = "ado";
 
     /// <summary>
     ///     2 supported modes:
