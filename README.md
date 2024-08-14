@@ -18,7 +18,6 @@ For the TLDR version:
 - The entry point is `ValidateOpenApiTask.ExecuteAsync()` and will be executed after the referencing project is built. This is defined in `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets` as a `UsingTask.TaskName`
 - The default value are defined in the property group on the target `ValidateOpenApi` in this file `./src/Workleap.OpenApi.MSBuild/msbuild/tools/Workleap.OpenApi.MSBuild.targets`
 - Users can select whether to validate the API with frontend or backend ruleset depending on how they configure the `OpenApiServiceProfile` MSBuild property ([`backend` (default)](https://github.com/gsoft-inc/wl-api-guidelines/blob/main/.spectral.backend.yaml) or [`frontend`](https://github.com/gsoft-inc/wl-api-guidelines/blob/main/.spectral.frontend.yaml)).
-- Users can configure their CI enviroment for reports depending on how they configure the `OpenApiCiReportEnvironment` MSBuild property (`ado` (default)).
 
 ## How to test locally
 

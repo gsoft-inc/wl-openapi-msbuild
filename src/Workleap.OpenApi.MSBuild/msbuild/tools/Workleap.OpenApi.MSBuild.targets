@@ -6,8 +6,6 @@
     <!-- We use this property when developing this MSBuild task in an IDE, -->
     <!-- so we can reference the task assembly that is built in its bin folder instead of the one in the distributed NuGet package -->
     <OpenApiDebuggingEnabled Condition="'$(OpenApiDebuggingEnabled)' == ''">false</OpenApiDebuggingEnabled>
-    <!-- We use this property to determine the format for spectral report exports for the CI environments -->
-    <OpenApiCiReportEnvironment Condition="'$(OpenApiCiReportEnvironment)' == ''">ado</OpenApiCiReportEnvironment>
     <OpenApiTouchFileName>openapi_spec_validated.txt</OpenApiTouchFileName>
   </PropertyGroup>
 
@@ -85,7 +83,6 @@
       OpenApiSpecificationFiles="$(OpenApiSpecificationFiles)"
       OpenApiTreatWarningsAsErrors="$(OpenApiTreatWarningsAsErrors)"
       OpenApiServiceProfile="$(OpenApiServiceProfile)"
-      OpenApiCiReportEnvironment="$(OpenApiCiReportEnvironment)"
     />
     <Touch Files="$(IntermediateOutputPath)$(OpenApiTouchFileName)" AlwaysCreate="true" />
   </Target>
