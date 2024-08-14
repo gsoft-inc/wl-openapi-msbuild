@@ -90,8 +90,10 @@ internal sealed class SpectralRunner
                     this._loggerWrapper.LogWarning(line);
                 }
             }
-
-            this._loggerWrapper.LogMessage(line, MessageImportance.High);
+            else
+            {
+                this._loggerWrapper.LogMessage(line, MessageImportance.High);
+            }
         }
     }
 
