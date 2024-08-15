@@ -1,4 +1,6 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 
 namespace Workleap.OpenApi.MSBuild.Spectral;
@@ -7,6 +9,9 @@ internal sealed class SpectralRunner
 {
     // If the line below changes, make sure to update the corresponding regex on the renovate.json file
     private const string SpectralVersion = "6.11.0";
+
+    // Matches logs with the format of: 0 problems (0 errors, 0 warnings, 0 infos, 0 hints)
+    private static readonly Regex SpectralLogWarningPattern = new(@"[0-9]+ problems? \((?<errors>[0-9]+) errors?, (?<warnings>[0-9]+) warnings?, [0-9]+ infos?, [0-9]+ hints?\)");
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IProcessWrapper _processWrapper;
@@ -39,6 +44,7 @@ internal sealed class SpectralRunner
             foreach (var documentPath in openApiDocumentPaths)
             {
                 this._loggerWrapper.LogMessage("- Check previous report here: {0}", MessageImportance.High, messageArgs: this.GetReportPath(documentPath));
+                this.DisplayPreviousSpectralReport(documentPath);
             }
 
             this._loggerWrapper.LogMessage("\n ****************************************************************", MessageImportance.High);
@@ -71,6 +77,29 @@ internal sealed class SpectralRunner
         this._diffCalculator.SaveCurrentExecutionChecksum(spectralRulesetPath, openApiDocumentPaths);
     }
 
+    // Display previous spectral report and log warning if there are any previous spectral errors or warnings
+    private void DisplayPreviousSpectralReport(string documentPath)
+    {
+        var lines = File.ReadLines(this.GetReportPath(documentPath));
+        foreach (var line in lines)
+        {
+            var match = SpectralLogWarningPattern.Match(line);
+            if (match.Success)
+            {
+                var errors = int.Parse(match.Groups["errors"].Value, CultureInfo.InvariantCulture);
+                var warnings = int.Parse(match.Groups["warnings"].Value, CultureInfo.InvariantCulture);
+                if (errors > 0 || warnings > 0)
+                {
+                    this._loggerWrapper.LogWarning("Spectral errors from previous run: {0}", line);
+                }
+            }
+            else
+            {
+                this._loggerWrapper.LogMessage(line, MessageImportance.High);
+            }
+        }
+    }
+
     private async Task<bool> ShouldRunSpectral(string spectralRulesetPath, IReadOnlyCollection<string> openApiDocumentPaths)
     {
         if (this._diffCalculator.HasRulesetChangedSinceLastExecution(spectralRulesetPath))
@@ -81,6 +110,17 @@ internal sealed class SpectralRunner
         if (this._diffCalculator.HasOpenApiDocumentChangedSinceLastExecution(openApiDocumentPaths))
         {
             return true;
+        }
+
+        // If we can't find a report for any of the documents, then run spectral
+        foreach (var documentPath in openApiDocumentPaths)
+        {
+            var spectralReportPath = this.GetReportPath(documentPath);
+
+            if (!File.Exists(spectralReportPath))
+            {
+                return true;
+            }
         }
 
         return false;
