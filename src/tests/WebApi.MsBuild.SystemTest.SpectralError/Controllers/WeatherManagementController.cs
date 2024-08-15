@@ -11,14 +11,14 @@ public class WeatherManagementController : ControllerBase
     {
         "Accuweather", "AerisWeather", "Foreca", "Open Weathermap", "National Oceanic and Atmospheric Administration",
     };
-    
+
     private readonly ILogger<WeatherManagementController> _logger;
-    
+
     public WeatherManagementController(ILogger<WeatherManagementController> logger)
     {
         this._logger = logger;
     }
-    
+
     [HttpGet(Name = "GetWeatherSources")]
     [ProducesResponseType<string[]>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]

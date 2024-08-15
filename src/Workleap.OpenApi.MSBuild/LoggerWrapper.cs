@@ -13,7 +13,7 @@ internal sealed class LoggerWrapper : ILoggerWrapper
         this._helper = helper;
         this._treatWarningAsError = treatWarningAsError;
     }
-    
+
     public void LogMessage(string message, MessageImportance importance = MessageImportance.Low, params object[] messageArgs)
         => this._helper.LogMessage(importance, message, messageArgs);
 

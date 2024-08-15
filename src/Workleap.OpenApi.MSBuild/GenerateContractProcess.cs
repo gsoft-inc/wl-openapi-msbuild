@@ -20,12 +20,12 @@ internal class GenerateContractProcess
     private readonly OasdiffManager _oasdiffManager;
 
     internal GenerateContractProcess(
-        ILoggerWrapper loggerWrapper, 
+        ILoggerWrapper loggerWrapper,
         SpectralInstaller spectralInstaller,
         SpectralRulesetManager spectralRulesetManager,
-        SpectralRunner spectralRunner, 
-        SwaggerManager swaggerManager, 
-        SpecGeneratorManager specGeneratorManager, 
+        SpectralRunner spectralRunner,
+        SwaggerManager swaggerManager,
+        SpecGeneratorManager specGeneratorManager,
         OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
@@ -36,13 +36,13 @@ internal class GenerateContractProcess
         this._specGeneratorManager = specGeneratorManager;
         this._oasdiffManager = oasdiffManager;
     }
-    
+
     internal enum GenerateContractMode
     {
         SpecGeneration,
         SpecComparison,
     }
-    
+
     internal async Task Execute(
         string[] openApiSpecificationFilesPath,
         string[] openApiSwaggerDocumentNames,
@@ -51,7 +51,7 @@ internal class GenerateContractProcess
     {
         this._loggerWrapper.LogMessage("Installing dependencies...");
         var dependenciesResult = await this.InstallDependencies(mode, cancellationToken);
-        
+
         this._loggerWrapper.LogMessage("Running Swagger...");
         var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
 
@@ -59,7 +59,7 @@ internal class GenerateContractProcess
         {
             this._loggerWrapper.LogMessage("Generating specification files...");
             await this._specGeneratorManager.UpdateSpecificationFilesAsync(openApiSpecificationFilesPath, generateOpenApiDocsPath, cancellationToken);
-        } 
+        }
         else
         {
             this._loggerWrapper.LogMessage("Running Oasdiff...");
@@ -74,16 +74,16 @@ internal class GenerateContractProcess
         GenerateContractMode mode,
         CancellationToken cancellationToken)
     {
-        var installationTasks = new List<Task>();    
-        
+        var installationTasks = new List<Task>();
+
         var spectralRulesetTask = this._spectralRulesetManager.GetLocalSpectralRulesetFile(cancellationToken);
-        installationTasks.Add(spectralRulesetTask);        
+        installationTasks.Add(spectralRulesetTask);
 
         var spectralInstallerTask = this._spectralInstaller.InstallSpectralAsync(cancellationToken);
         installationTasks.Add(spectralInstallerTask);
-        
+
         installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
-        
+
         if (mode == GenerateContractMode.SpecComparison)
         {
             installationTasks.Add(this._oasdiffManager.InstallOasdiffAsync(cancellationToken));
@@ -94,10 +94,10 @@ internal class GenerateContractProcess
 
         var spectralRulesetPath = await spectralRulesetTask;
         var spectralExecutablePath = await spectralInstallerTask;
-        
+
         return new DependenciesResult(spectralRulesetPath, spectralExecutablePath);
     }
-    
+
     private class DependenciesResult
     {
         public DependenciesResult(string spectralRulesetPath, string spectralExecutablePath)
@@ -107,7 +107,7 @@ internal class GenerateContractProcess
         }
 
         public string SpectralRulesetPath { get; }
-        
+
         public string SpectralExecutablePath { get; }
     }
 }

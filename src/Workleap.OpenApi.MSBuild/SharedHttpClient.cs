@@ -22,7 +22,7 @@ internal static class SharedHttpClient
             : base(handler)
         {
         }
-        
+
         protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             const int maxRetries = 3;
