@@ -16,13 +16,13 @@ internal class ValidateContractProcess
     private readonly SpectralRunner _spectralRunner;
     private readonly SwaggerManager _swaggerManager;
     private readonly OasdiffManager _oasdiffManager;
-    
+
     internal ValidateContractProcess(
-        ILoggerWrapper loggerWrapper, 
+        ILoggerWrapper loggerWrapper,
         SpectralInstaller spectralInstaller,
         SpectralRulesetManager spectralRulesetManager,
-        SpectralRunner spectralRunner, 
-        SwaggerManager swaggerManager, 
+        SpectralRunner spectralRunner,
+        SwaggerManager swaggerManager,
         OasdiffManager oasdiffManager)
     {
         this._loggerWrapper = loggerWrapper;
@@ -53,12 +53,12 @@ internal class ValidateContractProcess
 
         this._loggerWrapper.LogMessage("Installing dependencies...  ");
         var dependenciesResult = await this.InstallDependencies(compareCodeAgainstSpecFile, cancellationToken);
-        
+
         if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
             this._loggerWrapper.LogMessage("Running Swagger...");
             var generateOpenApiDocsPath = (await this._swaggerManager.RunSwaggerAsync(openApiSwaggerDocumentNames, cancellationToken)).ToList();
-            
+
             this._loggerWrapper.LogMessage("Running Oasdiff...");
             await this._oasdiffManager.RunOasdiffAsync(openApiSpecificationFiles, generateOpenApiDocsPath, cancellationToken);
         }
@@ -68,9 +68,9 @@ internal class ValidateContractProcess
 
         return true;
     }
-    
+
     private bool CheckIfBaseSpecExists(
-        string[] openApiSpecificationFiles, 
+        string[] openApiSpecificationFiles,
         string openApiToolsDirectoryPath)
     {
         foreach (var file in openApiSpecificationFiles)
@@ -82,8 +82,8 @@ internal class ValidateContractProcess
 
             this._loggerWrapper.LogWarning(
                 "The file '{0}' does not exist. If you are running this for the first time, we have generated specification here '{1}' which can be used as base specification. " +
-                "Please copy specification file(s) to your project directory and rebuild.", 
-                file, 
+                "Please copy specification file(s) to your project directory and rebuild.",
+                file,
                 openApiToolsDirectoryPath);
 
             return false;
@@ -91,19 +91,19 @@ internal class ValidateContractProcess
 
         return true;
     }
-    
+
     private async Task<DependenciesResult> InstallDependencies(
         CompareCodeAgainstSpecFile compareCodeAgainstSpecFile,
         CancellationToken cancellationToken)
     {
-        var installationTasks = new List<Task>();    
-        
+        var installationTasks = new List<Task>();
+
         var spectralRulesetTask = this._spectralRulesetManager.GetLocalSpectralRulesetFile(cancellationToken);
-        installationTasks.Add(spectralRulesetTask);        
+        installationTasks.Add(spectralRulesetTask);
 
         var spectralInstallerTask = this._spectralInstaller.InstallSpectralAsync(cancellationToken);
-        installationTasks.Add(spectralInstallerTask);    
-        
+        installationTasks.Add(spectralInstallerTask);
+
         if (compareCodeAgainstSpecFile == CompareCodeAgainstSpecFile.Enabled)
         {
             installationTasks.Add(this._swaggerManager.InstallSwaggerCliAsync(cancellationToken));
@@ -112,13 +112,13 @@ internal class ValidateContractProcess
 
         await Task.WhenAll(installationTasks);
         this._loggerWrapper.LogMessage("Finished installing OpenAPI dependencies.", MessageImportance.High);
-        
+
         var spectralRulesetPath = await spectralRulesetTask;
         var spectralExecutablePath = await spectralInstallerTask;
-        
+
         return new DependenciesResult(spectralRulesetPath, spectralExecutablePath);
     }
-    
+
     private class DependenciesResult
     {
         public DependenciesResult(string spectralRulesetPath, string spectralExecutablePath)
@@ -128,7 +128,7 @@ internal class ValidateContractProcess
         }
 
         public string SpectralRulesetPath { get; }
-        
+
         public string SpectralExecutablePath { get; }
     }
 }

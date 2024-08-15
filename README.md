@@ -28,14 +28,3 @@ Since it's a MSBuild task named `ValidateOpenApi` you can run it this command: `
 Note: Before executing this task it will build the project.
 
 Warming: validate your IDE is in Configuration:Debug otherwise the execution will not be done on the most recent code.
-
-### With the system test
-
-This command `./Run-SystemTest.ps1` will:
-
-1. Pack the MSBuild library
-2. Build the WebApi.MsBuild.SystemTest and inject the previously packed library
-
-Be careful since it will update the project dependencies to use a local version: do not commit this.
-
-Also if you run it multiple time on the same branch you need to clear the local cache `%UserProfile%\.nuget\packages\workleap.openapi.msbuild` since the name won't change.

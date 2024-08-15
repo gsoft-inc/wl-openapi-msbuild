@@ -3,7 +3,7 @@
 namespace WebApiDebugger;
 
 public static class SwaggerHostFactory
-{    
+{
     public static IHost CreateHost()
     {
         return Host
@@ -23,7 +23,7 @@ public static class SwaggerHostFactory
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            
+
             services.AddSwaggerGen();
         }
 

@@ -21,11 +21,11 @@ internal sealed class OasdiffManager : IOasdiffManager
         this._processWrapper = processWrapper;
         this._oasdiffDirectory = Path.Combine(openApiToolsDirectoryPath, "oasdiff", OasdiffVersion);
     }
-    
+
     public async Task InstallOasdiffAsync(CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("Starting Oasdiff installation.");
-            
+
         Directory.CreateDirectory(this._oasdiffDirectory);
 
         var oasdiffFileName = GetOasdiffFileName();
@@ -33,7 +33,7 @@ internal sealed class OasdiffManager : IOasdiffManager
 
         await this._httpClientWrapper.DownloadFileToDestinationAsync(url, Path.Combine(this._oasdiffDirectory, oasdiffFileName), cancellationToken);
         await this.DecompressDownloadedFileAsync(oasdiffFileName, cancellationToken);
-            
+
         this._loggerWrapper.LogMessage("Oasdiff installation completed.");
     }
 
@@ -41,15 +41,15 @@ internal sealed class OasdiffManager : IOasdiffManager
     {
         var generatedOpenApiSpecFilesList = generatedOpenApiSpecFiles.ToList();
         var oasdiffExecutePath = Path.Combine(this._oasdiffDirectory, RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "oasdiff.exe" : "oasdiff");
-        
+
         var filesPath = generatedOpenApiSpecFiles.ToDictionary(Path.GetFileName, x => x);
 
         foreach (var baseSpecFile in openApiSpecFiles)
         {
             var fileName = Path.GetFileName(baseSpecFile);
-            
+
             this._loggerWrapper.LogMessage($"\n ******** Oasdiff: Diff comparison with {fileName} ******** \n", MessageImportance.High);
-            
+
             var isFileFound = filesPath.TryGetValue(fileName, out var generatedSpecFilePath);
             if (!isFileFound || string.IsNullOrEmpty(generatedSpecFilePath))
             {
@@ -59,7 +59,7 @@ internal sealed class OasdiffManager : IOasdiffManager
 
             this._loggerWrapper.LogMessage("- Specification file path: {0}", MessageImportance.High, baseSpecFile);
             this._loggerWrapper.LogMessage("- Specification generated from code path: {0} \n", MessageImportance.High, generatedSpecFilePath);
-            
+
             var result = await this._processWrapper.RunProcessAsync(oasdiffExecutePath, new[] { "diff", baseSpecFile, generatedSpecFilePath, "--exclude-elements", "description,examples,title,summary", "-o" }, cancellationToken);
             if (string.IsNullOrEmpty(result.StandardError))
             {
@@ -69,7 +69,7 @@ internal sealed class OasdiffManager : IOasdiffManager
                 {
                     this._loggerWrapper.LogWarning($"Your web API does not respect the following OpenAPI specification: {fileName}. Please review the logs below for details.");
                 }
-                
+
                 this._loggerWrapper.LogMessage(result.StandardOutput, MessageImportance.High);
             }
             else
@@ -89,7 +89,7 @@ internal sealed class OasdiffManager : IOasdiffManager
         {
             return;
         }
-        
+
         var result = await this._processWrapper.RunProcessAsync("tar", new[] { "-xzf", $"{pathToCompressedFile}", "-C", $"{this._oasdiffDirectory}" }, cancellationToken);
 
         if (result.ExitCode != 0)
