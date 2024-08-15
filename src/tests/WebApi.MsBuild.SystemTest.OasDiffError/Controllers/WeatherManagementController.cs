@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 
 namespace WebApi.MsBuild.SystemTest.Controllers;
 
@@ -12,13 +12,6 @@ public class WeatherManagementController : ControllerBase
     {
         "Accuweather", "AerisWeather", "Foreca", "Open Weathermap", "National Oceanic and Atmospheric Administration",
     };
-
-    private readonly ILogger<WeatherManagementController> _logger;
-
-    public WeatherManagementController(ILogger<WeatherManagementController> logger)
-    {
-        this._logger = logger;
-    }
 
     [HttpGet(Name = "GetWeatherSources")]
     [ProducesResponseType(StatusCodes.Status200OK)]
