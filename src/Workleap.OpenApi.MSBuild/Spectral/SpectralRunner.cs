@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
@@ -10,7 +11,7 @@ internal sealed class SpectralRunner
     private const string SpectralVersion = "6.11.0";
 
     // Matches logs with the format of: 0 problems (0 errors, 0 warnings, 0 infos, 0 hints)
-    private static readonly Regex SpectralLogWarningPattern = new(@"\d+ problems? \((?<errors>\d+) errors?, (?<warnings>\d+) warnings?, \d+ infos?, \d+ hints?\)");
+    private static readonly Regex SpectralLogWarningPattern = new(@"[0-9]+ problems? \((?<errors>[0-9]+) errors?, (?<warnings>[0-9]+) warnings?, [0-9]+ infos?, [0-9]+ hints?\)");
 
     private readonly ILoggerWrapper _loggerWrapper;
     private readonly IProcessWrapper _processWrapper;
@@ -31,7 +32,7 @@ internal sealed class SpectralRunner
         this._processWrapper = processWrapper;
         this._diffCalculator = diffCalculator;
     }
-    
+
     public async Task RunSpectralAsync(IReadOnlyCollection<string> openApiDocumentPaths, string spectralExecutablePath, string spectralRulesetPath, CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("\n ******** Spectral: Validating OpenAPI Documents against ruleset ********", MessageImportance.High);
@@ -85,8 +86,8 @@ internal sealed class SpectralRunner
             var match = SpectralLogWarningPattern.Match(line);
             if (match.Success)
             {
-                var errors = int.Parse(match.Groups["errors"].Value);
-                var warnings = int.Parse(match.Groups["warnings"].Value);
+                var errors = int.Parse(match.Groups["errors"].Value, CultureInfo.InvariantCulture);
+                var warnings = int.Parse(match.Groups["warnings"].Value, CultureInfo.InvariantCulture);
                 if (errors > 0 || warnings > 0)
                 {
                     this._loggerWrapper.LogWarning("Spectral errors from previous run: {0}", line);
