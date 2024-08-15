@@ -13,6 +13,16 @@ Process {
             [string]$extraArgs
         )
 
+        Write-Host ""
+        Write-Host "############################################"
+        Write-Host "############################################"
+        Write-Host "# OpenApiMsBuildSource: $openApiMsBuildSource"
+        Write-Host "# ProjectPath: $projectPath"
+        Write-Host "# IsFailureExpected: $isFailureExpected"
+        Write-Host "# ExtraArgs: $extraArgs"
+        Write-Host "############################################"
+        Write-Host "############################################"
+        Write-Host ""
         try
         {
             Push-Location $projectPath
