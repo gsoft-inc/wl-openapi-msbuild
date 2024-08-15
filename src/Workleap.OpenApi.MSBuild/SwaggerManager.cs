@@ -79,7 +79,6 @@ internal sealed class SwaggerManager : ISwaggerManager
         var swaggerCancellationToken = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         swaggerCancellationToken.CancelAfter(TimeSpan.FromMinutes(1));
 
-        var willRetry = true;
         for (var retryCount = 0; retryCount < MaxRetryCount; retryCount++)
         {
             var result = await this._processWrapper.RunProcessAsync(swaggerExePath, ["tofile", "--output", outputOpenApiSpecPath, "--yaml", this._openApiWebApiAssemblyPath, documentName], cancellationToken: swaggerCancellationToken.Token, envVars: envVars);

@@ -1,47 +1,50 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "platform": "github",
-    "labels": ["renovate"],
-    "extends": [
-      "config:base",
-      ":rebaseStalePrs"
-    ],
-    "enabledManagers": [
-      "github-actions",
-      "nuget"
-    ],
-    "stabilityDays": 3,
-    "prHourlyLimit": 0,
-    "prConcurrentLimit": 0,
-    "branchConcurrentLimit": 0,
-    "dependencyDashboard": false,
-    "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
-    "packageRules": [
-      {
-        "matchManagers": ["nuget"],
-        "excludePackagePatterns": ["^Microsoft\\.Extensions\\.", "^System\\.", "^dotnet-sdk$", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
-        "groupName": "NuGet dependencies"
-      },
-      {
-        "matchManagers": ["nuget"],
-        "matchPackagePatterns": ["^Microsoft\\.(Extensions|AspNetCore|SourceLink)\\.", "^System\\.", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
-        "groupName": "Ignored NuGet dependencies",
-        "description": "These packages are usually set to a user-defined minimal supported version such as 6.0.0 for .NET 6, and they are overriden by consuming applications",
-        "enabled": false
-      },
-      {
-        "matchPackageNames": ["dotnet-sdk"],
-        "groupName": "Dotnet SDK",
-        "description": "Only update patch and minor for the dotnet SDK version within the global.json",
-        "extends": [":disableMajorUpdates"]
-      },
-      {
-        "matchManagers": ["github-actions"],
-        "groupName": "Pipeline dependencies"
-      }
-    ],
-    "vulnerabilityAlerts": {
-      "enabled": true,
-      "labels": ["security"]
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "platform": "github",
+  "extends": [
+    "github>gsoft-inc/renovate-config"
+  ],
+  "stabilityDays": 3,
+  "packageRules": [
+    {
+      "matchManagers": ["nuget"],
+      "excludePackagePatterns": ["^Microsoft\\.Extensions\\.", "^System\\.", "^dotnet-sdk$", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
+      "groupName": "NuGet dependencies"
+    },
+    {
+      "matchManagers": ["nuget"],
+      "matchPackagePatterns": ["^Microsoft\\.(Extensions|AspNetCore)\\.", "^System\\.", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
+      "groupName": "Ignored NuGet dependencies",
+      "description": "These packages are usually set to a user-defined minimal supported version such as 6.0.0 for .NET 6, and they are overriden by consuming applications",
+      "enabled": false
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "Pipeline dependencies"
     }
-  }
+  ],
+  "customManagers": [
+    {
+      "description": "Custom manager for renovating spectral version listed in .cs files",
+      "customType": "regex",
+      "fileMatch": ["\\.cs$"],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "private const string SpectralVersion = \"(?<currentValue>[^\"]+)\";"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "stoplightio/spectral"
+    },
+    {
+      "description": "Custom manager for renovating oasdiff version listed in .cs files",
+      "customType": "regex",
+      "fileMatch": ["\\.cs$"],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "private const string OasdiffVersion = \"(?<currentValue>[^\"]+)\";"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "Tufin/oasdiff"
+    }
+  ]
+}

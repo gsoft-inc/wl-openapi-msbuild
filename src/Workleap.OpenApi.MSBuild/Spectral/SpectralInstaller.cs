@@ -2,6 +2,7 @@
 
 internal class SpectralInstaller
 {
+    // If the line below changes, make sure to update the corresponding regex on the renovate.json file
     private const string SpectralVersion = "6.11.0";
     private const string SpectralDownloadUrlFormat = "https://github.com/stoplightio/spectral/releases/download/v{0}/{1}";
 
@@ -10,15 +11,15 @@ internal class SpectralInstaller
     private readonly string _spectralDirectory;
 
     public SpectralInstaller(
-        ILoggerWrapper loggerWrapper, 
-        string openApiToolsDirectoryPath, 
+        ILoggerWrapper loggerWrapper,
+        string openApiToolsDirectoryPath,
         IHttpClientWrapper httpClientWrapper)
     {
         this._loggerWrapper = loggerWrapper;
         this._httpClientWrapper = httpClientWrapper;
         this._spectralDirectory = Path.Combine(openApiToolsDirectoryPath, "spectral", SpectralVersion);
     }
-    
+
     /// <summary>
     /// Install spectral tool
     /// </summary>
@@ -26,20 +27,20 @@ internal class SpectralInstaller
     public async Task<string> InstallSpectralAsync(CancellationToken cancellationToken)
     {
         this._loggerWrapper.LogMessage("Starting Spectral installation.");
-            
+
         Directory.CreateDirectory(this._spectralDirectory);
 
         var executablePath = GetSpectralFileName();
-        var url = string.Format(SpectralDownloadUrlFormat,  SpectralVersion, executablePath);
+        var url = string.Format(SpectralDownloadUrlFormat, SpectralVersion, executablePath);
         var destination = Path.Combine(this._spectralDirectory, executablePath);
-        
+
         await this._httpClientWrapper.DownloadFileToDestinationAsync(url, destination, cancellationToken);
-        
+
         this._loggerWrapper.LogMessage("Spectral installation completed.");
 
         return executablePath;
     }
-    
+
     private static string GetSpectralFileName()
     {
         var osType = RuntimeInformationHelper.GetOperatingSystem();

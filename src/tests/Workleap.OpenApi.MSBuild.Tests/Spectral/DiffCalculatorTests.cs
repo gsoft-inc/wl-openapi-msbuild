@@ -1,6 +1,6 @@
 using Workleap.OpenApi.MSBuild.Spectral;
 
-namespace Workleap.OpenApi.MSBuild.Tests;
+namespace Workleap.OpenApi.MSBuild.Tests.Spectral;
 
 public class DiffCalculatorTests
 {
@@ -9,14 +9,14 @@ public class DiffCalculatorTests
     private const string OpenApiDocumentV1 = "./Spectral/v1/openapi.yaml";
     private const string OpenApiDocumentV2 = "./Spectral/v2/openapi.yaml";
     private const string OpenApiDocumentAdminV2 = "./Spectral/v2/openapi-admin.yaml";
-    
+
     private readonly DiffCalculator _diffCalculator;
 
     public DiffCalculatorTests()
     {
         this._diffCalculator = new DiffCalculator(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString()));
     }
-    
+
     [Fact]
     public void Given_Nothing_Saved_When_HasRulesetChangedSinceLastExecution_Then_True()
     {
@@ -28,7 +28,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.True(hasChanged);
     }
-    
+
     [Fact]
     public void Given_Spectral_Rules_Saved_When_HasRulesetChangedSinceLastExecution_With_Same_Ruleset_Then_False()
     {
@@ -41,7 +41,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.False(hasChanged);
     }
-    
+
     [Fact]
     public void Given_Spectral_Rules_Saved_When_HasRulesetChangedSinceLastExecution_With_Other_Ruleset_Then_True()
     {
@@ -54,7 +54,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.True(hasChanged);
     }
-    
+
     [Fact]
     public void Given_Nothing_Saved_When_HasOpenApiDocumentChangedSinceLastExecution_Then_True()
     {
@@ -66,7 +66,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.True(hasChanged);
     }
-    
+
     [Fact]
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_Same_Ruleset_Then_False()
     {
@@ -79,7 +79,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.False(hasChanged);
     }
-    
+
     [Fact]
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_New_Version_Then_True()
     {
@@ -92,7 +92,7 @@ public class DiffCalculatorTests
         // Assert
         Assert.True(hasChanged);
     }
-    
+
     [Fact]
     public void Given_OpenApi_Document_Saved_When_HasRulesetChangedSinceLastExecution_With_Extra_Version_Then_True()
     {
