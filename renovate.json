@@ -4,22 +4,37 @@
   "extends": [
     "github>gsoft-inc/renovate-config"
   ],
-  "stabilityDays": 3,
+  "minimumReleaseAge": "3 days",
   "packageRules": [
     {
-      "matchManagers": ["nuget"],
-      "excludePackagePatterns": ["^Microsoft\\.Extensions\\.", "^System\\.", "^dotnet-sdk$", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
-      "groupName": "NuGet dependencies"
+      "matchManagers": [
+        "nuget"
+      ],
+      "groupName": "NuGet dependencies",
+      "matchPackageNames": [
+        "!/^Microsoft\\.Extensions\\./",
+        "!/^System\\./",
+        "!/^dotnet-sdk$/",
+        "!/^Microsoft\\.CodeAnalysis\\.CSharp\\./"
+      ]
     },
     {
-      "matchManagers": ["nuget"],
-      "matchPackagePatterns": ["^Microsoft\\.(Extensions|AspNetCore)\\.", "^System\\.", "^Microsoft\\.CodeAnalysis\\.CSharp\\."],
+      "matchManagers": [
+        "nuget"
+      ],
       "groupName": "Ignored NuGet dependencies",
       "description": "These packages are usually set to a user-defined minimal supported version such as 6.0.0 for .NET 6, and they are overriden by consuming applications",
-      "enabled": false
+      "enabled": false,
+      "matchPackageNames": [
+        "/^Microsoft\\.(Extensions|AspNetCore)\\./",
+        "/^System\\./",
+        "/^Microsoft\\.CodeAnalysis\\.CSharp\\./"
+      ]
     },
     {
-      "matchManagers": ["github-actions"],
+      "matchManagers": [
+        "github-actions"
+      ],
       "groupName": "Pipeline dependencies"
     }
   ],
@@ -27,7 +42,9 @@
     {
       "description": "Custom manager for renovating spectral version listed in .cs files",
       "customType": "regex",
-      "fileMatch": ["\\.cs$"],
+      "fileMatch": [
+        "\\.cs$"
+      ],
       "matchStringsStrategy": "any",
       "matchStrings": [
         "private const string SpectralVersion = \"(?<currentValue>[^\"]+)\";"
@@ -38,7 +55,9 @@
     {
       "description": "Custom manager for renovating oasdiff version listed in .cs files",
       "customType": "regex",
-      "fileMatch": ["\\.cs$"],
+      "fileMatch": [
+        "\\.cs$"
+      ],
       "matchStringsStrategy": "any",
       "matchStrings": [
         "private const string OasdiffVersion = \"(?<currentValue>[^\"]+)\";"
