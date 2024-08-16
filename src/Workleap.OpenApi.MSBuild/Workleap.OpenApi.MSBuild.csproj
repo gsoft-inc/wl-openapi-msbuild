@@ -7,9 +7,6 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <DevelopmentDependency>true</DevelopmentDependency>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-
-    <!-- Prevents PDBs from being included in the package as we manually copy the files in the tools/ dir -->
-    <DebugType Condition="'$(Configuration)' == 'Release'">None</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
