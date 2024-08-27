@@ -1,6 +1,61 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "extends": [
-      "github>gsoft-inc/renovate-config"
-    ]
-  }
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>gsoft-inc/renovate-config"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "nuget"
+      ],
+      "groupName": "NuGet dependencies",
+      "matchPackageNames": [
+        "!/^Microsoft\\.Extensions\\./",
+        "!/^System\\./",
+        "!/^dotnet-sdk$/",
+        "!/^Microsoft\\.CodeAnalysis\\.CSharp\\./"
+      ]
+    },
+    {
+      "matchManagers": [
+        "nuget"
+      ],
+      "groupName": "Ignored NuGet dependencies",
+      "description": "These packages are usually set to a user-defined minimal supported version such as 6.0.0 for .NET 6, and they are overriden by consuming applications",
+      "enabled": false,
+      "matchPackageNames": [
+        "/^Microsoft\\.(Extensions|AspNetCore)\\./",
+        "/^System\\./",
+        "/^Microsoft\\.CodeAnalysis\\.CSharp\\./"
+      ]
+    }
+  ],
+  "customManagers": [
+    {
+      "description": "Custom manager for renovating spectral version listed in .cs files",
+      "customType": "regex",
+      "fileMatch": [
+        "\\.cs$"
+      ],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "private const string SpectralVersion = \"(?<currentValue>[^\"]+)\";"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "stoplightio/spectral"
+    },
+    {
+      "description": "Custom manager for renovating oasdiff version listed in .cs files",
+      "customType": "regex",
+      "fileMatch": [
+        "\\.cs$"
+      ],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "private const string OasdiffVersion = \"(?<currentValue>[^\"]+)\";"
+      ],
+      "datasourceTemplate": "github-tags",
+      "depNameTemplate": "Tufin/oasdiff"
+    }
+  ]
+}
