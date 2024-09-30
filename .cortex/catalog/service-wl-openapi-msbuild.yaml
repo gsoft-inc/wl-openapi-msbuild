@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: Workleap OpenApi MSBuild
-  description: .NET library that generate and validate an OpenAPI specification file from an ASP.NET application at build time.
+  description: .NET library that generates and validates an OpenAPI specification file from an ASP.NET application at build time.
   x-cortex-git:
     github:
       alias: gsoft-inc
