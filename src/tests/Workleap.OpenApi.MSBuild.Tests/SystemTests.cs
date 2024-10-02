@@ -74,7 +74,7 @@ public sealed class SystemTests(ITestOutputHelper testOutputHelper, SystemTestFi
 
         var buildResult = await Cli.Wrap("dotnet")
             .WithWorkingDirectory(projectDir.FullPath)
-            .WithArguments(["build", "--configuration", "Release", .. extraBuildArgs])
+            .WithArguments(["build", "--configuration", "Release", "/bl", .. extraBuildArgs])
             .WithStandardOutputPipe(PipeTarget.ToDelegate(testOutputHelper.WriteLine))
             .WithStandardErrorPipe(PipeTarget.ToDelegate(testOutputHelper.WriteLine))
             .WithValidation(CommandResultValidation.None)
@@ -82,11 +82,11 @@ public sealed class SystemTests(ITestOutputHelper testOutputHelper, SystemTestFi
 
         if (isFailureExpected && buildResult.ExitCode == 0)
         {
-            Assert.Fail("The build for project $projectPath was expected to fail, but it succeeded.");
+            Assert.Fail($"The build for project {projectPath} was expected to fail, but it succeeded.");
         }
         else if (!isFailureExpected && buildResult.ExitCode != 0)
         {
-            Assert.Fail("The build for project $projectPath was expected to succeed, but it failed.");
+            Assert.Fail($"The build for project {projectPath} was expected to succeed, but it failed.");
         }
     }
 }
