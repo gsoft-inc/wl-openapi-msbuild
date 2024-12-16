@@ -8,12 +8,11 @@ on:
   push:
     branches:
       - "renovate/**"
-      - "feature/**"
 
 # Prevent duplicate runs if Renovate falls back to creating a PR
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
-#   cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 
 jobs:
   ci:
@@ -21,20 +20,6 @@ jobs:
 
 
     steps:
-      - name: Log GitHub Context Variables
-        run: |
-          echo "head_ref: ${{ github.head_ref }}"
-          echo "ref_name: ${{ github.ref_name }}"
-          echo "ref: ${{ github.ref }}"
-          echo "sha: ${{ github.sha }}"
-          echo "workflow: ${{ github.workflow }}"
-          echo "event_name: ${{ github.event_name }}"
-          echo "actor: ${{ github.actor }}"
-          echo "repository: ${{ github.repository }}"
-          echo "repository_owner: ${{ github.repository_owner }}"
-          echo "run_id: ${{ github.run_id }}"
-          echo "run_number: ${{ github.run_number }}"    
-
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
