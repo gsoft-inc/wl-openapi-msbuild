@@ -8,8 +8,8 @@ on:
   push:
     branches:
       - "renovate/**"
-      - "feature/**"
-  
+
+# Prevent duplicate runs if renovate fallback to create a PR
 concurrency:
   group: ${{ github.workflow }}-${{  github.head_ref || github.ref_name }}
   cancel-in-progress: true
