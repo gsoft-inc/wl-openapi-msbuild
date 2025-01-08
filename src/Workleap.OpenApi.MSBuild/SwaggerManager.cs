@@ -100,6 +100,18 @@ internal sealed class SwaggerManager : ISwaggerManager
             break;
         }
 
+        try
+        {
+            // Add the comment at the top of the generated YAML file
+            var comment = "# DO NOT EDIT. This is a generated file\n";
+            var yamlContent = File.ReadAllText(outputOpenApiSpecPath);
+            File.WriteAllText(outputOpenApiSpecPath, comment + yamlContent);
+        }
+        catch (Exception)
+        {
+            this._loggerWrapper.LogWarning($"Failed to add Do not edit to generated spec for {outputOpenApiSpecPath}.");
+        }
+
         return outputOpenApiSpecPath;
     }
 }
