@@ -6,6 +6,7 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class SwaggerManager : ISwaggerManager
 {
     private const string SwaggerVersion = "6.5.0";
+    private const string DoNotEditComment = "# DO NOT EDIT. This is a generated file\n";
     private const int MaxRetryCount = 3;
     private readonly IProcessWrapper _processWrapper;
     private readonly ILoggerWrapper _loggerWrapper;
@@ -100,18 +101,22 @@ internal sealed class SwaggerManager : ISwaggerManager
             break;
         }
 
+        this.PrependComment(outputOpenApiSpecPath, DoNotEditComment);
+
+        return outputOpenApiSpecPath;
+    }
+
+    private void PrependComment(string outputOpenApiSpecPath, string comment)
+    {
         try
         {
             // Add the comment at the top of the generated YAML file
-            var comment = "# DO NOT EDIT. This is a generated file\n";
             var yamlContent = File.ReadAllText(outputOpenApiSpecPath);
             File.WriteAllText(outputOpenApiSpecPath, comment + yamlContent);
         }
         catch (Exception)
         {
-            this._loggerWrapper.LogWarning($"Failed to add Do not edit to generated spec for {outputOpenApiSpecPath}.");
+            this._loggerWrapper.LogWarning($"Failed to add comment to generated spec for {outputOpenApiSpecPath}.");
         }
-
-        return outputOpenApiSpecPath;
     }
 }
