@@ -6,7 +6,8 @@ namespace Workleap.OpenApi.MSBuild;
 internal sealed class OasdiffManager : IOasdiffManager
 {
     // If the line below changes, make sure to update the corresponding regex on the renovate.json file
-    private const string OasdiffVersion = "2.1.2";
+    // Do not upgrade to v2.x as it is an older version with breaking changes
+    private const string OasdiffVersion = "1.10.27";
     private const string OasdiffDownloadUrlFormat = "https://github.com/Tufin/oasdiff/releases/download/v{0}/{1}";
 
     private readonly ILoggerWrapper _loggerWrapper;
