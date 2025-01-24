@@ -30,6 +30,10 @@ jobs:
         env:
           NUGET_AUTH_TOKEN: ${{ secrets.GSOFT_NUGET_API_KEY }}
 
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
       - run: ./Build.ps1
         shell: pwsh
         env:
