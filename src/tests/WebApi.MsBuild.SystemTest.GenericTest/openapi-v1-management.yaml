@@ -46,6 +46,8 @@ components:
           nullable: true
       additionalProperties: { }
     WeatherSource:
+      required:
+        - source
       type: object
       properties:
         source:
