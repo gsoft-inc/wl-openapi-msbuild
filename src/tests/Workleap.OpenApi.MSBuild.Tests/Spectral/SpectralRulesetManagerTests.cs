@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
 using Workleap.OpenApi.MSBuild.Spectral;
 using YamlDotNet.Serialization;
@@ -36,7 +36,7 @@ public class SpectralRulesetManagerTests
     public async Task Given_Custom_Hosted_Ruleset_When_GetLocalSpectralRulesetFile_Then_This_Ruleset()
     {
         // Given
-        var ruleset = "https://raw.githubusercontent.com/gsoft-inc/wl-api-guidelines/0.1.0/.spectral.yaml";
+        var ruleset = "https://raw.githubusercontent.com/workleap/wl-api-guidelines/0.1.0/.spectral.yaml";
         var expectedExtends = "spectral:oas";
         var expectedNumberOfRules = 10;
 
