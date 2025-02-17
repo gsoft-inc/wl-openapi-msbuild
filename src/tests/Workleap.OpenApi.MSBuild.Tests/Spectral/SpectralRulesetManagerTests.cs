@@ -64,7 +64,7 @@ public class SpectralRulesetManagerTests
     public async Task Given_Overriding_Ruleset_With_No_Extends_When_GetLocalSpectralRulesetFile_Then_Extends_With_Profile_Ruleset(string profile)
     {
         // Given
-        var expectedExtendsPatterns = new Regex($"https://raw\\.githubusercontent\\.com/gsoft-inc/wl-api-guidelines/(\\d+\\.\\d+\\.\\d+)/\\.spectral\\.{profile}\\.yaml");
+        var expectedExtendsPatterns = new Regex($"https://raw\\.githubusercontent\\.com/workleap/wl-api-guidelines/(\\d+\\.\\d+\\.\\d+)/\\.spectral\\.{profile}\\.yaml");
 
         var rulesetManager = new SpectralRulesetManager(new FakeLogger(), new HttpClientWrapper(), profile, OverridingRuleset);
 
